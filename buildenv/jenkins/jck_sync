@@ -1,0 +1,53 @@
+#!groovy
+
+def JCK_VERSION = params.JCK_VERSION ?: ""
+def ARTIFACTORY_TOKEN = params.ARTIFACTORY_TOKEN ?: ""
+def GIT_USER = params.GIT_USER ?: ""
+def GIT_TOKEN = params.GIT_TOKEN ?: ""
+def GIT_DEV_BRANCH = params.GIT_DEV_BRANCH ?: ""
+def JAVA_HOME = params.JAVA_HOME ?: ""
+
+def JCK_VERSION_FLAG = ""
+if (JCK_VERSION != "") {
+    JCK_VERSION_FLAG = "-j"
+}
+def ARTIFACTORY_TOKEN_FLAG =""
+if (ARTIFACTORY_TOKEN != "") {
+    ARTIFACTORY_TOKEN_FLAG = "-at"
+}
+def GIT_USER_FLAG = ""
+if (GIT_USER != "") {
+    GIT_USER_FLAG = "-u"
+}
+def GIT_TOKEN_FLAG =  ""
+if (GIT_TOKEN != "") {
+    GIT_TOKEN_FLAG = "-gt"
+}
+def GIT_DEV_BRANCH_FLAG =""
+if (GIT_DEV_BRANCH != "") {
+    GIT_DEV_BRANCH_FLAG = "-gb"
+}
+def JAVA_HOME_FLAG =""
+if (JAVA_HOME != "") {
+    JAVA_HOME_FLAG = "-java"
+}
+
+def command = "sh"
+def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent
+def scriptPath = "${scriptDir}/../../jck/jck-semiauto-updater/jckupdater.sh"
+
+def processBuilder = new ProcessBuilder(command, scriptPath, JCK_VERSION_FLAG,JCK_VERSION, ARTIFACTORY_TOKEN_FLAG, ARTIFACTORY_TOKEN, GIT_USER_FLAG, GIT_USER, GIT_TOKEN_FLAG, GIT_TOKEN, GIT_DEV_BRANCH_FLAG,GIT_DEV_BRANCH, JAVA_HOME_FLAG, JAVA_HOME)
+def process = processBuilder.start()
+
+def output = new StringBuilder()
+def reader = new BufferedReader(new InputStreamReader(process.getInputStream()))
+String line
+while ((line = reader.readLine()) != null) {
+    output.append(line).append('\n')
+}
+reader.close()
+
+int exitCode = process.waitFor()
+ println("Shell script executed with exit code:")
+ println("Script output:\n$output")
+
