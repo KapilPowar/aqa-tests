@@ -1,36 +1,18 @@
 #!groovy
 
-def JCK_VERSION = params.JCK_VERSION ?: ""
-def ARTIFACTORY_TOKEN = params.ARTIFACTORY_TOKEN ?: ""
-def GIT_USER = params.GIT_USER ?: ""
-def GIT_TOKEN = params.GIT_TOKEN ?: ""
-def GIT_DEV_BRANCH = params.GIT_DEV_BRANCH ?: ""
-def JAVA_HOME = params.JAVA_HOME ?: ""
+JCK_VERSION = params.JCK_VERSION ?: ""
+ARTIFACTORY_TOKEN = params.ARTIFACTORY_TOKEN ?: ""
+GIT_USER = params.GIT_USER ?: ""
+GIT_TOKEN = params.GIT_TOKEN ?: ""
+GIT_DEV_BRANCH = params.GIT_DEV_BRANCH ?: ""
+JAVA_HOME = params.JAVA_HOME ?: ""
 
-def JCK_VERSION_FLAG = ""
-if (JCK_VERSION != "") {
-    JCK_VERSION_FLAG = "-j"
-}
-def ARTIFACTORY_TOKEN_FLAG =""
-if (ARTIFACTORY_TOKEN != "") {
-    ARTIFACTORY_TOKEN_FLAG = "-at"
-}
-def GIT_USER_FLAG = ""
-if (GIT_USER != "") {
-    GIT_USER_FLAG = "-u"
-}
-def GIT_TOKEN_FLAG =  ""
-if (GIT_TOKEN != "") {
-    GIT_TOKEN_FLAG = "-gt"
-}
-def GIT_DEV_BRANCH_FLAG =""
-if (GIT_DEV_BRANCH != "") {
-    GIT_DEV_BRANCH_FLAG = "-gb"
-}
-def JAVA_HOME_FLAG =""
-if (JAVA_HOME != "") {
-    JAVA_HOME_FLAG = "-java"
-}
+JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
+ARTIFACTORY_TOKEN_FLAG = ARTIFACTORY_TOKEN ? "-at" : ""
+GIT_USER_FLAG = GIT_USER ? "-u" : ""
+GIT_TOKEN_FLAG = GIT_TOKEN ? "-gt" : ""
+GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
+JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
 
 def command = "sh"
 def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent
