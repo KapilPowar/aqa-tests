@@ -248,7 +248,7 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             echo "${currentDirectory}"
                             //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
-                            def filePath="${currentDirectory}/aqa-tests/jck/test/file.txt"
+                            def filePath="${currentDirectory}/aqa-tests/jck/jck-semiauto-updater/workspace/../../test/file.txt"
                             def fileContents = new File(filePath).text.trim()
                             def pr_number=fileContents.toInteger()
                             def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
