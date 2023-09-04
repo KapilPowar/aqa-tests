@@ -248,25 +248,22 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             echo "${currentDirectory}"
                             //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
-                            dir("${currentDirectory}/aqa-tests/jck/test"){
+                            dir("${currentDirectory}/aqa-tests/jck"){
                                 currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                                def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
-                                echo "List of Files:\n${lsOutput}"
+                                // def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
+                                // echo "List of Files:\n${lsOutput}"
                                 
-                                def filePath="${currentDirectory}/file.txt"
+                                def filePath="${currentDirectory}/test/file.txt"
                                 def version = readFile "${filePath}"
-                                println " --- ${version}"
-                                //def fileContents = new File(filePath).text.trim()
                                 def pr_number=version.toInteger()
-                                //def pr_number=4
-                                
                                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                                 println "Number from file: $pr_number"
+                                deleteDir("${currentDirectory}/test/")
                                 def comment = "Test comment from script"
                                 def curlCommand = """
                                 curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
                                     "body": "${comment}"
-                                }' "${comment_url}" 
+                                }' "${comment_url}"
                                 """ 
                                 println  "$curlCommand"
                                 //Execute the curl command using sh
