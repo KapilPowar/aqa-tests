@@ -263,6 +263,7 @@ def createComment() {
                 if (GIT_USER == "j9build"){
                     GIT_USER= "runtimes"
                 }
+                
                 JCK_VERSION = params.JDK_VERSION ?: ""
                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 echo "${currentDirectory}"
