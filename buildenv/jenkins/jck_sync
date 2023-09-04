@@ -278,10 +278,7 @@ def createComment() {
                 def pr_number=version.toInteger()
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 println "Number from file: $pr_number"
-                def comment = """
-                    Test comment from script
-                    Multiline comment
-                """
+                def comment = "Test comment from script "
                 def curlCommand = """
                 curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d "${comment}" "${comment_url}"
                 """
