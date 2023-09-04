@@ -118,19 +118,19 @@ def PLATFORM_MAP = [
     ],
 ]
 
-
-        def JCK_VERSION = params.JDK_VERSION ?: ""
-        def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ?: ""
-        def JAVA_HOME = params.JAVA_HOME ?: ""
-        def JAVA_SDK_URL = params.JAVA_SDK_URL ?: ""
-        def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
-        def JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
-        def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
-        def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
-        def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
-        def GIT_USER = params.GIT_USER ?: ""
-        def EXITCODE = 0
-
+environment{
+def JCK_VERSION = params.JDK_VERSION ?: ""
+def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ?: ""
+def JAVA_HOME = params.JAVA_HOME ?: ""
+def JAVA_SDK_URL = params.JAVA_SDK_URL ?: ""
+def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
+def JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
+def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
+def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
+def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
+def GIT_USER = params.GIT_USER ?: ""
+def EXITCODE = 0        
+}
 
 timestamps{
     stage('Setup') {
