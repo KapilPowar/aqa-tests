@@ -283,7 +283,7 @@ def createComment() {
                 curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
                    "body":"$comment"
                 }'
-                ${comment_url}
+                $comment_url
                 """
                 println  "$curlCommand"
 
