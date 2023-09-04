@@ -259,7 +259,11 @@ def syncJckMaterial(){
                                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                                 println "Number from file: $pr_number"
                                 def comment = "Test comment from script"
-                                def curlCommand = "curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{"body": "${comment}"}' "${comment_url}" "
+                                def curlCommand = """
+                                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
+                                    "body": "${comment}"
+                                }' "${comment_url}" 
+                                """
                                 println $curlCommand
                                 //Execute the curl command using sh
                                 def exitCode = sh(script: curlCommand, returnStatus: true)
