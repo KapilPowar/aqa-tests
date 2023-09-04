@@ -278,23 +278,24 @@ def createComment() {
                 def pr_number=version.toInteger()
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 println "Number from file: $pr_number"
-                def comment = """
-                Test comment from script
-                second line 
-                """
+                // def comment = """
+                // Test comment from script
+                // second line 
+                // """
+                def comment = "single line Test comment from script "
                 def commentPayload = [
                         body: comment
                     ]
                 def commentData = groovy.json.JsonOutput.toJson(commentPayload)
-
-                // def curlCommand = """
-                //     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
-                //     "body":"$comment" 
-                //     }' "$comment_url"
-                // """
+                println  "commentData -- $commentData"
                 def curlCommand = """
-                    curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d ' "$commentData"' "$comment_url"
+                    curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
+                    "body":"$comment" 
+                    }' "$comment_url"
                 """
+                // def curlCommand = """
+                //     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d ' "$commentData"' "$comment_url"
+                // """
                 println  "$curlCommand"
 
                 //Execute the curl command using sh
