@@ -280,7 +280,10 @@ def createComment() {
                 println "Number from file: $pr_number"
                 def comment = "Test comment from script "
                 def curlCommand = """
-                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d "${comment}" "${comment_url}"
+                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
+                   "body":"$comment"
+                }'
+                "${comment_url}"
                 """
                 println  "$curlCommand"
 
