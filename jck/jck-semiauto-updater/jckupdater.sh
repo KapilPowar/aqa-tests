@@ -11,7 +11,7 @@ DOWNLOAD_URL=""
 ARTIFACTORY_TOKEN=""
 GIT_REPO_NAME=""
 GIT_USER=""
-GIT_DEV_BRANCH="main"
+GIT_DEV_BRANCH="autoBranch"
 GIT_TOKEN=""
 JCK_FOLDER_SUFFIX=""
 JAVA_SDK_URL=""
@@ -99,7 +99,6 @@ setup(){
 	mkdir $GIT_REPO
 	mkdir $WORKSPACE/unpackjck
 	mkdir $WORKSPACE/jckmaterial
-	mkdir $WORKSPACE/java
 }
 
 
@@ -162,11 +161,14 @@ isLatestUpdate() {
 	
 	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
-		cleanup
-		exit 2
+		#clean up after testing
+		#get_JAVA_SDK
+		getJCKSources
+		# cleanup
+		# exit -1
 	else	
 		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
-		install_JAVA
+		get_JAVA_SDK
 		getJCKSources
 	fi
 }
@@ -202,30 +204,16 @@ getJCKSources() {
 }
 
 #install Java
-install_JAVA(){
+get_JAVA_SDK(){
 
-		if [ ${JAVA_SDK_URL} =="" ]; then
-			JAVA_SDK_URL="https://na-public.artifactory.swg-devops.com/artifactory/sys-rt-generic-local/hyc-runtimes-jenkins.swg-devops.com/build-scripts/jobs/jdk17/jdk17-linux-x64-openj9/44/ibm-semeru-open-jdk_x64_linux_JDK17_2021-09-25-14-44.tar.gz"
-		fi
-		echo "JAVA SDK URL --" $JAVA_SDK_URL
-		cd $WORKSPACE/java #download java in directory 
-		curl -LO -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} $JAVA_SDK_URL
-		# Extract the downloaded archive
-		tar_file=$(ls -1 | sort | head -n 1)
-		tar -zxvf $tar_file
-		# Clean up by removing the downloaded archive
-		rm -f $tar_file
-		# Get path to JAVA 
-		first_file=$(ls -1 | sort | head -n 1)
-		JAVA_SDK_PATH=$WORKSPACE/java/$first_file
+		cd $WORKSPACE/../../../../openjdkbinary/j2sdk-image
+		JAVA_SDK_PATH="$(pwd)"
 		echo $JAVA_SDK_PATH
-		echo "Java version --"
 		$JAVA_SDK_PATH/bin/java -version
 }
 
 #Unpack downloaded jar files 
 extract() {
-	
 	cd $WORKSPACE/jckmaterial
 	
   	echo "install downloaded resources"
@@ -233,8 +221,11 @@ extract() {
 	for f in $WORKSPACE/jckmaterial/*.jar; do
 		echo "Unpacking $f:"
 		
-		if [[ $JAVA_HOME != "" ]] ; then
-			$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
+		#using default java on machine for local
+		if [[ $JAVA_HOME = "" ]] ; then
+			#$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
+			java -version
+			java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
 		else
 			$JAVA_SDK_PATH/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
 		fi
@@ -252,7 +243,7 @@ gitClone()
 	cd $GIT_REPO
 	git init
 	git remote add origin git@github.ibm.com:$GIT_USER/"$GIT_REPO_NAME"
-	git remote add upstream git@github.ibm.com:runtimes/"$GIT_REPO_NAME"
+	git remote add upstream git@github.ibm.com:$GIT_USER/"$GIT_REPO_NAME" #change to runtimes after testing
 	git remote -v
 	git checkout -b $GIT_DEV_BRANCH
 	git fetch upstream main
@@ -326,14 +317,51 @@ createPR(){
 	title="JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH udpate"
 	body="This is a new pull request for the JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH udpate"
 	echo " Creating PR from $GIT_DEV_BRANCH to main branch"
-	curl -X POST \
+	url="https://api.github.ibm.com/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/pulls"
+
+	response=$(curl -X POST \
 	-H "Authorization: token $GIT_TOKEN" \
         -H "Content-Type: application/json" \
         -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"$GIT_USER:$GIT_DEV_BRANCH\",\"base\":\"main\"}" \
-        "https://api.github.ibm.com/repos/runtimes/JCK$JCK_VERSION-unzipped/pulls"
+        "$url")
+	
+	# Assuming $response contains the JSON response
+	#pr=$(echo "$response" | grep -o '"number":[0-9]*' | awk -F':' '{print $2}' | tr -d '," ')
+	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
+
+	# $pr_number now contains the PR number
+	echo "PR Number=$pr_number"
+
+	echo "Add comment to PR "
+	comment="Test comment from script"
+	comment_url="https://github.ibm.com/api/v3/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/issues/$pr_number/comments"
+	echo "comment_url -- $comment_url"
+
+	comment_response=$(curl -X POST \
+        -H "Authorization: token $GIT_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"body\":\"$comment\"}" \
+       	$comment_url)
 
 }
 
+test() {
+
+	echo "Inside jckupdater script"
+	response='{
+	"url": "https://github.ibm.com/api/v3/repos/kapil-powar/JCK8-unzipped/pulls/4",
+	"number": 4,
+	"id": 12262634
+	}'
+	echo "Response -- $response"
+	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
+
+	echo "PR -- $pr_number"
+	file_path="$WORKSPACE/../../test/file.txt"
+	mkdir -p "$(dirname "$file_path")"
+	touch "$file_path"
+	echo "$pr_number" > "$file_path"
+}
 
 cleanup() {
 	echo "Starting clean up dir $WORKSPACE and $GIT_REPO ........"
@@ -349,14 +377,15 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$GIT_USER" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$GIT_TOKEN" != "" ]  ; then
-	cleanup
-	setup
-	isLatestUpdate
-	extract
-	gitClone
-	copyFilestoGITRepo
-	checkChangesAndCommit
-	cleanup
+	# cleanup
+	# setup
+	# isLatestUpdate
+	# extract
+	# gitClone
+	# copyFilestoGITRepo
+	# checkChangesAndCommit
+	# cleanup
+	test
 else 
 	echo "Please provide missing arguments"
 	usage; exit 1

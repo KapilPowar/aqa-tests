@@ -118,8 +118,6 @@ def PLATFORM_MAP = [
     ],
 ]
 
-def PLATFORMS = params.PLATFORM.trim().split("\\s*,\\s*");
-
 timestamps{
     stage('Setup') {
             if (PLATFORM_MAP.containsKey(params.PLATFORM)) {
@@ -134,54 +132,26 @@ timestamps{
                 try {
                     def retry_count = 0
                     def sleep_time = 180
-
-                    // if (params.PLATFORM.contains('zos')) {
-                    //     /* Ensure correct CC env */
-                    //     env._CC_CCMODE = '1'
-                    //     env._CXX_CCMODE = '1'
-                    //     env._C89_CCMODE = '1'
-
-                    //     def gitConfig = scm.getUserRemoteConfigs()[0]
-                    //     def SCM_GIT_REPO = gitConfig.getUrl()
-                    //     def SCM_GIT_BRANCH = scm.branches[0].name
-
-                    //     // SCM_GIT_REPO value only gets expanded in sh
-                    //     def SCM_GIT_REPO_VAL = sh(script: "echo ${SCM_GIT_REPO}", returnStdout: true).trim()
-                    //     SCM_GIT_REPO_VAL = SCM_GIT_REPO_VAL.replace("https://github.com/","git@github.com:")
-
-                    //     retry(5) {
-                    //         if (retry_count > 0) {
-                    //             sleep(sleep_time)
-                    //         }
-                    //         retry_count++
-                    //         timeout(time: 1, unit: 'HOURS') {
-                    //             forceCleanWS()
-                    //         }
-                    //         sh "git clone -b ${SCM_GIT_BRANCH} ${SCM_GIT_REPO_VAL} aqa-tests"
-                    //     }
-                    // } else {
-                            def gitConfig = scm.getUserRemoteConfigs().get(0)
-
-                            // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
-                            ref_cache = "${env.HOME}/openjdk_cache"
-                            retry(5) {
-                                if (retry_count > 0) {
-                                    sleep(sleep_time)
-                                }
-                                retry_count++
-                                timeout(time: 1, unit: 'HOURS') {
-                                    forceCleanWS()
-                                }
-                                checkout scm: [$class: 'GitSCM',
-                                    branches: [[name: "${scm.branches[0].name}"]],
-                                    extensions: [
-                                        [$class: 'CleanBeforeCheckout'],
-                                        [$class: 'CloneOption', reference: ref_cache],
-                                        [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
-                                    userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
-                                ]
-                            }
-                        //}
+                    def gitConfig = scm.getUserRemoteConfigs().get(0)
+                    // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
+                    ref_cache = "${env.HOME}/openjdk_cache"
+                    retry(5) {
+                        if (retry_count > 0) {
+                            sleep(sleep_time)
+                        }
+                        retry_count++
+                        timeout(time: 1, unit: 'HOURS') {
+                            forceCleanWS()
+                        }
+                        checkout scm: [$class: 'GitSCM',
+                        branches: [[name: "${scm.branches[0].name}"]],
+                        extensions: [
+                            [$class: 'CleanBeforeCheckout'],
+                            [$class: 'CloneOption', reference: ref_cache],
+                            [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
+                        userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
+                        ]
+                        }
                      syncJckMaterial()
 
                     } catch (Exception e) {
@@ -194,55 +164,13 @@ timestamps{
                             currentBuild.result = 'FAILURE'
                         }
 
-                    } 
-                    // finally {
-                    //     if (params.SLACK_CHANNEL) {
-                    //         timeout(time: 5, unit: 'MINUTES') {
-                    //             if (currentBuild.result == 'FAILURE') {
-                    //                 println("${env.JOB_NAME} #${env.BUILD_NUMBER} result is FAILURE. Checking console log for specific errors...")
-                    //                 // create error list and regex can be used
-                    //                 List<String> errorList = new ArrayList<String>();
-                    //                 errorList.add(".*There is not enough space in the file system.*");
-                    //                 errorList.add(".*java.io.IOException: Cannot run program \"nohup\".*");
-
-                    //                 // nightly/weekly builds should not have git clone issue
-                    //                 if (!env.JOB_NAME.contains("Grinder") && !env.JOB_NAME.contains("_Personal")) {
-                    //                     errorList.add(".*ERROR: Error cloning remote repo.*");
-                    //                 }
-                    //                 checkErrors(errorList)
-                    //             }
-                    //         }
-                    //     }
-                    // }
-            }
-        } else {
-            assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
+                    }
+                }
+            } else {
+                assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
         }
     }
 }
-
-// def checkErrors(errorList) {
-//     def foundError = ""
-//     for (String error : errorList) {
-//         if (manager.logContains(error)) {
-//             foundError = error;
-//             break;
-//         }
-//     }
-//     if (foundError) {
-//         def message = "${env.JOB_NAME} #${env.BUILD_NUMBER} failed on ${NODE_NAME} due to ${foundError}: ${env.BUILD_URL} \nSet ${NODE_NAME} temporarily offline! ${env.JENKINS_URL}computer/${NODE_NAME}"
-//         def currentNode = Jenkins.instance.getNode(NODE_NAME).toComputer()
-//         // set the current node temporarily offline
-//         if (currentNode) {
-//             println("${message}")
-//             currentNode.setTemporarilyOffline(true, new hudson.slaves.OfflineCause.UserCause(User.current(), "${message}"))
-//         }
-//         // if SLACK_CHANNEL is provided, send the message in slack
-//         if (params.SLACK_CHANNEL) {
-//             slackSend channel: SLACK_CHANNEL, message: "${message}"
-//         }
-//     }
-// }
 
 def forceCleanWS() {
     try {
@@ -269,27 +197,32 @@ def syncJckMaterial(){
         def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
         def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
         def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
-        def EXITCODE = 1
+        def GIT_USER = params.GIT_USER ?: ""
+        def EXITCODE = 0
+        def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
 
         stage('Build') {
                 script {
+                        jenkinsfile.setup()
+
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
 						usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
-                        //using personal GIT ID
-                            usernamePassword(credentialsId: "${params.GIT_CREDENTIALS}",
-						usernameVariable: 'GIT_USER', passwordVariable: 'GIT_CREDENTIALS')
-                        //J9build creds which are secret text
-                            //string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+                            string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
                         ]) {
-                                //Clean after finalising the user ID
-                                //GIT_USER = "j9build"
+                                // IF no custom GIT user provided, use runtimes main repo for j9build.
+                                if (GIT_USER == "j9build"){
+                                    GIT_USER= "runtimes"
+                                }
+                                echo "GIT user -- ${GIT_USER}"
                                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                                 dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
                                         echo "${SCRIPT}"
-                                        EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
+                                        def scriptResult = sh(script: "${SCRIPT}", returnStatus: true)
+                                        EXITCODE = scriptResult
+                                        echo "EXITCODE= ${EXITCODE}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                         } else if (EXITCODE == 0) {
@@ -303,14 +236,52 @@ def syncJckMaterial(){
                         }
                     }
                 }
+                
+        stage( 'Splitter'){
+            script{
+                    withCredentials([
+                            string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+                        ]) {
+                            if (GIT_USER == "j9build"){
+                                    GIT_USER= "runtimes"
+                                }
+                            def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                            echo "${currentDirectory}"
+                            // def filePath=
+                            // def pr_number=
+                            // def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
+                
+                            // def comment = """
+                            // This is your comment.
+                            // You can write multiple lines here.
+                            // """
+                            // def curlCommand = """
+                            // curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
+                            // "body": "${comment}"
+                            // }' "${comment_url}"
+                            // """
+
+                            // Execute the curl command using sh
+                            //def exitCode = sh(script: curlCommand, returnStatus: true)
+
+                            // if (exitCode == 0) {
+                            //     echo "Comment added successfully."
+                            // } else {
+                            //     error "Failed to add a comment."
+                            // }
+                        }
+                    
+                }
+            }
+
         stage('SanityTest') {
                 script{
-                    if ( EXITCODE==0){
-                        jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
-                        jenkinsfile.testBuild()
+                    if (EXITCODE==0){
+                        jenkinsfile.addJobDescription()
+                        jenkinsfile.addGrinderLink()
+                        jenkinsfile.testExecution()
+                        jenkinsfile.terminateTestProcesses()
                     }
-                }  
+                }
         }
     }
-
-
