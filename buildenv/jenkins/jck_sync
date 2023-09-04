@@ -203,7 +203,7 @@ def syncJckMaterial(){
 
         stage('Build') {
                 script {
-                        jenkinsfile.setup()
+                        //jenkinsfile.setup()
 
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -236,7 +236,7 @@ def syncJckMaterial(){
                         }
                     }
                 }
-                
+
         stage( 'Splitter'){
             script{
                     withCredentials([
@@ -247,41 +247,42 @@ def syncJckMaterial(){
                                 }
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             echo "${currentDirectory}"
-                            // def filePath=
-                            // def pr_number=
-                            // def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
-                
-                            // def comment = """
-                            // This is your comment.
-                            // You can write multiple lines here.
-                            // """
-                            // def curlCommand = """
-                            // curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
-                            // "body": "${comment}"
-                            // }' "${comment_url}"
-                            // """
+                            def filePath="${currentDirectory}/aqa-tests/jck/test/file.txt"
+                            def fileContents = new File(filePath).text.trim()
+                            def pr_number=fileContents.toInteger()
+                            def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
+                            println "Number from file: $pr_number"
+                            def comment = """
+                            This is your comment.
+                            You can write multiple lines here.
+                            """
+                            def curlCommand = """
+                            curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
+                            "body": "${comment}"
+                            }' "${comment_url}"
+                            """
 
-                            // Execute the curl command using sh
-                            //def exitCode = sh(script: curlCommand, returnStatus: true)
+                            Execute the curl command using sh
+                            def exitCode = sh(script: curlCommand, returnStatus: true)
 
-                            // if (exitCode == 0) {
-                            //     echo "Comment added successfully."
-                            // } else {
-                            //     error "Failed to add a comment."
-                            // }
+                            if (exitCode == 0) {
+                                echo "Comment added successfully."
+                            } else {
+                                error "Failed to add a comment."
+                            }
                         }
                     
                 }
             }
 
-        stage('SanityTest') {
-                script{
-                    if (EXITCODE==0){
-                        jenkinsfile.addJobDescription()
-                        jenkinsfile.addGrinderLink()
-                        jenkinsfile.testExecution()
-                        jenkinsfile.terminateTestProcesses()
-                    }
-                }
-        }
+        // stage('SanityTest') {
+        //         script{
+        //             if (EXITCODE==0){
+        //                 jenkinsfile.addJobDescription()
+        //                 jenkinsfile.addGrinderLink()
+        //                 jenkinsfile.testExecution()
+        //                 jenkinsfile.terminateTestProcesses()
+        //             }
+        //         }
+        // }
     }
