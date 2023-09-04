@@ -118,20 +118,6 @@ def PLATFORM_MAP = [
     ],
 ]
 
-env{
-def JCK_VERSION = params.JDK_VERSION ?: ""
-def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ?: ""
-def JAVA_HOME = params.JAVA_HOME ?: ""
-def JAVA_SDK_URL = params.JAVA_SDK_URL ?: ""
-def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
-def JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
-def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
-def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
-def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
-def GIT_USER = params.GIT_USER ?: ""
-def EXITCODE = 0        
-}
-
 timestamps{
     stage('Setup') {
             if (PLATFORM_MAP.containsKey(params.PLATFORM)) {
@@ -201,7 +187,19 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
+        def JCK_VERSION = params.JDK_VERSION ?: ""
+        def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ?: ""
+        def JAVA_HOME = params.JAVA_HOME ?: ""
+        def JAVA_SDK_URL = params.JAVA_SDK_URL ?: ""
+        def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
+        def JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
+        def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
+        def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
+        def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
+        def GIT_USER = params.GIT_USER ?: ""
+        def EXITCODE = 0    
         def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
+
         stage('Build') {
                 script {
                     
@@ -220,7 +218,7 @@ def syncJckMaterial(){
                                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                                 dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                        def SCRIPT = "./jckupdater.sh ${env.JCK_VERSION_FLAG} ${env.JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${env.GIT_DEV_BRANCH_FLAG} ${env.GIT_DEV_BRANCH} ${env.JAVA_HOME_FLAG} ${env.JAVA_HOME} ${env.JAVA_SDK_URL_FLAG} ${env.JAVA_SDK_URL}"
+                                        def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
                                         echo "${SCRIPT}"
                                         EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
                                         //EXITCODE = scriptResult
@@ -265,6 +263,7 @@ def createComment() {
                 if (GIT_USER == "j9build"){
                     GIT_USER= "runtimes"
                 }
+                JCK_VERSION = params.JDK_VERSION ?: ""
                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 echo "${currentDirectory}"
                 //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
@@ -276,7 +275,7 @@ def createComment() {
                 def filePath="${currentDirectory}/test/file.txt"
                 def version = readFile "${filePath}"
                 def pr_number=version.toInteger()
-                def comment_url="https://github.ibm.com/api/v3/repos/${env.GIT_USER}/JCK${env.JCK_VERSION}-unzipped/issues/${pr_number}/comments"
+                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 println "Number from file: $pr_number"
                 def comment = """
                     Test comment from script
