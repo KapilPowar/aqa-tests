@@ -247,6 +247,7 @@ def syncJckMaterial(){
                                 }
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             echo "${currentDirectory}"
+                            //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
                             def filePath="${currentDirectory}/aqa-tests/jck/test/file.txt"
                             def fileContents = new File(filePath).text.trim()
                             def pr_number=fileContents.toInteger()
