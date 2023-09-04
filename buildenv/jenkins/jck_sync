@@ -287,9 +287,9 @@ def createComment() {
                     ]
                 def commentData = groovy.json.JsonOutput.toJson(commentPayload)
                 def curlCommand = """
-                    curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
-                    "body":"$comment" 
-                    }' "$commentData"
+                    curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d ' 
+                    "$comment"
+                    ' "$commentData"
                 """
                 println  "$curlCommand"
 
