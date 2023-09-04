@@ -364,6 +364,7 @@ test() {
 	echo "$pr_number" > "$file_path"
 	echo "file contents--"
 	cat "$file_path"
+	chmod 0777 $file_path
 }
 
 cleanup() {
