@@ -282,8 +282,9 @@ def createComment() {
                     Test comment from script
                     Multiline comment
                 """
-                def curlCommand = "curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d "${comment}" "${comment_url}" "
-                
+                def curlCommand = """
+                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d "${comment}" "${comment_url}"
+                """
                 println  "$curlCommand"
 
                 //Execute the curl command using sh
