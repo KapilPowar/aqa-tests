@@ -292,17 +292,17 @@ def createComment() {
                 //Execute the curl command using sh
                 def exitCode = sh(script: curlCommand, returnStatus: true)
 
-                def attachmentContent = readFile(filePath).trim()
-                def attachmentPayload = [
-                        body: attachmentContent,
-                        content_type: 'text/plain'
-                    ]
-                sh """
-                        curl -X POST -H "Authorization: ${GIT_CREDENTIALS}" \\
-                            -H "Accept: application/vnd.github.v3+json" \\
-                            -d '${attachmentPayload as groovy.json.JsonOutput}' \\
-                            "${comment_url}"
-                    """
+                // def attachmentContent = readFile(filePath).trim()
+                // def attachmentPayload = [
+                //         body: attachmentContent,
+                //         content_type: 'text/plain'
+                //     ]
+                // sh """
+                //         curl -X POST -H "Authorization: ${GIT_CREDENTIALS}" \\
+                //             -H "Accept: application/vnd.github.v3+json" \\
+                //             -d '${attachmentPayload as groovy.json.JsonOutput}' \\
+                //             "${comment_url}"
+                //     """
                 
                 if (exitCode == 0) {
                     echo "Comment added successfully."
