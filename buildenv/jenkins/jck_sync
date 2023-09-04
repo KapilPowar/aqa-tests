@@ -263,8 +263,8 @@ def syncJckMaterial(){
                                 curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
                                     "body": "${comment}"
                                 }' "${comment_url}" 
-                                """
-                                println $curlCommand
+                                """ 
+                                println  "$curlCommand"
                                 //Execute the curl command using sh
                                 def exitCode = sh(script: curlCommand, returnStatus: true)
 
