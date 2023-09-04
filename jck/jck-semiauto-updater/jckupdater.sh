@@ -360,6 +360,7 @@ test() {
 	file_path="$WORKSPACE/../../test/file.txt"
 	mkdir -p "$(dirname "$file_path")"
 	touch "$file_path"
+	echo "file path -- $file_path"
 	echo "$pr_number" > "$file_path"
 	echo "file contents--"
 	cat "$file_path"
