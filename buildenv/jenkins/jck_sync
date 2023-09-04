@@ -220,8 +220,8 @@ def syncJckMaterial(){
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
                                         echo "${SCRIPT}"
-                                        def scriptResult = sh(script: "${SCRIPT}", returnStatus: true)
-                                        EXITCODE = scriptResult
+                                        EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
+                                        //EXITCODE = scriptResult
                                         echo "EXITCODE= ${EXITCODE}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
@@ -233,49 +233,13 @@ def syncJckMaterial(){
                                     }
                                    
                                 }
-                        }
+                            }
                     }
                 }
 
         stage( 'Splitter'){
             script{
-                    withCredentials([
-                            string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
-                        ]) {
-                            if (GIT_USER == "j9build"){
-                                    GIT_USER= "runtimes"
-                                }
-                            def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                            echo "${currentDirectory}"
-                            //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
-                            dir("${currentDirectory}/aqa-tests/jck"){
-                                currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                                // def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
-                                // echo "List of Files:\n${lsOutput}"
-                                
-                                def filePath="${currentDirectory}/test/file.txt"
-                                def version = readFile "${filePath}"
-                                def pr_number=version.toInteger()
-                                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
-                                println "Number from file: $pr_number"
-                                deleteDir("${currentDirectory}/test/")
-                                def comment = "Test comment from script"
-                                def curlCommand = """
-                                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
-                                    "body": "${comment}"
-                                }' "${comment_url}"
-                                """ 
-                                println  "$curlCommand"
-                                //Execute the curl command using sh
-                                def exitCode = sh(script: curlCommand, returnStatus: true)
-
-                                if (exitCode == 0) {
-                                    echo "Comment added successfully."
-                                } else {
-                                    error "Failed to add a comment."
-                                }
-                            }
-                        }
+                    createComment()
                     
                 }
             }
@@ -291,3 +255,58 @@ def syncJckMaterial(){
         //         }
         // }
     }
+
+def createComment() {
+            withCredentials([
+                string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+            ]) {
+                if (GIT_USER == "j9build"){
+                    GIT_USER= "runtimes"
+                }
+                def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                echo "${currentDirectory}"
+                //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
+                dir("${currentDirectory}/aqa-tests/jck"){
+                currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                // def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
+                // echo "List of Files:\n${lsOutput}"
+                                
+                def filePath="${currentDirectory}/test/file.txt"
+                def version = readFile "${filePath}"
+                def pr_number=version.toInteger()
+                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
+                println "Number from file: $pr_number"
+                def comment = """
+                    Test comment from script
+                    Multiline comment
+                """
+                def curlCommand = """
+                curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{
+                    "body": "${comment}"
+                }' "${comment_url}"
+                """ 
+                println  "$curlCommand"
+
+                //Execute the curl command using sh
+                def exitCode = sh(script: curlCommand, returnStatus: true)
+
+                def attachmentContent = readFile(filePath).trim()
+                def attachmentPayload = [
+                        body: attachmentContent,
+                        content_type: 'text/plain'
+                    ]
+                sh """
+                        curl -X POST -H "Authorization: ${GIT_CREDENTIALS}" \\
+                            -H "Accept: application/vnd.github.v3+json" \\
+                            -d '${attachmentPayload as groovy.json.JsonOutput}' \\
+                            "${comment_url}"
+                    """
+                
+                if (exitCode == 0) {
+                    echo "Comment added successfully."
+                } else {
+                        error "Failed to add a comment."
+                }
+            }
+        }
+}
