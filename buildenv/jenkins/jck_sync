@@ -309,12 +309,6 @@ def createComment(TestComment) {
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 def comment = "${TestComment}"
                 println  "comment -- $comment"
-                // def commentPayload = [
-                //         body: comment
-                //     ]
-                // def commentData = groovy.json.JsonOutput.toJson(commentPayload)
-                // println  "commentData -- $commentData"
-                //def file="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
                     "body":"$comment" 
@@ -325,18 +319,23 @@ def createComment(TestComment) {
                 //Execute the curl command using sh
                 def exitCode = sh(script: curlCommand, returnStatus: true)
 
-                // def attachmentContent = readFile(filePath).trim()
-                // def attachmentPayload = [
-                //         body: attachmentContent,
-                //         content_type: 'text/plain'
-                //     ]
-                // sh """
-                //         curl -X POST -H "Authorization: ${GIT_CREDENTIALS}" \\
-                //             -H "Accept: application/vnd.github.v3+json" \\
-                //             -d '${attachmentPayload as groovy.json.JsonOutput}' \\
-                //             "${comment_url}"
-                //     """
-                
+                def filePath = "${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/text.log"
+                def fileContentBase64 = filePath.bytes.encodeBase64().toString()
+                def curlCommand1 = """
+                    curl -X POST \
+                        -H "Authorization: token ${GIT_CREDENTIALS}" \
+                        -H "Content-Type: application/json" \
+                        -d '{
+                            "body": "$comment",
+                            "in_reply_to": null,
+                            "attachment": {
+                                "data": "$fileContentBase64",
+                                "name": "${filePath.substring(filePath.lastIndexOf('/') + 1)}",
+                                "mime_type": "text/plain"
+                            }
+                        }' \
+                        "$commentUrl"
+                """
                 if (exitCode == 0) {    
                     echo "Comment added successfully."
                 } else {
