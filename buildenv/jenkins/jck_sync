@@ -314,11 +314,9 @@ def createComment(TestComment) {
                 
                 JCK_VERSION = params.JDK_VERSION ?: ""
                 def pr_number = getPRNumber()
-                //getting PR number --move it to diff function
                 println "PR number returned is $pr_number" 
                 //def pr_number=4
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
-                //println "Number from file: $pr_number"
                 def comment = "${TestComment}"
                 println  "comment -- $comment"
                 // def commentPayload = [
@@ -326,10 +324,12 @@ def createComment(TestComment) {
                 //     ]
                 // def commentData = groovy.json.JsonOutput.toJson(commentPayload)
                 // println  "commentData -- $commentData"
+                def file="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
                     "body":"$comment" 
-                    }' "$comment_url"
+                    }' --data-binary "${file}/test.log"
+                    "$comment_url"
                 """
                 // def curlCommand = """
                 //     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d ' "$commentData"' "$comment_url"
@@ -351,7 +351,7 @@ def createComment(TestComment) {
                 //             "${comment_url}"
                 //     """
                 
-                if (exitCode == 0) {
+                if (exitCode == 0) {    
                     echo "Comment added successfully."
                 } else {
                     error "Failed to add a comment."
@@ -360,25 +360,13 @@ def createComment(TestComment) {
         }
 
 def getPRNumber(){
-                //def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 def pr_number=0
-                //echo "${currentDirectory}"
-                //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
                 def directory="${WORKSPACE}/aqa-tests/jck/test"
                 echo " file path --${directory}"
                 def filePath="${directory}/file.txt"
                 def version = readFile "${filePath}"
                 pr_number=version.toInteger()
                 echo "PR Number ${pr_number}"
-                return pr_number
-                
-                // dir("${directory}"){
-                // def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                // // def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
-                // // echo "List of Files:\n${lsOutput}"
-                                
-                
-                // }
-                
+                return pr_number                
 }
 
