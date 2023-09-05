@@ -275,7 +275,7 @@ def target_JCK_Folder(){
                          def logFile = "test.log"
                                         echo "${SCRIPT}"
                                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                                        echo "${logfile}"
+                                        echo "${logFile}"
                                         echo "${EXITCODE}"
 
                     }
