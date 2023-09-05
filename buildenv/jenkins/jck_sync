@@ -252,23 +252,23 @@ def syncJckMaterial(){
                 }
             }
 
-        stage('SanityTest') {
-            when{
-                expression {
-                    return EXITCODE==0
-                }
-            }
-                script{
-                    //if (EXITCODE==0){
-                        //def test_job="Grinder_JCK"
-                        // jenkinsfile.addJobDescription()
-                        // jenkinsfile.addGrinderLink()
-                        // jenkinsfile.testExecution()
-                        // jenkinsfile.terminateTestProcesses()
-                        //build job: test_job, parameters: childParams
-                   //}
-                }
-        }
+        // stage('SanityTest') {
+        //     when{
+        //         expression {
+        //             return EXITCODE==0
+        //         }
+        //     }
+        //         script{
+        //             //if (EXITCODE==0){
+        //                 //def test_job="Grinder_JCK"
+        //                 // jenkinsfile.addJobDescription()
+        //                 // jenkinsfile.addGrinderLink()
+        //                 // jenkinsfile.testExecution()
+        //                 // jenkinsfile.terminateTestProcesses()
+        //                 //build job: test_job, parameters: childParams
+        //            //}
+        //         }
+        // }
     }
 
 def target_JCK_Folder(){
