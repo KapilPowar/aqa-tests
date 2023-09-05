@@ -258,15 +258,15 @@ def syncJckMaterial(){
 
 def target_JCK_Folder(){
                 //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
-                def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                echo "${currentDirectory}"
+                // def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                // echo "${currentDirectory}"
                 def TEST_JDK_HOME="${WORKSPACE}/openjdkbinary/j2sdk-image"
                 def comment="TEST comment"
                 //running script jck_target_folder_check.sh
                 
                 dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                        def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${currentDirectory} "
+                        def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE}"
                         def logFile = "test.log"
                         def specificLine = "Total new folders detected : 0"
                         
@@ -306,7 +306,6 @@ def createComment(TestComment) {
                 JCK_VERSION = params.JDK_VERSION ?: ""
                 def pr_number = getPRNumber()
                 println "PR number returned is $pr_number" 
-                //def pr_number=4
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 def comment = "${TestComment}"
                 println  "comment -- $comment"
@@ -321,9 +320,6 @@ def createComment(TestComment) {
                     "body":"$comment" 
                     }' "$comment_url"
                 """
-                // def curlCommand = """
-                //     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d ' "$commentData"' "$comment_url"
-                // """
                 println  "$curlCommand"
 
                 //Execute the curl command using sh
@@ -347,7 +343,7 @@ def createComment(TestComment) {
                     error "Failed to add a comment."
                 }
             }
-        }
+}
 
 def getPRNumber(){
                 def pr_number=0
