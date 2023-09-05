@@ -334,26 +334,26 @@ def createComment(TestComment) {
                 //Execute the curl command using sh
                 def exitCode = sh(script: curlCommand, returnStatus: true)
 
-                def filePath = "${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/text.log"
-                def fileContentBase64 = filePath.bytes.encodeBase64().toString()
-                def curlCommand1 = """
-                    curl -X POST \
-                        -H "Authorization: token ${GIT_CREDENTIALS}" \
-                        -H "Content-Type: application/json" \
-                        -d '{
-                            "body": "$comment",
-                            "in_reply_to": null,
-                            "attachment": {
-                                "data": "$fileContentBase64",
-                                "name": "${filePath.substring(filePath.lastIndexOf('/') + 1)}",
-                                "mime_type": "text/plain"
-                            }
-                        }' \
-                        "$commentUrl"
-                """
+                // def filePath = "${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/text.log"
+                // def fileContentBase64 = filePath.bytes.encodeBase64().toString()
+                // def curlCommand1 = """
+                //     curl -X POST \
+                //         -H "Authorization: token ${GIT_CREDENTIALS}" \
+                //         -H "Content-Type: application/json" \
+                //         -d '{
+                //             "body": "$comment",
+                //             "in_reply_to": null,
+                //             "attachment": {
+                //                 "data": "$fileContentBase64",
+                //                 "name": "${filePath.substring(filePath.lastIndexOf('/') + 1)}",
+                //                 "mime_type": "text/plain"
+                //             }
+                //         }' \
+                //         "$commentUrl"
+                // """
 
-                def exitCode1 = sh(script: curlCommand1, returnStatus: true)
-                println "$exitCode1"
+                //def exitCode1 = sh(script: curlCommand1, returnStatus: true)
+                //println "$exitCode1"
                 if (exitCode == 0) {    
                     echo "Comment added successfully."
                 } else {
