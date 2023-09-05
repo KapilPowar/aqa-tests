@@ -203,7 +203,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     
-                        jenkinsfile.setup()
+                        //jenkinsfile.setup()
 
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -267,7 +267,7 @@ def target_JCK_Folder(){
                 //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 echo "${currentDirectory}"
-                def TEST_JDK_HOME="${currentDirectory}/openjdkbinary/j2sdk-image"
+                //def TEST_JDK_HOME="${currentDirectory}/openjdkbinary/j2sdk-image"
                 def comment="TEST comment"
                 //running script jck_target_folder_check.sh
                 
@@ -360,21 +360,25 @@ def createComment(TestComment) {
         }
 
 def getPRNumber(){
-                def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                //def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 def pr_number=0
-                echo "${currentDirectory}"
+                //echo "${currentDirectory}"
                 //home/jenkins/workspace/JCK_Sync/aqa-tests/jck/test/file.txt
-                def directory="${WORKSPACE}/aqa-tests/jck"
-                dir("${directory}"){
-                currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
-                echo "List of Files:\n${lsOutput}"
-                                
-                def filePath="${currentDirectory}/test/file.txt"
+                def directory="${WORKSPACE}/aqa-tests/jck/test"
+                echo " file path --${directory}"
+                def filePath="${directory}/file.txt"
                 def version = readFile "${filePath}"
                 pr_number=version.toInteger()
-                }
                 echo "PR Number ${pr_number}"
                 return pr_number
+                
+                // dir("${directory}"){
+                // def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                // // def lsOutput = sh(script: "ls -l ${currentDirectory}", returnStdout: true).trim()
+                // // echo "List of Files:\n${lsOutput}"
+                                
+                
+                // }
+                
 }
 
