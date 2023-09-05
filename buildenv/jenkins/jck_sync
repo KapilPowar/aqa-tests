@@ -203,7 +203,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     
-                        //jenkinsfile.setup()
+                        jenkinsfile.setup()
 
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -221,7 +221,6 @@ def syncJckMaterial(){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
                                         echo "${SCRIPT}"
                                         EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
-                                        //EXITCODE = scriptResult
                                         echo "EXITCODE= ${EXITCODE}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
