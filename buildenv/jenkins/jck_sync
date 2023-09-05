@@ -257,6 +257,37 @@ def syncJckMaterial(){
         // }
     }
 
+def target_JCK_Folder(){
+        withCredentials([
+                string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+            ]) {
+                if (GIT_USER == "j9build"){
+                    GIT_USER= "runtimes"
+                }
+                //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
+                def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                echo "${currentDirectory}"
+                TEST_JDK_HOME="${currentDirectory}/openjdkbinary/j2sdk-image"
+                
+                dir("${currentDirectory}/aqa-tests/jck/jck_target_folder_check") {
+                    sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+                         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${currentDirectory} "
+                         def logFile = "test.log"
+                                        echo "${SCRIPT}"
+                                        EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                                        echo "${logfile}"
+                                        echo "${EXITCODE}"
+
+                    }
+                    
+
+                }
+
+
+            }   
+
+}
+
 def createComment() {
             withCredentials([
                 string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
@@ -323,32 +354,3 @@ def createComment() {
         }
 }
 
-def target_JCK_Folder(){
-        withCredentials([
-                string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
-            ]) {
-                if (GIT_USER == "j9build"){
-                    GIT_USER= "runtimes"
-                }
-                //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
-                def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                echo "${currentDirectory}"
-                System.env.TEST_JDK_HOME="${currentDirectory}/openjdkbinary/j2sdk-image"
-                dir("${currentDirectory}/aqa-tests/jck/jck_target_folder_check") {
-                    sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${currentDirectory} "
-                         def logFile = "test.log"
-                                        echo "${SCRIPT}"
-                                        EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                                        echo "${logfile}"
-                                        echo "${EXITCODE}"
-
-                    }
-                    
-
-                }
-
-
-            }   
-
-}
