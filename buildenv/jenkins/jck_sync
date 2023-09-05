@@ -376,5 +376,4 @@ def createComment(TestComment) {
                 }
             }
         }
-}
 
