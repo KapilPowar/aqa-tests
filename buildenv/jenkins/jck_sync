@@ -258,48 +258,49 @@ def syncJckMaterial(){
     }
 
 def target_JCK_Folder(){
-        withCredentials([
-                string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
-            ]) {
-                if (GIT_USER == "j9build"){
-                    GIT_USER= "runtimes"
-                }
+        // withCredentials([
+        //         string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+        //     ]) {
+                // if (GIT_USER == "j9build"){
+                //     GIT_USER= "runtimes"
+                // }
                 //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 echo "${currentDirectory}"
                 def TEST_JDK_HOME="${currentDirectory}/openjdkbinary/j2sdk-image"
-                def comment=""
-
-                dir("${currentDirectory}/aqa-tests/jck/jck_target_folder_check") {
-                    sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                        def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${currentDirectory} "
-                        def logFile = "test.log"
-                        def specificLine = "Total new folders detected : 0"
+                def comment="TEST comment"
+                //running script jck_target_folder_check.sh
+                
+                // dir("${currentDirectory}/aqa-tests/jck/jck_target_folder_check") {
+                //     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+                //         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${currentDirectory} "
+                //         def logFile = "test.log"
+                //         def specificLine = "Total new folders detected : 0"
                         
-                        echo "${SCRIPT}"
+                //         echo "${SCRIPT}"
 
-                        EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                        sh "cat ${logFile}"
-                        echo "${EXITCODE}"
+                //         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                //         sh "cat ${logFile}"
+                //         echo "${EXITCODE}"
 
-                        // Use 'grep' to search for the specific line in the log file
-                        def grepCommand = "grep '${specificLine}' ${logFile}"
-                        def grepResult = sh(script: grepCommand, returnStatus: true)
+                //         // Use 'grep' to search for the specific line in the log file
+                //         def grepCommand = "grep '${specificLine}' ${logFile}"
+                //         def grepResult = sh(script: grepCommand, returnStatus: true)
                        
-                        if (grepResult == 0) {
-                        echo "Specific line found in the log file: '${specificLine}'"
-                        comment="No new folders detected. No need to update playlist.xml"
-                        //currentBuild.result = 'SUCCESS' // Mark the build as successful
-                        } else {
-                        echo "Specific line not found in the log file"
-                        comment="New folders detected. Need to update playlist.xml"
-                        //currentBuild.result = 'FAILURE' // Mark the build as failed
-                        }
-                    }
-                }
+                //         if (grepResult == 0) {
+                //         echo "Specific line found in the log file: '${specificLine}'"
+                //         comment="No new folders detected. No need to update playlist.xml"
+                //         //currentBuild.result = 'SUCCESS' // Mark the build as successful
+                //         } else {
+                //         echo "Specific line not found in the log file"
+                //         comment="New folders detected. Need to update playlist.xml"
+                //         //currentBuild.result = 'FAILURE' // Mark the build as failed
+                //         }
+                //     }
+                // }
 
             createComment(comment)
-            }   
+            //}   
 
 }
 
@@ -312,12 +313,12 @@ def createComment(TestComment) {
                 }
                 
                 JCK_VERSION = params.JDK_VERSION ?: ""
-                def pr = getPRNumber()
+                def pr_number = getPRNumber()
                 //getting PR number --move it to diff function
                 println "PR number returned is $pr" 
-                def pr_number=4
+                //def pr_number=4
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
-                println "Number from file: $pr_number"
+                //println "Number from file: $pr_number"
                 def comment = "${TestComment}"
                 println  "comment -- $comment"
                 // def commentPayload = [
