@@ -315,7 +315,7 @@ def createComment(TestComment) {
                 JCK_VERSION = params.JDK_VERSION ?: ""
                 def pr_number = getPRNumber()
                 //getting PR number --move it to diff function
-                println "PR number returned is $pr" 
+                println "PR number returned is $pr_number" 
                 //def pr_number=4
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 //println "Number from file: $pr_number"
