@@ -329,7 +329,7 @@ def target_JCK_Folder(){
                         // grep last few lines after Done! to create comment
                         def fileContents = readFile(file: logFile).trim()
                         def delimiter = 'Done!'
-                        def parts = fileContent.split(delimiter)
+                        def parts = fileContents.split(delimiter)
                         def linesAfterDone = parts[1].trim()
                         def lines = linesAfterDone.split('\n')
                         def newVariable = lines.collect { it.trim() }.join('\\r\\n')
