@@ -313,7 +313,7 @@ def target_JCK_Folder(){
                 dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE}"
-                        def logFile = "test.log"
+                        def logFile = "test.txt"
                         def specificLine = "Total new folders detected : 0"
                         
                         echo "${SCRIPT}"
