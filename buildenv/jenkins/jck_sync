@@ -163,7 +163,6 @@ timestamps{
                         } else {
                             currentBuild.result = 'FAILURE'
                         }
-
                     } finally {
                             timeout(time: 5, unit: 'MINUTES') {
                                 if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
@@ -176,25 +175,11 @@ timestamps{
                                     echo "Build status is unknown or unstable."
                                     currentBuild.result = "UNSTABLE"
                                 }
-                            //if (currentBuild.result == 'FAILURE') {
                                 def build_status=("${env.JOB_NAME} #${env.BUILD_NUMBER} result is $currentBuild.result .")
                                 println "$build_status"
-                                createComment(build_status)
-                                // create error list and regex can be used
-                                // List<String> errorList = new ArrayList<String>();
-                                // errorList.add(".*There is not enough space in the file system.*");
-                                // errorList.add(".*java.io.IOException: Cannot run program \"nohup\".*");
-
-                                // // nightly/weekly builds should not have git clone issue
-                                // if (!env.JOB_NAME.contains("Grinder") && !env.JOB_NAME.contains("_Personal")) {
-                                //     errorList.add(".*ERROR: Error cloning remote repo.*");
-                                // }
-                                // checkErrors(errorList)
-                            //}
-            }
-    }
-
-                }
+                                //createComment(build_status)
+                            }
+                    }
             } else {
                 assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
         }
@@ -230,11 +215,6 @@ def syncJckMaterial(){
         def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
         
         stage('Build') {
-            //  when{
-            //     expression {
-            //         return TEST==0
-            //     }
-            // }
                 script {
                     
                         //jenkinsfile.setup()
@@ -275,61 +255,50 @@ def syncJckMaterial(){
                     //createComment()
                     //def job_id = BUILD_URL
                     def comment="Test Jenkins job link $BUILD_URL"
-                    def text ="""
-                            Cleaning up generated target list..
-                                Done!
-                                --------------------------------------------------------
-                                    Cross-checking test folders under: compiler       
-                                --------------------------------------------------------
-                                Total new folders detected : 0
-                                --------------------------------------------------------
-                                    Cross-checking test folders under: runtime       
-                                --------------------------------------------------------
-                                Total new folders detected : 0
-                                Thu Aug 31 19:19:51 IST 2023
-                                Total process took ~ 0 seconds.
-                    """
-                    def doneIndex = text.indexOf("Done!")
-                        if (doneIndex != -1) {
-                            // Extract lines after "Done!"
-                            def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
-                            def lines = linesAfterDone.split('\n')
-                            def newVariable = lines.collect { it.trim() }.join('\\r\\n')
-                            comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
-                        }
-                    //echo "Specific line found in the log file: '${specificLine}'"
+                    // def text ="""
+                    //         Cleaning up generated target list..
+                    //             Done!
+                    //             --------------------------------------------------------
+                    //                 Cross-checking test folders under: compiler       
+                    //             --------------------------------------------------------
+                    //             Total new folders detected : 0
+                    //             --------------------------------------------------------
+                    //                 Cross-checking test folders under: runtime       
+                    //             --------------------------------------------------------
+                    //             Total new folders detected : 0
+                    //             Thu Aug 31 19:19:51 IST 2023
+                    //             Total process took ~ 0 seconds.
+                    // """
+                    // def doneIndex = text.indexOf("Done!")
+                    //     if (doneIndex != -1) {
+                    //         // Extract lines after "Done!"
+                    //         def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
+                    //         def lines = linesAfterDone.split('\n')
+                    //         def newVariable = lines.collect { it.trim() }.join('\\r\\n')
+                    //         comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
+                    //     }
+                    // //echo "Specific line found in the log file: '${specificLine}'"
                     
-                        //currentBuild.result = 'SUCCESS' // Mark the build as successful
+                    //     //currentBuild.result = 'SUCCESS' // Mark the build as successful
                        
-                    createComment(comment)
-                    //target_JCK_Folder()
+                    // createComment(comment)
+                    target_JCK_Folder()
                     
                 }
             }
 
-        //stage('SanityTest') {
-                //script{
-                    //if (EXITCODE==0){
-                        //def test_job="Grinder_JCK"
-                        // jenkinsfile.addJobDescription()
-                        // jenkinsfile.addGrinderLink()
-                        // jenkinsfile.testExecution()
-                        // jenkinsfile.terminateTestProcesses()
-                        //build job: test_job, parameters: childParams
-                   //}
-               // }
-       // }
-        // post {
-        //     if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
-        //         echo "Build was successful."
-        //     } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
-        //         echo "Build failed."
-        //     } else {
-        //         echo "Build status is unknown or unstable."
-        //     }
-        //     def comment="Test Jenkins job link $BUILD_URL with status $currentBuild.result "
-        //     createComment(comment)
-        // }
+    //    stage('SanityTest') {
+    //            script{
+    //                if (EXITCODE==0){
+    //                     def test_job="Grinder_JCK"
+    //                     jenkinsfile.addJobDescription()
+    //                     jenkinsfile.addGrinderLink()
+    //                     jenkinsfile.testExecution()
+    //                     jenkinsfile.terminateTestProcesses()
+    //                     build job: test_job, parameters: childParams
+    //               }
+    //           }
+    //   }
     }
 
 def target_JCK_Folder(){
@@ -356,15 +325,16 @@ def target_JCK_Folder(){
                         def grepCommand = "grep '${specificLine}' ${logFile}"
                         def grepResult = sh(script: grepCommand, returnStatus: true)
                         // grep last few lines after Done! to create comment
-                        def fileContents = readFile(file: filePath).trim()
+                        //def fileContents = readFile(file: filePath).trim()
+                        def fileContents = new File(logFile).text.trim()
                         def doneIndex = fileContents.indexOf("Done!")
                         if (doneIndex != -1) {
-                            // Extract lines after "Done!"
-                            def linesAfterDone = fileContents.substring(doneIndex + "Done!".length()).trim()
-                            def lines = linesAfterDone.split('\n')
-                            def newVariable = lines.collect { it.trim() }.join('\\r\\n')
+                                // Extract lines after "Done!"
+                                def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
+                                def lines = linesAfterDone.split('\n')
+                                def newVariable = lines.collect { it.trim() }.join('\\r\\n')
+                                //comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ``` "
                         }
-
                         if (grepResult == 0) {
                         echo "Specific line found in the log file: '${specificLine}'"
                         comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
