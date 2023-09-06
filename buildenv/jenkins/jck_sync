@@ -327,9 +327,9 @@ def target_JCK_Folder(){
                         def grepCommand = "grep '${specificLine}' ${logFile}"
                         def grepResult = sh(script: grepCommand, returnStatus: true)
                         // grep last few lines after Done! to create comment
-                        //def fileContents = readFile(file: filePath).trim()
+                        def fileContents = readFile(file: logFile).trim()
                         //def fileContents = new File(logFile).text.trim()
-                        def doneIndex = logFile.indexOf("Done!")
+                        def doneIndex = fileContents.indexOf("Done!")
                         if (doneIndex != -1) {
                                 // Extract lines after "Done!"
                                 def linesAfterDone = logFile.substring(doneIndex + "Done!".length()).trim()
