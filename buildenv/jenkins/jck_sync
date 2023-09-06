@@ -164,7 +164,26 @@ timestamps{
                             currentBuild.result = 'FAILURE'
                         }
 
-                    }
+                    } finally {
+                            timeout(time: 5, unit: 'MINUTES') {
+                            //if (currentBuild.result == 'FAILURE') {
+                                def build_status=("${env.JOB_NAME} #${env.BUILD_NUMBER} result is $currentBuild.result .")
+                                println "$build_status"
+                                createComment(build_status)
+                                // create error list and regex can be used
+                                // List<String> errorList = new ArrayList<String>();
+                                // errorList.add(".*There is not enough space in the file system.*");
+                                // errorList.add(".*java.io.IOException: Cannot run program \"nohup\".*");
+
+                                // // nightly/weekly builds should not have git clone issue
+                                // if (!env.JOB_NAME.contains("Grinder") && !env.JOB_NAME.contains("_Personal")) {
+                                //     errorList.add(".*ERROR: Error cloning remote repo.*");
+                                // }
+                                // checkErrors(errorList)
+                            //}
+            }
+    }
+
                 }
             } else {
                 assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
@@ -208,7 +227,7 @@ def syncJckMaterial(){
             // }
                 script {
                     
-                        jenkinsfile.setup()
+                        //jenkinsfile.setup()
 
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -246,7 +265,7 @@ def syncJckMaterial(){
                     //createComment()
                     //def job_id = BUILD_URL
                     def comment="Test Jenkins job link $BUILD_URL"
-                    createComment(comment)
+                    //createComment(comment)
                     //target_JCK_Folder()
                     
                 }
@@ -264,17 +283,17 @@ def syncJckMaterial(){
                    //}
                // }
        // }
-        post {
-            if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
-                echo "Build was successful."
-            } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
-                echo "Build failed."
-            } else {
-                echo "Build status is unknown or unstable."
-            }
-            def comment="Test Jenkins job link $BUILD_URL with status $currentBuild.result "
-            createComment(comment)
-        }
+        // post {
+        //     if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+        //         echo "Build was successful."
+        //     } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
+        //         echo "Build failed."
+        //     } else {
+        //         echo "Build status is unknown or unstable."
+        //     }
+        //     def comment="Test Jenkins job link $BUILD_URL with status $currentBuild.result "
+        //     createComment(comment)
+        // }
     }
 
 def target_JCK_Folder(){
