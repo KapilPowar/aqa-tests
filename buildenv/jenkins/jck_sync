@@ -331,7 +331,7 @@ def target_JCK_Folder(){
                         def doneIndex = fileContents.indexOf("Done!")
                         if (doneIndex != -1) {
                                 // Extract lines after "Done!"
-                                def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
+                                def linesAfterDone = logFile.substring(doneIndex + "Done!".length()).trim()
                                 def lines = linesAfterDone.split('\n')
                                 def newVariable = lines.collect { it.trim() }.join('\\r\\n')
                                 //comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ``` "
