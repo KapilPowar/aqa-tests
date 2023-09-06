@@ -292,7 +292,7 @@ def syncJckMaterial(){
                     def doneIndex = text.indexOf("Done!")
                         if (doneIndex != -1) {
                             // Extract lines after "Done!"
-                            def linesAfterDone = fileContents.substring(doneIndex + "Done!".length()).trim()
+                            def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
                             def lines = linesAfterDone.split('\n')
                             def newVariable = lines.collect { it.trim() }.join('\\r\\n')
                             comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
