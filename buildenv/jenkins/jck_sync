@@ -218,7 +218,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     
-                        //jenkinsfile.setup()
+                        jenkinsfile.setup()
 
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
