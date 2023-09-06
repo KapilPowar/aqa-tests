@@ -275,7 +275,31 @@ def syncJckMaterial(){
                     //createComment()
                     //def job_id = BUILD_URL
                     def comment="Test Jenkins job link $BUILD_URL"
-                    //createComment(comment)
+                    def text ="Cleaning up generated target list..
+                                Done!
+                                --------------------------------------------------------
+                                    Cross-checking test folders under: compiler       
+                                --------------------------------------------------------
+                                Total new folders detected : 0
+                                --------------------------------------------------------
+                                    Cross-checking test folders under: runtime       
+                                --------------------------------------------------------
+                                Total new folders detected : 0
+                                Thu Aug 31 19:19:51 IST 2023
+                                Total process took ~ 0 seconds."
+                    def doneIndex = text.indexOf("Done!")
+                        if (doneIndex != -1) {
+                            // Extract lines after "Done!"
+                            def linesAfterDone = fileContents.substring(doneIndex + "Done!".length()).trim()
+                            def lines = linesAfterDone.split('\n')
+                            def newVariable = lines.collect { it.trim() }.join('\\r\\n')
+                            comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
+                        }
+                    //echo "Specific line found in the log file: '${specificLine}'"
+                    
+                        //currentBuild.result = 'SUCCESS' // Mark the build as successful
+                       
+                    createComment(comment)
                     //target_JCK_Folder()
                     
                 }
@@ -329,14 +353,23 @@ def target_JCK_Folder(){
                         // Use 'grep' to search for the specific line in the log file
                         def grepCommand = "grep '${specificLine}' ${logFile}"
                         def grepResult = sh(script: grepCommand, returnStatus: true)
-                       
+                        // grep last few lines after Done! to create comment
+                        def fileContents = readFile(file: filePath).trim()
+                        def doneIndex = fileContents.indexOf("Done!")
+                        if (doneIndex != -1) {
+                            // Extract lines after "Done!"
+                            def linesAfterDone = fileContents.substring(doneIndex + "Done!".length()).trim()
+                            def lines = linesAfterDone.split('\n')
+                            def newVariable = lines.collect { it.trim() }.join('\\r\\n')
+                        }
+
                         if (grepResult == 0) {
                         echo "Specific line found in the log file: '${specificLine}'"
-                        comment="No new folders detected. No need to update playlist.xml"
+                        comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
                         //currentBuild.result = 'SUCCESS' // Mark the build as successful
                         } else {
                         echo "Specific line not found in the log file"
-                        comment="New folders detected. Need to update playlist.xml"
+                        comment="New folders detected. Need to update playlist.xml \\r\\n ``` ${newVariable} ``` "
                         //currentBuild.result = 'FAILURE' // Mark the build as failed
                         }
                     }
