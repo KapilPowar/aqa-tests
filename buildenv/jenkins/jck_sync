@@ -275,7 +275,8 @@ def syncJckMaterial(){
                     //createComment()
                     //def job_id = BUILD_URL
                     def comment="Test Jenkins job link $BUILD_URL"
-                    def text ="Cleaning up generated target list..
+                    def text ="""
+                            Cleaning up generated target list..
                                 Done!
                                 --------------------------------------------------------
                                     Cross-checking test folders under: compiler       
@@ -286,7 +287,8 @@ def syncJckMaterial(){
                                 --------------------------------------------------------
                                 Total new folders detected : 0
                                 Thu Aug 31 19:19:51 IST 2023
-                                Total process took ~ 0 seconds."
+                                Total process took ~ 0 seconds.
+                    """
                     def doneIndex = text.indexOf("Done!")
                         if (doneIndex != -1) {
                             // Extract lines after "Done!"
