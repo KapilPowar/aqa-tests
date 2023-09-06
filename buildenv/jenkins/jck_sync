@@ -180,6 +180,7 @@ timestamps{
                                 //createComment(build_status)
                             }
                     }
+                }
             } else {
                 assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
         }
