@@ -22,7 +22,7 @@ usage ()
 	echo '                [--artifactory_token|-at] : Token to access JCK artifactory: https://eu.artifactory.swg-devops.com/artifactory/jim-jck-generic-local.'
 	echo '                [--git_username|-u] : Indicate GIT username.'
 	echo '                [--git_token|-gt] : Git API Token to create PR.'
-	echo '                [--git_dev_branch|-gb ] :  Optional. GIT_DEV_BRANCH name to clone repo. Default is main'
+	echo '                [--git_dev_branch|-gb ] :  Optional. GIT_DEV_BRANCH name to clone repo. Default is autoBranch'
 	echo '                [--java_home|-java] : optional. JAVA_HOME path. '
 	echo '                [--java_sdk_url|-sdk_url] : optional. JAVA_SDK_URL to download JDK. Default is JDK17'
 
