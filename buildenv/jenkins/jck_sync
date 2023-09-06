@@ -245,30 +245,36 @@ def syncJckMaterial(){
             script{
                     //createComment()
                     //def job_id = BUILD_URL
-                    def comment="Test Jenkins job link $BUILD_URL/console"
+                    def comment="Test Jenkins job link $BUILD_URL"
                     createComment(comment)
                     //target_JCK_Folder()
                     
                 }
             }
 
-        // stage('SanityTest') {
-        //     when{
-        //         expression {
-        //             return EXITCODE==0
-        //         }
-        //     }
-        //         script{
-        //             //if (EXITCODE==0){
-        //                 //def test_job="Grinder_JCK"
-        //                 // jenkinsfile.addJobDescription()
-        //                 // jenkinsfile.addGrinderLink()
-        //                 // jenkinsfile.testExecution()
-        //                 // jenkinsfile.terminateTestProcesses()
-        //                 //build job: test_job, parameters: childParams
-        //            //}
-        //         }
-        // }
+        //stage('SanityTest') {
+                //script{
+                    //if (EXITCODE==0){
+                        //def test_job="Grinder_JCK"
+                        // jenkinsfile.addJobDescription()
+                        // jenkinsfile.addGrinderLink()
+                        // jenkinsfile.testExecution()
+                        // jenkinsfile.terminateTestProcesses()
+                        //build job: test_job, parameters: childParams
+                   //}
+               // }
+       // }
+        post {
+            if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+                echo "Build was successful."
+            } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
+                echo "Build failed."
+            } else {
+                echo "Build status is unknown or unstable."
+            }
+            def comment="Test Jenkins job link $BUILD_URL with status $currentBuild.result "
+            createComment(comment)
+        }
     }
 
 def target_JCK_Folder(){
