@@ -191,16 +191,16 @@ timestamps{
     }
 }
 
-def getGitRepoBranch(ownerBranch, defaultOwnerBranch, repo) {
+def getGitRepoBranch(defaultOwnerBranch, repo) {
 	String[] actualRepoBranch = defaultOwnerBranch.split(":")
-	if (ownerBranch) {
-		String[] tokens = ownerBranch.split(":")
-		if (tokens.size() == 2 ) {
-			actualRepoBranch = tokens;
-		} else {
-			error "[ERROR]: Wrong format of XXX_OWNER_BRANCH value: ${ownerBranch}. The expected format is [owner]:[branch]"
-		}
-	}
+	// if (ownerBranch) {
+	// 	String[] tokens = ownerBranch.split(":")
+	// 	if (tokens.size() == 2 ) {
+	// 		actualRepoBranch = tokens;
+	// 	} else {
+	// 		error "[ERROR]: Wrong format of XXX_OWNER_BRANCH value: ${ownerBranch}. The expected format is [owner]:[branch]"
+	// 	}
+	// }
 
 	String owner = actualRepoBranch[0].trim()
 	String repoURL = "https://github.com/${owner}/${repo}.git"
@@ -238,7 +238,7 @@ def syncJckMaterial(){
         def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
         def GIT_USER = params.GIT_USER ?: ""
         def EXITCODE = 0    
-        def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
+        //def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
         
         stage('Build') {
                 script {
@@ -249,7 +249,7 @@ def syncJckMaterial(){
                         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
                         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
                         OPENJ9_SHA_OPTION = (params.OPENJ9_SHA) ? "--openj9_sha ${params.OPENJ9_SHA}" : ""
-                        String[] tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
+                        String[] tkg = getGitRepoBranch("adoptium:master", "TKG")
                         TKG_REPO = tkg[0]
                         TKG_BRANCH = tkg[1]
                         // expect VENDOR_TEST_* to be comma separated string parameters
