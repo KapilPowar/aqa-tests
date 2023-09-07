@@ -120,26 +120,30 @@ def PLATFORM_MAP = [
 
 timestamps{
     stage('Setup') {
-            if (PLATFORM_MAP.containsKey(params.PLATFORM)) {
-                    SPEC = PLATFORM_MAP[params.PLATFORM]["SPEC"]
+            //if (PLATFORM_MAP.containsKey(params.PLATFORM)) {
+                   // SPEC = PLATFORM_MAP[params.PLATFORM]["SPEC"]
+                   SPEC = "linux_x86-64"
                     if (params.LABEL) {
                         LABEL = params.LABEL
                     } else {
-                        LABEL = PLATFORM_MAP[params.PLATFORM]["LABEL"]
+                        //LABEL = PLATFORM_MAP[params.PLATFORM]["LABEL"]
+                        LABEL = "ci.role.test&&hw.arch.x86&&sw.os.linux"
                     }
             node(LABEL) {
                 echo "clone the SCM GIT repo"
+                 println "SPEC: ${SPEC}"
+                println "LABEL: ${LABEL}"
                 try {
                     def retry_count = 0
                     def sleep_time = 180
                     def gitConfig = scm.getUserRemoteConfigs().get(0)
                     // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
                     ref_cache = "${env.HOME}/openjdk_cache"
-                    retry(5) {
-                        if (retry_count > 0) {
-                            sleep(sleep_time)
-                        }
-                        retry_count++
+                    //retry(5) {
+                        // if (retry_count > 0) {
+                        //     sleep(sleep_time)
+                        // }
+                        //retry_count++
                         timeout(time: 1, unit: 'HOURS') {
                             forceCleanWS()
                         }
@@ -151,7 +155,7 @@ timestamps{
                             [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
                         userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                         ]
-                        }
+                       // }
                      syncJckMaterial()
 
                     } catch (Exception e) {
@@ -181,9 +185,9 @@ timestamps{
                             }
                     }
                 }
-            } else {
-                assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
-        }
+        //     } else {
+        //         assert false : "Cannot find key PLATFORM: ${params.PLATFORM} in PLATFORM_MAP: ${PLATFORM_MAP}."
+        // }
     }
 }
 
@@ -218,8 +222,12 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     
-                        jenkinsfile.setup()
-
+                        //jenkinsfile.setup()
+                        dir("${WORKSPACE}/aqa-tests") {
+                        sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true) {
+                            sh "./get.sh"
+	                        }
+                        }
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
 						usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
@@ -283,23 +291,23 @@ def syncJckMaterial(){
                     //     //currentBuild.result = 'SUCCESS' // Mark the build as successful
                        
                     // createComment(comment)
-                    target_JCK_Folder()
+                   // target_JCK_Folder()
                     
                 }
             }
 
-    //    stage('SanityTest') {
-    //            script{
-    //                if (EXITCODE==0){
-    //                     def test_job="Grinder_JCK"
-    //                     jenkinsfile.addJobDescription()
-    //                     jenkinsfile.addGrinderLink()
-    //                     jenkinsfile.testExecution()
-    //                     jenkinsfile.terminateTestProcesses()
-    //                     build job: test_job, parameters: childParams
-    //               }
-    //           }
-    //   }
+       stage('SanityTest') {
+               script{
+                   if (EXITCODE==0){
+                        //def test_job="Grinder_JCK"
+                        // jenkinsfile.addJobDescription()
+                        // jenkinsfile.addGrinderLink()
+                        jenkinsfile.testExecution()
+                        // jenkinsfile.terminateTestProcesses()
+                        // build job: test_job, parameters: childParams
+                  }
+              }
+      }
     }
 
 def target_JCK_Folder(){
@@ -362,37 +370,14 @@ def createComment(TestComment) {
                 println "PR number returned is $pr_number" 
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
                 def comment = "${TestComment}"
-                println  "comment -- $comment"
+                //println  "comment -- $comment"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
                     "body":"$comment" 
                     }' "$comment_url"
                 """
-                println  "$curlCommand"
-
                 //Execute the curl command using sh
                 def exitCode = sh(script: curlCommand, returnStatus: true)
-
-                // def filePath = "${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/text.log"
-                // def fileContentBase64 = filePath.bytes.encodeBase64().toString()
-                // def curlCommand1 = """
-                //     curl -X POST \
-                //         -H "Authorization: token ${GIT_CREDENTIALS}" \
-                //         -H "Content-Type: application/json" \
-                //         -d '{
-                //             "body": "$comment",
-                //             "in_reply_to": null,
-                //             "attachment": {
-                //                 "data": "$fileContentBase64",
-                //                 "name": "${filePath.substring(filePath.lastIndexOf('/') + 1)}",
-                //                 "mime_type": "text/plain"
-                //             }
-                //         }' \
-                //         "$commentUrl"
-                // """
-
-                //def exitCode1 = sh(script: curlCommand1, returnStatus: true)
-                //println "$exitCode1"
                 if (exitCode == 0) {    
                     echo "Comment added successfully."
                 } else {
