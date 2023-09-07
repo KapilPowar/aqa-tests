@@ -308,7 +308,7 @@ def syncJckMaterial(){
                     //     //currentBuild.result = 'SUCCESS' // Mark the build as successful
                        
                     // createComment(comment)
-                    target_JCK_Folder()
+                    //target_JCK_Folder()
                     
                 }
             }
