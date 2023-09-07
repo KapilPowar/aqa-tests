@@ -352,8 +352,9 @@ def target_JCK_Folder(){
                 //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
                 // def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                 // echo "${currentDirectory}"
-                def TEST_JDK_HOME="${WORKSPACE}/openjdkbinary/j2sdk-image"
-                echo "TEST_JDK_HOME == ${TEST_JDK_HOME}"
+                env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
+                //def TEST_JDK_HOME="${WORKSPACE}/openjdkbinary/j2sdk-image"
+                echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
                 def comment="TEST comment"
                 //running script jck_target_folder_check.sh
                 
