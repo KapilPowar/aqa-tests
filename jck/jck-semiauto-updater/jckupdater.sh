@@ -206,7 +206,7 @@ getJCKSources() {
 #install Java
 get_JAVA_SDK(){
 
-		cd $WORKSPACE/../../../openjdkbinary/j2sdk-image
+		cd $WORKSPACE/../../../../openjdkbinary/j2sdk-image
 		JAVA_SDK_PATH="$(pwd)"
 		echo $JAVA_SDK_PATH
 		$JAVA_SDK_PATH/bin/java -version
@@ -381,8 +381,8 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$GIT_USER" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$GIT_TOKEN" != "" ]  ; then
-	# cleanup
-	# setup
+	 cleanup
+	 setup
 	# isLatestUpdate
 	# extract
 	# gitClone
