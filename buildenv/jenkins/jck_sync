@@ -249,6 +249,12 @@ def syncJckMaterial(){
                         String[] tkg = getGitRepoBranch("adoptium:master", "TKG")
                         TKG_REPO = tkg[0]
                         TKG_BRANCH = tkg[1]
+                        if(!params.USE_TESTENV_PROPERTIES){
+                            OPENJ9_REPO_OPTION = "--openj9_repo ${OPENJ9_REPO}"
+                            OPENJ9_BRANCH_OPTION = "--openj9_branch ${OPENJ9_BRANCH}"
+                            TKG_REPO_OPTION = "--tkg_repo ${TKG_REPO}"
+                            TKG_BRANCH_OPTION = "--tkg_branch ${TKG_BRANCH}"
+                        }
                         // expect VENDOR_TEST_* to be comma separated string parameters
                         // VENDOR_TEST_REPOS = (params.VENDOR_TEST_REPOS) ? "--vendor_repos \"${params.VENDOR_TEST_REPOS}\"" : ""
                         // VENDOR_TEST_BRANCHES = (params.VENDOR_TEST_BRANCHES) ? "--vendor_branches \"${params.VENDOR_TEST_BRANCHES}\"" : ""
