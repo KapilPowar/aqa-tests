@@ -331,8 +331,8 @@ createPR(){
 
 	# $pr_number now contains the PR number
 	echo "PR Number=$pr_number"
-	TEST_ENV="$pr_number"
-	echo "TEST_ENV== $TEST_ENV"
+	#TEST_ENV="$pr_number"
+	#echo "TEST_ENV== $TEST_ENV"
 
 	echo "Add comment to PR "
 	comment="Test comment from script"
@@ -358,7 +358,7 @@ test() {
 	echo "Response -- $response"
 	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
-	$TEST_ENV=$pr_number
+	$TEST_ENV="$pr_number"
 	echo "TEST_ENV== $TEST_ENV"
 	
 	echo "PR -- $pr_number"
