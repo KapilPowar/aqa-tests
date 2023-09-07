@@ -1,122 +1,122 @@
 #!groovy
 
-def PLATFORM_MAP = [
-    'arm_linux' : [
-        'SPEC' : 'linux_arm',
-        'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.aarch32',
-    ],
-    'aarch64_mac' : [
-        'SPEC' : 'osx_aarch64',
-        'LABEL' : 'ci.role.test&&hw.arch.aarch64&&(sw.os.osx||sw.os.mac)',
-    ],
-    'aarch64_linux' : [
-        'SPEC' : 'linux_aarch64',
-        'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.aarch64',
-    ],
-    'aarch64_windows' : [
-        'SPEC' : 'windows_aarch64',
-        'LABEL' : 'ci.role.test&&sw.os.windows&&hw.arch.aarch64',
-    ],
-    'aarch64_alpine-linux' : [
-        'SPEC' : 'alpine-linux_aarch64',
-        'LABEL' : 'ci.role.test&&hw.arch.aarch64&&sw.os.alpine-linux',
-    ],
-    'ppc32_aix' : [
-        'SPEC' : 'aix_ppc',
-        'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.aix',
-    ],
-    'ppc32_linux' : [
-        'SPEC' : 'linux_ppc',
-        'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.linux',
-    ],
-    'ppc64_aix' : [
-        'SPEC' : 'aix_ppc-64',
-        'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.aix',
-    ],
-    'ppc64_linux' : [
-        'SPEC' : 'linux_ppc-64',
-        'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.linux',
-    ],
-    'ppc64le_linux' : [
-        'SPEC' : 'linux_ppc-64_le',
-        'LABEL' : 'ci.role.test&&hw.arch.ppc64le&&sw.os.linux',
-        'DynamicAgents' : ['fyre']
-    ],
-    'riscv64_linux' : [
-        'SPEC' : 'linux_riscv64',
-        'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.riscv',
-        'DockerAgents' : ['default']
-    ],
-    'riscv64_linux_xl' : [
-        'SPEC' : 'linux_riscv64',
-        'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.riscv&&hw.bits.64',
-    ],
-    's390_linux' : [
-        'SPEC' : 'linux_390',
-        'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.linux&&hw.bits.32',
-    ],
-    's390x_linux_zt' : [
-        'SPEC' : 'linux_390-64_zt',
-        'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.linux',
-    ],
-    's390x_linux' : [
-        'SPEC' : 'linux_390-64',
-        'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.linux',
-    ],
-    's390x_zos' : [
-        'SPEC' : 'zos_390-64',
-        'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
-    ],
-    's390x_zos_xl' : [
-        'SPEC' : 'zos_390-64',
-        'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
-    ],
-    's390x_zos_zt' : [
-        'SPEC' : 'zos_390-64_zt',
-        'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.zos',
-    ],
-    's390_zos_zt' : [
-        'SPEC' : 'zos_390_zt',
-        'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.zos',
-    ],
-    's390_zos' : [
-        'SPEC' : 'zos_390',
-        'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
-    ],
-    'sparcv9_solaris' : [
-        'SPEC' : 'sunos_sparcv9-64',
-        'LABEL' : 'ci.role.test&&hw.arch.sparcv9&&sw.os.sunos',
-    ],
-    'x86-64_solaris' : [
-        'SPEC' : 'sunos_x86-64',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.sunos',
-    ],
-    'x86-64_alpine-linux' : [
-        'SPEC' : 'alpine-linux_x86-64',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.alpine-linux',
-    ],
-    'x86-32_linux' : [
-        'SPEC' : 'linux_x86',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.linux',
-    ],
-    'x86-32_windows' : [
-        'SPEC' : 'win_x86',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.windows',
-    ],
-    'x86-64_linux' : [
-        'SPEC' : 'linux_x86-64',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.linux',
-        'DynamicAgents' : ['azure', 'fyre']
-    ],
-    'x86-64_mac' : [
-        'SPEC' : 'osx_x86-64',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&(sw.os.osx||sw.os.mac)',
-    ],
-    'x86-64_windows' : [
-        'SPEC' : 'win_x86-64',
-        'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.windows',
-    ],
-]
+// def PLATFORM_MAP = [
+//     'arm_linux' : [
+//         'SPEC' : 'linux_arm',
+//         'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.aarch32',
+//     ],
+//     'aarch64_mac' : [
+//         'SPEC' : 'osx_aarch64',
+//         'LABEL' : 'ci.role.test&&hw.arch.aarch64&&(sw.os.osx||sw.os.mac)',
+//     ],
+//     'aarch64_linux' : [
+//         'SPEC' : 'linux_aarch64',
+//         'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.aarch64',
+//     ],
+//     'aarch64_windows' : [
+//         'SPEC' : 'windows_aarch64',
+//         'LABEL' : 'ci.role.test&&sw.os.windows&&hw.arch.aarch64',
+//     ],
+//     'aarch64_alpine-linux' : [
+//         'SPEC' : 'alpine-linux_aarch64',
+//         'LABEL' : 'ci.role.test&&hw.arch.aarch64&&sw.os.alpine-linux',
+//     ],
+//     'ppc32_aix' : [
+//         'SPEC' : 'aix_ppc',
+//         'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.aix',
+//     ],
+//     'ppc32_linux' : [
+//         'SPEC' : 'linux_ppc',
+//         'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.linux',
+//     ],
+//     'ppc64_aix' : [
+//         'SPEC' : 'aix_ppc-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.aix',
+//     ],
+//     'ppc64_linux' : [
+//         'SPEC' : 'linux_ppc-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.ppc64&&sw.os.linux',
+//     ],
+//     'ppc64le_linux' : [
+//         'SPEC' : 'linux_ppc-64_le',
+//         'LABEL' : 'ci.role.test&&hw.arch.ppc64le&&sw.os.linux',
+//         'DynamicAgents' : ['fyre']
+//     ],
+//     'riscv64_linux' : [
+//         'SPEC' : 'linux_riscv64',
+//         'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.riscv',
+//         'DockerAgents' : ['default']
+//     ],
+//     'riscv64_linux_xl' : [
+//         'SPEC' : 'linux_riscv64',
+//         'LABEL' : 'ci.role.test&&sw.os.linux&&hw.arch.riscv&&hw.bits.64',
+//     ],
+//     's390_linux' : [
+//         'SPEC' : 'linux_390',
+//         'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.linux&&hw.bits.32',
+//     ],
+//     's390x_linux_zt' : [
+//         'SPEC' : 'linux_390-64_zt',
+//         'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.linux',
+//     ],
+//     's390x_linux' : [
+//         'SPEC' : 'linux_390-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.linux',
+//     ],
+//     's390x_zos' : [
+//         'SPEC' : 'zos_390-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
+//     ],
+//     's390x_zos_xl' : [
+//         'SPEC' : 'zos_390-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
+//     ],
+//     's390x_zos_zt' : [
+//         'SPEC' : 'zos_390-64_zt',
+//         'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.zos',
+//     ],
+//     's390_zos_zt' : [
+//         'SPEC' : 'zos_390_zt',
+//         'LABEL' : 'ci.role.test&&hw.arch.znext&&sw.os.zos',
+//     ],
+//     's390_zos' : [
+//         'SPEC' : 'zos_390',
+//         'LABEL' : 'ci.role.test&&hw.arch.s390x&&sw.os.zos',
+//     ],
+//     'sparcv9_solaris' : [
+//         'SPEC' : 'sunos_sparcv9-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.sparcv9&&sw.os.sunos',
+//     ],
+//     'x86-64_solaris' : [
+//         'SPEC' : 'sunos_x86-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.sunos',
+//     ],
+//     'x86-64_alpine-linux' : [
+//         'SPEC' : 'alpine-linux_x86-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.alpine-linux',
+//     ],
+//     'x86-32_linux' : [
+//         'SPEC' : 'linux_x86',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.linux',
+//     ],
+//     'x86-32_windows' : [
+//         'SPEC' : 'win_x86',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.windows',
+//     ],
+//     'x86-64_linux' : [
+//         'SPEC' : 'linux_x86-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.linux',
+//         'DynamicAgents' : ['azure', 'fyre']
+//     ],
+//     'x86-64_mac' : [
+//         'SPEC' : 'osx_x86-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&(sw.os.osx||sw.os.mac)',
+//     ],
+//     'x86-64_windows' : [
+//         'SPEC' : 'win_x86-64',
+//         'LABEL' : 'ci.role.test&&hw.arch.x86&&sw.os.windows',
+//     ],
+// ]
 
 timestamps{
     stage('Setup') {
@@ -302,7 +302,7 @@ def syncJckMaterial(){
                         //def test_job="Grinder_JCK"
                         // jenkinsfile.addJobDescription()
                         // jenkinsfile.addGrinderLink()
-                        jenkinsfile.testExecution()
+                        //jenkinsfile.testExecution()
                         // jenkinsfile.terminateTestProcesses()
                         // build job: test_job, parameters: childParams
                   }

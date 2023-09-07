@@ -389,6 +389,7 @@ if [ "$JCK_VERSION" != "" ] && [ "$GIT_USER" != "" ] && [ "$ARTIFACTORY_TOKEN" !
 	# copyFilestoGITRepo
 	# checkChangesAndCommit
 	# cleanup
+	get_JAVA_SDK
 	test
 else 
 	echo "Please provide missing arguments"
