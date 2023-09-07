@@ -356,9 +356,9 @@ test() {
 	"id": 12262634
 	}'
 	echo "Response -- $response"
-	env.TEST_ENV=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
+	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
-	#env.TEST_ENV=${pr_number}
+	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
 	
 	#echo "PR -- $pr_number"

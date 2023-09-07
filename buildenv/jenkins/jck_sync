@@ -259,8 +259,11 @@ def syncJckMaterial(){
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
                                         echo "${SCRIPT}"
-                                        EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
-                                        echo "EXITCODE= ${EXITCODE}"
+                                        EXITCODE = sh(script: "${SCRIPT}", returnStdout: true, returnStatus: true)
+                                        def output = EXITCODE.trim() 
+                                        def exitStatus = result.exitStatus
+                                        echo "EXITCODE= ${exitStatus}"
+                                        echo "output = ${output}"
                                         echo "PR number TEST_ENV = ${env.TEST_ENV}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
