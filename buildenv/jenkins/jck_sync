@@ -253,6 +253,7 @@ def syncJckMaterial(){
                                     GIT_USER= "runtimes"
                                 }
                                 echo "GIT user -- ${GIT_USER}"
+                                env.TEST_ENV=""
                                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                                 dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
@@ -260,6 +261,7 @@ def syncJckMaterial(){
                                         echo "${SCRIPT}"
                                         EXITCODE = sh(script: "${SCRIPT}", returnStatus: true)
                                         echo "EXITCODE= ${EXITCODE}"
+                                        echo "PR number TEST_ENV = ${env.TEST_ENV}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                         } else if (EXITCODE == 0) {
