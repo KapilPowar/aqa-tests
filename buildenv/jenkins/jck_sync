@@ -241,7 +241,7 @@ def syncJckMaterial(){
                 script {
                     
                         //jenkinsfile.setup()
-                        getJavaSDK()
+                        //getJavaSDK()
                         
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",

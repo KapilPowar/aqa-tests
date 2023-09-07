@@ -358,7 +358,7 @@ test() {
 	echo "Response -- $response"
 	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
-	$TEST_ENV = "$pr_number"
+	TEST_ENV = $pr_number
 	echo "TEST_ENV== $TEST_ENV"
 	
 	echo "PR -- $pr_number"
@@ -386,15 +386,15 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$GIT_USER" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$GIT_TOKEN" != "" ]  ; then
-	 cleanup
-	 setup
+	 #cleanup
+	 #setup
 	# isLatestUpdate
 	# extract
 	# gitClone
 	# copyFilestoGITRepo
 	# checkChangesAndCommit
 	# cleanup
-	get_JAVA_SDK
+	#get_JAVA_SDK
 	test
 else 
 	echo "Please provide missing arguments"
