@@ -361,6 +361,7 @@ test() {
 	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
 	export TEST_ENV="$pr_number"
+	echo "TEST_ENV== $TEST_ENV"
 	#echo "PR -- $pr_number"
 	file_path="$WORKSPACE/../../test/file.txt"
 	mkdir -p "$(dirname "$file_path")"
