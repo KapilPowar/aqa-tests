@@ -133,7 +133,7 @@ setup() {
 		echo "Using existing test repo at: $workspace/test"
 	else 
 		echo "Git cloning test materials from $repo..."
-		git clone --depth 1 -q $repo $workspace/test
+		git clone --depth 1 -q -b script $repo $workspace/test
 		if [ $? != 0 ]; then 
 			exit 1
 		fi
