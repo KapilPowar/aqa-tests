@@ -340,8 +340,11 @@ def target_JCK_Folder(){
                         echo "directoryPath= ${directoryPath}"
                         dir("${WORKSPACE}"){
                             sh(script: "ls -l ", returnStatus: true) 
-                            sh(script: "cd test ", returnStatus: true)  
-                            sh(script: "ls -l ", returnStatus: true)  
+                            dir("${WORKSPACE}/test"){
+                                sh(script: "ls -l ", returnStatus: true) 
+                                }
+                            //sh(script: "cd test ", returnStatus: true)  
+                             
                         }
                         
                         // Use 'grep' to search for the specific line in the log file
