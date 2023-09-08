@@ -17,7 +17,8 @@ GIT_TOKEN=""
 JCK_FOLDER_SUFFIX=""
 
 usage ()
-{echo 'Usage : jckupdater.sh  [--jck_version|-j ] : Indicate JCK version to update.'
+{
+	echo 'Usage : jckupdater.sh  [--jck_version|-j ] : Indicate JCK version to update.'
 	echo '                [--artifactory_token|-at] : Token to access JCK artifactory: https://eu.artifactory.swg-devops.com/artifactory/jim-jck-generic-local.'
 	echo '                [--artifactory_url|-au] : Artifactory server URL to download JCK material'
 	echo '                [--jck-repo|-repo] : JCK GIT repo to update.'
