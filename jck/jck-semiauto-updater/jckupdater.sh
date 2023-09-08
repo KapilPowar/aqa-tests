@@ -365,7 +365,7 @@ test() {
 
 	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
-	echo "PR Number=${$pr_number}"
+	echo "PR Number=$pr_number"
 	export TEST_ENV="$pr_number"
 	echo "TEST_ENV== $TEST_ENV"
 	#echo "PR -- $pr_number"

@@ -271,7 +271,7 @@ def syncJckMaterial(){
                     //def comment="Test Jenkins job link $BUILD_URL"
                     
                     // createComment(comment)
-                    //target_JCK_Folder()
+                    target_JCK_Folder()
                     
                 }
             }
