@@ -333,13 +333,17 @@ def target_JCK_Folder(){
                         echo "${SCRIPT}"
 
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                        echo "${EXITCODE}"
                         sh "cat ${logFile}"
                         sh(script: "ls -l ", returnStatus: true)
                         def directoryPath = "${WORKSPACE}"
                         echo "directoryPath= ${directoryPath}"
-                        sh(script: "ls -l", returnStatus: true, dir: directoryPath)
-                        echo "${EXITCODE}"
-
+                        dir("${WORKSPACE}"){
+                            sh(script: "ls -l ", returnStatus: true) 
+                            sh(script: "cd test ", returnStatus: true)  
+                            sh(script: "ls -l ", returnStatus: true)  
+                        }
+                        
                         // Use 'grep' to search for the specific line in the log file
                         def grepCommand = "grep '${specificLine}' ${logFile}"
                         def grepResult = sh(script: grepCommand, returnStatus: true)
