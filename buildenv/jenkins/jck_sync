@@ -224,23 +224,17 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
-        def JCK_VERSION = params.JDK_VERSION ?: ""
-        def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ?: ""
-        def JAVA_HOME = params.JAVA_HOME ?: ""
-        def JAVA_SDK_URL = params.JAVA_SDK_URL ?: ""
-        
-        def JCK_VERSION_FLAG = JCK_VERSION ? "-j" : ""
-        def GIT_DEV_BRANCH_FLAG = GIT_DEV_BRANCH ? "-gb" : ""
-        def JAVA_HOME_FLAG = JAVA_HOME ? "-java" : ""
-        def JAVA_SDK_URL_FLAG = JAVA_SDK_URL ? "-sdk_url" : ""
-        def GIT_USER = params.GIT_USER ?: ""
-        def EXITCODE = 0    
+        def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
+        def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
+        def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
+        def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+        def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+        def EXITCODE = 0
         //def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
         
         stage('Build') {
                 script {
                     
-                        //jenkinsfile.setup()
                         //getJavaSDK()
                         
                         withCredentials([
@@ -248,24 +242,14 @@ def syncJckMaterial(){
 						usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
                             string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
                         ]) {
-                                // IF no custom GIT user provided, use runtimes main repo for j9build.
-                                if (GIT_USER == "j9build"){
-                                    GIT_USER= "runtimes"
-                                }
-                                echo "GIT user -- ${GIT_USER}"
-                                //env.TEST_ENV=""
                                 def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                                 dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                        def SCRIPT = "./jckupdater.sh ${JCK_VERSION_FLAG} ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} -u ${GIT_USER} -gt ${GIT_CREDENTIALS} ${GIT_DEV_BRANCH_FLAG} ${GIT_DEV_BRANCH} ${JAVA_HOME_FLAG} ${JAVA_HOME} ${JAVA_SDK_URL_FLAG} ${JAVA_SDK_URL}"
+                                        def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${GIT_DEV_BRANCH}  ${JAVA_HOME} "
                                         echo "${SCRIPT}"
-                                        EXITCODE = sh(script: "${SCRIPT}",  returnStatus: true)
-                                        //def output = EXITCODE.trim() 
-                                        //def exitStatus = result.exitStatus
+                                        EXITCODE = sh(script: "${SCRIPT}",  returnStatus: true, returnStdout: true)
                                         echo "EXITCODE= ${EXITCODE}"
-                                        //echo "output = ${output}"
-                                       //def pr_number= env.TEST_ENV
-                                        echo "PR number TEST_ENV = ${env.TEST_ENV}"
+                                        //echo "PR number TEST_ENV = ${env.TEST_ENV}"
                                         if (EXITCODE == 2) {
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                         } else if (EXITCODE == 0) {
@@ -284,33 +268,8 @@ def syncJckMaterial(){
             script{
                     //createComment()
                     //def job_id = BUILD_URL
-                    def comment="Test Jenkins job link $BUILD_URL"
-                    // def text ="""
-                    //         Cleaning up generated target list..
-                    //             Done!
-                    //             --------------------------------------------------------
-                    //                 Cross-checking test folders under: compiler       
-                    //             --------------------------------------------------------
-                    //             Total new folders detected : 0
-                    //             --------------------------------------------------------
-                    //                 Cross-checking test folders under: runtime       
-                    //             --------------------------------------------------------
-                    //             Total new folders detected : 0
-                    //             Thu Aug 31 19:19:51 IST 2023
-                    //             Total process took ~ 0 seconds.
-                    // """
-                    // def doneIndex = text.indexOf("Done!")
-                    //     if (doneIndex != -1) {
-                    //         // Extract lines after "Done!"
-                    //         def linesAfterDone = text.substring(doneIndex + "Done!".length()).trim()
-                    //         def lines = linesAfterDone.split('\n')
-                    //         def newVariable = lines.collect { it.trim() }.join('\\r\\n')
-                    //         comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
-                    //     }
-                    // //echo "Specific line found in the log file: '${specificLine}'"
+                    //def comment="Test Jenkins job link $BUILD_URL"
                     
-                    //     //currentBuild.result = 'SUCCESS' // Mark the build as successful
-                       
                     // createComment(comment)
                     //target_JCK_Folder()
                     
@@ -376,6 +335,8 @@ def target_JCK_Folder(){
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                         sh "cat ${logFile}"
                         sh(script: "ls -l ", returnStatus: true)
+                        def directoryPath = "${WORKSPACE}"
+                        sh(script: "ls -l", returnStatus: true, dir: directoryPath)
                         echo "${EXITCODE}"
 
                         // Use 'grep' to search for the specific line in the log file
