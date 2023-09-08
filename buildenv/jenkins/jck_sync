@@ -247,7 +247,7 @@ def syncJckMaterial(){
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${GIT_DEV_BRANCH}  ${JAVA_HOME} "
                                         echo "${SCRIPT}"
-                                        EXITCODE = sh(script: "${SCRIPT}",  returnStatus: true, returnStdout: true)
+                                        EXITCODE = sh(script: "${SCRIPT}",  returnStatus: true)
                                         echo "EXITCODE= ${EXITCODE}"
                                         //echo "PR number TEST_ENV = ${env.TEST_ENV}"
                                         if (EXITCODE == 2) {
@@ -335,8 +335,8 @@ def target_JCK_Folder(){
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                         sh "cat ${logFile}"
                         sh(script: "ls -l ", returnStatus: true)
-                        def directoryPath = "${WORKSPACE}"
-                        sh(script: "ls -l", returnStatus: true, dir: directoryPath)
+                        //def directoryPath = "${WORKSPACE}"
+                        //sh(script: "ls -l", returnStatus: true, dir: directoryPath)
                         echo "${EXITCODE}"
 
                         // Use 'grep' to search for the specific line in the log file
@@ -373,7 +373,7 @@ def createComment(TestComment) {
                 //     GIT_USER= "runtimes"
                 // }
                 def JCK_GIT_REPO = params.JCK_GIT_REPO
-                def GIT_USER = ${JCK_GIT_REPO}.split(':')[1].split('/')[0]
+                def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
                 //def GIT_REPO_NAME = params.JCK_GIT_REPO.split(':')[1].split('/')[1]
                 echo "GIT_USER: $GIT_USER"
                 
