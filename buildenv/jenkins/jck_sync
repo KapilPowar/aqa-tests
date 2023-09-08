@@ -341,7 +341,7 @@ def getSplitter(){
             //     'GROUP' : '5',
             // ],
         ]
-        def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/"
+        def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
         TESTS_MAP.each { key, value ->
              if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
