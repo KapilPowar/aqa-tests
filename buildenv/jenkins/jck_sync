@@ -272,6 +272,7 @@ def syncJckMaterial(){
                     
                     // createComment(comment)
                     target_JCK_Folder()
+                    getSplitter()
                     
                 }
             }
@@ -289,6 +290,77 @@ def syncJckMaterial(){
               }
       }
     }
+
+def getSplitter(){
+    dir("${WORKSPACE}/aqa-tests/jck/splitter") {
+        def JDK_VERSION= params.JDK_VERSION
+        if (JDK_VERSION == "8") {
+            JDK_VERSION = "8d"
+        } else if (JDK_VERSION == "11"){
+             JDK_VERSION = "11"
+        } 
+        def TESTS_MAP = [
+            'ANNOT' : [
+                'TESTS' : 'ANNOT',
+                'GROUP' : '5',
+            ],
+            'CLSS' : [
+                'TESTS' : 'CLSS',
+                'GROUP' : '10',
+            ],
+            // 'CONV' : [
+            //     'TESTS' : 'CONV',
+            //     'GROUP' : '5',
+            // ],
+            // 'DASG' : [
+            //     'TESTS' : 'DASG',
+            //     'GROUP' : '5',
+            // ],
+            // 'EXPR' : [
+            //     'TESTS' : 'EXPR',
+            //     'GROUP' : '11',
+            // ],
+            // 'INTF' : [
+            //     'TESTS' : 'INTF',
+            //     'GROUP' : '5',
+            // ],
+            // 'LMBD' : [
+            //     'TESTS' : 'LMBD',
+            //     'GROUP' : '5',
+            // ],
+            // 'NAME' : [
+            //     'TESTS' : 'NAME',
+            //     'GROUP' : '5',
+            // ],
+            // 'TYPE' : [
+            //     'TESTS' : 'TYPE',
+            //     'GROUP' : '5',
+            // ],
+            // 'STMT' : [
+            //     'TESTS' : 'STMT',
+            //     'GROUP' : '5',
+            // ],
+        ]
+        def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-{$JDK_VERSION}/tests/lang/"
+        def SCRIPT=""
+        TESTS_MAP.each { key, value ->
+             if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
+                def testsValue = value['TESTS']
+                def groupValue = value['GROUP']
+                echo "Calling test.sh for TESTS: $testsValue and GROUP: $groupValue"
+                //echo "Calling test.sh for TESTS: $testsValue"
+                //splitter.sh <LOCAL_TCK_ROOT>/JCK-compiler-11/tests/lang/CLSS
+                // Call the test.sh script here, passing testsValue as an argument
+                SCRIPT = "./splitter.sh ${TARGET_TO_SPLIT}/${testsValue} ${groupValue}"
+                def logFile = "testsValue.log"
+                EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                echo "EXITCODE in splitter =${EXITCODE}"
+            }
+        }
+        
+
+    }
+}
 
 def getJavaSDK(){
     JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
