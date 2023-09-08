@@ -235,7 +235,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     
-                        //getJavaSDK()
+                        getJavaSDK()
                         
                         withCredentials([
                             usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -335,8 +335,8 @@ def target_JCK_Folder(){
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                         sh "cat ${logFile}"
                         sh(script: "ls -l ", returnStatus: true)
-                        def directoryPath = "${WORKSPACE}"
-                        sh(script: "ls -l", returnStatus: true, dir: directoryPath)
+                        //def directoryPath = "${WORKSPACE}"
+                        //sh(script: "ls -l", returnStatus: true, dir: directoryPath)
                         echo "${EXITCODE}"
 
                         // Use 'grep' to search for the specific line in the log file
