@@ -302,11 +302,11 @@ def getSplitter(){
         def TESTS_MAP = [
             'ANNOT' : [
                 'TESTS' : 'ANNOT',
-                'GROUP' : '5',
+                'GROUP' : 5,
             ],
             'CLSS' : [
                 'TESTS' : 'CLSS',
-                'GROUP' : '10',
+                'GROUP' : 10,
             ],
             // 'CONV' : [
             //     'TESTS' : 'CONV',
@@ -351,10 +351,14 @@ def getSplitter(){
                 //echo "Calling test.sh for TESTS: $testsValue"
                 //splitter.sh <LOCAL_TCK_ROOT>/JCK-compiler-11/tests/lang/CLSS
                 // Call the test.sh script here, passing testsValue as an argument
-                SCRIPT = "./splitter.sh ${TARGET_TO_SPLIT}/${testsValue} ${groupValue}"
-                def logFile = "testsValue.log"
-                EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                TARGET="${TARGET_TO_SPLIT}/${testsValue}"
+                //SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
+                SCRIPT = "./splitter.sh ${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/CLSS 10"
+                def logFile = "${testsValue}.log"
+                EXITCODE = sh(script: "${SCRIPT} > ${logFile}", returnStatus: true)
+                
                 echo "EXITCODE in splitter =${EXITCODE}"
+                sh "cat ${logFile}"
             }
         }
         
