@@ -353,7 +353,7 @@ def getSplitter(){
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${testsValue}"
                 //SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
-                SCRIPT = "./splitter.sh ${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/CLSS 10"
+                SCRIPT = "./splitter.sh ${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/${testsValue} 10"
                 def logFile = "${testsValue}.log"
                 EXITCODE = sh(script: "${SCRIPT} > ${logFile}", returnStatus: true)
                 
