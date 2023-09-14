@@ -362,7 +362,7 @@ def getSplitter(){
                 //def logFileName = "test.log"
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = null
-                def logFile = new File(logFileName)
+                def logFile = readFile(logFileName)
                 if (logFile.exists()) {
                     logFile.eachLine { line ->
                         if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
@@ -375,7 +375,7 @@ def getSplitter(){
                 } else {
                     println "No matching line found"
                 }
-                def mkFile = new File(mkFileName)
+                def mkFile = readFile(mkFileName)
                 if (mkFile.exists() && lastLine) {
                     def mkFileContents = mkFile.text
                     if (mkFileContents.contains(lastLine)) {
