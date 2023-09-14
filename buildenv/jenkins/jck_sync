@@ -501,7 +501,7 @@ def createComment(TestComment) {
                     }' "$comment_url"
                 """
                 //Execute the curl command using sh
-                def exitCode = sh(script: curlCommand, returnStatus: true)
+                def exitCode = sh(script: curlCommand, returnStatus: true, returnStdout: true)
                 if (exitCode == 0) {    
                     echo "Comment added successfully."
                 } else {
