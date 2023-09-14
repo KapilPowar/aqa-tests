@@ -366,13 +366,15 @@ def getSplitter(){
                     def logFileContents = readFile(file: logFileName).trim().split('\n')
                     for (int i = logFileContents.size() - 1; i >= 0; i--) {
                         def line = logFileContents[i]
-                        if (line.startsWith("COMPILER_LANG_ANNOT_TESTS_GROUP")) {
+                        if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
                             lastLine = line
                             break
                         }
                     }
                 // Check if the last line is present in test.mk
                     def mkFileContents = readFile(file: mkFileName).trim()
+                    echo "Last Line: ${lastLine}"
+                    echo "MK File Contents: ${mkFileContents}"
                     if (lastLine && mkFileContents.contains(lastLine)) {
                         echo "The line is present in $mkFileName"
                     } else {
