@@ -361,7 +361,7 @@ def getSplitter(){
                 sh "cat ${logFileName}"
                 //def logFileName = "test.log"
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
-                def lastLine = ""
+                def lastLine = null
                 def logFile = new File(logFileName)
                 if (logFile.exists()) {
                     logFile.eachLine { line ->
@@ -370,8 +370,11 @@ def getSplitter(){
                         }
                     }
                 }
-                echo "last line found in ${logFileName} is "
-                echo "${lastLine}"
+                if (lastLine != null) {
+                    println "Last line found: $lastLine"
+                } else {
+                    println "No matching line found"
+                }
                 def mkFile = new File(mkFileName)
                 if (mkFile.exists() && lastLine) {
                     def mkFileContents = mkFile.text
