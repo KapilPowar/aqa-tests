@@ -343,6 +343,8 @@ def getSplitter(){
         ]
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
+        def PR_NEEDED = false
+        def tesClasstList = []
         TESTS_MAP.each { key, value ->
              if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
                 def testsValue = value['TESTS']
@@ -356,6 +358,9 @@ def getSplitter(){
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 sh "cat ${logFileName}"
+                if (testsValue == "CLSS"){
+                    testsValue="CLASS"
+                }
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = null
                 // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from logFileName.log
@@ -376,11 +381,18 @@ def getSplitter(){
                     } else {
                         echo "The line is not present in $mkFileName"
                         echo "We need to update $mkFileName and create PR for --- $testsValue"
+                        tesClasstList.add(${testsValue})
+                        PR_NEEDED=true
                     }
             }
         }
-        
-
+        if (PR_NEEDED){
+            def comment=" We need to create PR for below test group\\r\\n" + tesClasstList.join(", ")
+            createComment(comment)
+        } else {
+            def comment =" No need to creat PR to update jck.mk file."
+            createComment(comment)
+        }
     }
 }
 
