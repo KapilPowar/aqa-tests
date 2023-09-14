@@ -354,11 +354,33 @@ def getSplitter(){
                 TARGET="${TARGET_TO_SPLIT}/${testsValue}"
                 SCRIPT = "./splitter.sh ${TARGET}"
                 //SCRIPT = "./splitter.sh ${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/${testsValue} 5"
-                def logFile = "${testsValue}.log"
-                EXITCODE = sh(script: "${SCRIPT} ${groupValue} > ${logFile}", returnStatus: true)
+                def logFileName = "${testsValue}.log"
+                EXITCODE = sh(script: "${SCRIPT} ${groupValue} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
-                sh "cat ${logFile}"
+                sh "cat ${logFileName}"
+                //def logFileName = "test.log"
+                def mkFileName = "../jck.mk"
+                def lastLine = ""
+                def logFile = new File(logFileName)
+                if (logFile.exists()) {
+                    logFile.eachLine { line ->
+                        if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
+                            lastLine = line
+                        }
+                    }
+                }
+                def mkFile = new File(mkFileName)
+                if (mkFile.exists() && lastLine) {
+                    def mkFileContents = mkFile.text
+                    if (mkFileContents.contains(lastLine)) {
+                        println "The line is present in $mkFileName"
+                    } else {
+                        println "The line is not present in $mkFileName"
+                    }
+                } else {
+                    println "Either $logFileName does not exist or no matching line found."
+                }
             }
         }
         

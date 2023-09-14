@@ -87,7 +87,7 @@ split()
 		for ((i=0; i<$numOfGrps; i++));
 		do
 			value=${groups[$i]}
-			printf "%s\n\n" "COMPILER_LANG_${testName}_TESTS_GROUP$((i+1)) = ${value%?}"
+			printf "%s\n\n" "COMPILER_LANG_${testName}_TESTS_GROUP$((i+1))=\$(Q)${value%?}\$(Q)"
 		done
 		printf "%s\n\n" "Total subtests processed = $totalCounted"
 	else 
