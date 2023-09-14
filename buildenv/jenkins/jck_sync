@@ -304,10 +304,10 @@ def getSplitter(){
                 'TESTS' : 'ANNOT',
                 'GROUP' : 5,
             ],
-            'CLSS' : [
-                'TESTS' : 'CLSS',
-                'GROUP' : 10,
-            ],
+            // 'CLSS' : [
+            //     'TESTS' : 'CLSS',
+            //     'GROUP' : 10,
+            // ],
             // 'CONV' : [
             //     'TESTS' : 'CONV',
             //     'GROUP' : '5',
@@ -360,7 +360,7 @@ def getSplitter(){
                 echo "EXITCODE in splitter =${EXITCODE}"
                 sh "cat ${logFileName}"
                 //def logFileName = "test.log"
-                def mkFileName = "../jck.mk"
+                def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = ""
                 def logFile = new File(logFileName)
                 if (logFile.exists()) {
@@ -370,6 +370,8 @@ def getSplitter(){
                         }
                     }
                 }
+                echo "last line found in ${logFileName} is "
+                echo "${lastLine}"
                 def mkFile = new File(mkFileName)
                 if (mkFile.exists() && lastLine) {
                     def mkFileContents = mkFile.text
