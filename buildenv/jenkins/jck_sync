@@ -387,8 +387,8 @@ def getSplitter(){
             }
         }
         if (PR_NEEDED){
-            echo " create comment as PR_NEEDED is ${PR_NEEDED}"
-            def comment=" We need to create PR for below test group\\r\\n" + tesClasstList.join(", ")
+            echo "create comment as PR_NEEDED is ${PR_NEEDED}"
+            def comment=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + tesClasstList.join(", ")
             createComment(comment)
         } else {
             def comment =" No need to creat PR to update jck.mk file."
@@ -474,7 +474,7 @@ def target_JCK_Folder(){
                     }
                 }
 
-            //createComment(comment)
+            createComment(comment)
 }
 
 def createComment(TestComment) {
@@ -513,11 +513,11 @@ def createComment(TestComment) {
 def getPRNumber(){
                 def pr_number=0
                 def directory="${WORKSPACE}/aqa-tests/jck/test"
-                echo " file path --${directory}"
+                //echo " file path --${directory}"
                 def filePath="${directory}/file.txt"
                 def version = readFile "${filePath}"
                 pr_number=version.toInteger()
-                echo "PR Number ${pr_number}"
+                //echo "PR Number ${pr_number}"
                 return pr_number                
 }
 
