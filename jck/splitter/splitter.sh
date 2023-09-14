@@ -25,6 +25,9 @@ split()
 	testPathPrefix=$3
     numOfIndices=numOfGrps+1; 
     testName=$(echo "$testPathPrefix" | awk -F'/' '{print $NF}')
+	if [[ ${testName} = "CLSS" ]]; then
+	        testName="CLASS"
+	fi
 	# Read in the sub-tests into an array 
 	
 	i=0
