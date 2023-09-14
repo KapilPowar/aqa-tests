@@ -357,7 +357,7 @@ def getSplitter(){
                 EXITCODE = sh(script: "${SCRIPT} ${groupValue} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
-                sh "cat ${logFileName}"
+                //sh "cat ${logFileName}"
                 if (testsValue == "CLSS"){
                     testsValue="CLASS"
                 }
@@ -374,19 +374,20 @@ def getSplitter(){
                     }
                 // Check if the last line is present in test.mk
                     def mkFileContents = readFile(file: mkFileName).trim()
-                    echo "Last Line: ${lastLine}"
+                    echo "Last test group in ${logFileName}: ${lastLine}"
                     if (lastLine && mkFileContents.contains(lastLine)) {
                         echo "The line is present in $mkFileName"
                         echo "No need to create PR for --- $testsValue"
                     } else {
                         echo "The line is not present in $mkFileName"
                         echo "We need to update $mkFileName and create PR for --- $testsValue"
-                        tesClasstList.add(${testsValue})
+                        tesClasstList.add(testsValue)
                         PR_NEEDED=true
                     }
             }
         }
         if (PR_NEEDED){
+            echo " create comment as PR_NEEDED is ${PR_NEEDED}"
             def comment=" We need to create PR for below test group\\r\\n" + tesClasstList.join(", ")
             createComment(comment)
         } else {
