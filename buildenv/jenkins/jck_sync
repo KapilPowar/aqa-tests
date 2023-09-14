@@ -362,30 +362,39 @@ def getSplitter(){
                 //def logFileName = "test.log"
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = null
-                def logFile = readFile(logFileName)
-                if (logFile.exists()) {
-                    logFile.eachLine { line ->
-                        if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
+                // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from test.log
+                    def logFileContents = readFile(file: logFileName).trim().split('\n')
+                    for (int i = logFileContents.size() - 1; i >= 0; i--) {
+                        def line = logFileContents[i]
+                        if (line.startsWith("COMPILER_LANG_ANNOT_TESTS_GROUP")) {
                             lastLine = line
+                            break
                         }
                     }
-                }
-                if (lastLine != null) {
-                    println "Last line found: $lastLine"
-                } else {
-                    println "No matching line found"
-                }
-                def mkFile = readFile(mkFileName)
-                if (mkFile.exists() && lastLine) {
-                    def mkFileContents = mkFile.text
-                    if (mkFileContents.contains(lastLine)) {
-                        println "The line is present in $mkFileName"
+                // Check if the last line is present in test.mk
+                    def mkFileContents = readFile(file: mkFileName).trim()
+                    if (lastLine && mkFileContents.contains(lastLine)) {
+                        echo "The line is present in $mkFileName"
                     } else {
-                        println "The line is not present in $mkFileName"
+                        echo "The line is not present in $mkFileName"
                     }
-                } else {
-                    println "Either $logFileName does not exist or no matching line found."
-                }
+
+                // if (lastLine != null) {
+                //     println "Last line found: $lastLine"
+                // } else {
+                //     println "No matching line found"
+                // }
+                // def mkFile = readFile(mkFileName)
+                // if (mkFile.exists() && lastLine) {
+                //     def mkFileContents = mkFile.text
+                //     if (mkFileContents.contains(lastLine)) {
+                //         println "The line is present in $mkFileName"
+                //     } else {
+                //         println "The line is not present in $mkFileName"
+                //     }
+                // } else {
+                //     println "Either $logFileName does not exist or no matching line found."
+                // }
             }
         }
         
