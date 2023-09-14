@@ -304,10 +304,10 @@ def getSplitter(){
                 'TESTS' : 'ANNOT',
                 'GROUP' : 5,
             ],
-            // 'CLSS' : [
-            //     'TESTS' : 'CLSS',
-            //     'GROUP' : 10,
-            // ],
+            'CLSS' : [
+                'TESTS' : 'CLSS',
+                'GROUP' : 10,
+            ],
             // 'CONV' : [
             //     'TESTS' : 'CONV',
             //     'GROUP' : '5',
@@ -347,22 +347,18 @@ def getSplitter(){
              if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
                 def testsValue = value['TESTS']
                 def groupValue = value['GROUP']
-                echo "Calling test.sh for TESTS: $testsValue and GROUP: $groupValue"
-                //echo "Calling test.sh for TESTS: $testsValue"
-                //splitter.sh <LOCAL_TCK_ROOT>/JCK-compiler-11/tests/lang/CLSS
+                echo "Calling splitter.sh for TESTS: $testsValue and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${testsValue}"
                 SCRIPT = "./splitter.sh ${TARGET}"
-                //SCRIPT = "./splitter.sh ${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang/${testsValue} 5"
                 def logFileName = "${testsValue}.log"
                 EXITCODE = sh(script: "${SCRIPT} ${groupValue} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 sh "cat ${logFileName}"
-                //def logFileName = "test.log"
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = null
-                // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from test.log
+                // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from logFileName.log
                     def logFileContents = readFile(file: logFileName).trim().split('\n')
                     for (int i = logFileContents.size() - 1; i >= 0; i--) {
                         def line = logFileContents[i]
@@ -374,29 +370,13 @@ def getSplitter(){
                 // Check if the last line is present in test.mk
                     def mkFileContents = readFile(file: mkFileName).trim()
                     echo "Last Line: ${lastLine}"
-                    echo "MK File Contents: ${mkFileContents}"
                     if (lastLine && mkFileContents.contains(lastLine)) {
                         echo "The line is present in $mkFileName"
+                        echo "No need to create PR for --- $testsValue"
                     } else {
                         echo "The line is not present in $mkFileName"
+                        echo "We need to update $mkFileName and create PR for --- $testsValue"
                     }
-
-                // if (lastLine != null) {
-                //     println "Last line found: $lastLine"
-                // } else {
-                //     println "No matching line found"
-                // }
-                // def mkFile = readFile(mkFileName)
-                // if (mkFile.exists() && lastLine) {
-                //     def mkFileContents = mkFile.text
-                //     if (mkFileContents.contains(lastLine)) {
-                //         println "The line is present in $mkFileName"
-                //     } else {
-                //         println "The line is not present in $mkFileName"
-                //     }
-                // } else {
-                //     println "Either $logFileName does not exist or no matching line found."
-                // }
             }
         }
         
@@ -405,7 +385,7 @@ def getSplitter(){
 }
 
 def getJavaSDK(){
-    JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
+        JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
                         JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
                         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
                         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
@@ -428,13 +408,9 @@ def getJavaSDK(){
 }
 
 def target_JCK_Folder(){
-                //javapath=/home/jenkins/workspace/JCK_Sync/openjdkbinary/j2sdk-image/bin/java
-                // def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                // echo "${currentDirectory}"
                 env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
-                //def TEST_JDK_HOME="${WORKSPACE}/openjdkbinary/j2sdk-image"
                 echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-                def comment="TEST comment"
+                def comment=""
                 //running script jck_target_folder_check.sh
                 
                 dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
@@ -451,17 +427,15 @@ def target_JCK_Folder(){
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                         echo "${EXITCODE}"
                         sh "cat ${logFile}"
-                        sh(script: "ls -l ", returnStatus: true)
+                        //sh(script: "ls -l ", returnStatus: true)
                         def directoryPath = "${WORKSPACE}"
                         echo "directoryPath= ${directoryPath}"
                         dir("${WORKSPACE}"){
-                            sh(script: "ls -l ", returnStatus: true) 
+                            //sh(script: "ls -l ", returnStatus: true) 
                             dir("${WORKSPACE}/test"){
-                                sh(script: "ls -l ", returnStatus: true) 
+                                //sh(script: "ls -l ", returnStatus: true) 
                                 sh(script: "git branch ", returnStatus: true) 
                                 }
-                            //sh(script: "cd test ", returnStatus: true)  
-                             
                         }
                         
                         // Use 'grep' to search for the specific line in the log file
