@@ -133,7 +133,7 @@ setup() {
 		echo "Using existing test repo at: $workspace/test"
 	else 
 		echo "Git cloning test materials from $repo..."
-		git clone --depth 1 -q -b script $repo $workspace/test
+		git clone --depth 1 -q -b $BRANCH $repo $workspace/test
 		if [ $? != 0 ]; then 
 			exit 1
 		fi
@@ -148,6 +148,7 @@ main() {
 	echo "TEST_ROOT = $TEST_ROOT"
 	echo "workspace = $workspace"
 	echo "TEST_JDK_HOME = $TEST_JDK_HOME"
+	echo "GIT Branch = $BRANCH"
 	
 	export outputdir=$workspace/output
 	mkdir $workspace/output
@@ -169,22 +170,24 @@ usage() {
 date
 begin_time="$(date -u +%s)"
 
-if [ "$#" -eq 3 ]; then
+if [ "$#" -eq 4 ]; then
 	# The script is running from a build which sends in three parameters. 
 	# No setup() is needed in this case.   
 	export VERSION=$(echo "$1" | sed 's/[^0-9]*//g')
 	export JCK_ROOT=$2
 	export TEST_ROOT=$3
+	export BRANCH=$4
 	export workspace=`pwd`/crosscheck
 	mkdir $workspace
 	main 
-elif [ "$#" -eq 2 ]; then
+elif [ "$#" -eq 3 ]; then
 	# We are running locally, where two parameters are sent in: test repo and workspace location.
 	# The script expects openjdk-test to be already checked out under workspace  
 	# Also, We will need setup() in this case. 
 	export repo=$1
 	export VERSION=$(echo "$repo" | sed 's/[^0-9]*//g')
 	export workspace=$2
+	export BRANCH=$3
 	if [ ! -d "$workspace/aqa-tests" ] ; then
 		echo "Please manually check out aqa-tests under $workspace"
 		exit 1
