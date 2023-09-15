@@ -366,7 +366,7 @@ def createComment(TestComment) {
                 COMMENT = "${TestComment}"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
-                    "body":"$comment" 
+                    "body":"$COMMENT" 
                     }' "$comment_url"
                 """
                 //Execute the curl command using sh
