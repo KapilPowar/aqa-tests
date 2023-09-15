@@ -3,11 +3,6 @@
 def PR = 0
 def COMMENT = ""
 def EXITCODE = 0
-// def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
-// def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
-// def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
-// def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
-// def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
 
 timestamps{
     stage('Setup') {
@@ -253,26 +248,26 @@ def getSplitter(){
                 def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
                 def lastLine = null
                 // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from logFileName.log
-                    def logFileContents = readFile(file: logFileName).trim().split('\n')
-                    for (int i = logFileContents.size() - 1; i >= 0; i--) {
-                        def line = logFileContents[i]
-                        if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
-                            lastLine = line
-                            break
-                        }
+                def logFileContents = readFile(file: logFileName).trim().split('\n')
+                for (int i = logFileContents.size() - 1; i >= 0; i--) {
+                    def line = logFileContents[i]
+                    if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
+                        lastLine = line
+                        break
                     }
+                }
                 // Check if the last line is present in test.mk
-                    def mkFileContents = readFile(file: mkFileName).trim()
-                    echo "Last test group in ${logFileName}: ${lastLine}"
-                    if (lastLine && mkFileContents.contains(lastLine)) {
-                        echo "The line is present in $mkFileName"
-                        echo "No need to create PR for --- $testsValue"
-                    } else {
-                        echo "The line is not present in $mkFileName"
-                        echo "We need to update $mkFileName and create PR for --- $testsValue"
-                        tesClasstList.add(testsValue)
-                        PR_NEEDED=true
-                    }
+                def mkFileContents = readFile(file: mkFileName).trim()
+                //echo "Last test group in ${logFileName}: ${lastLine}"
+                if (lastLine && mkFileContents.contains(lastLine)) {
+                    //echo "The line is present in $mkFileName"
+                    echo "No need to create PR for --- $testsValue"
+                } else {
+                    //echo "The line is not present in $mkFileName"
+                    echo "We need to update $mkFileName and create PR for --- $testsValue"
+                    tesClasstList.add(testsValue)
+                    PR_NEEDED=true
+                }
             }
         }
         if (PR_NEEDED){
@@ -316,7 +311,7 @@ def target_JCK_Folder(){
                 
                 dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                        def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
+                        //def JCK_GIT_REPO = params.JCK_GIT_REPO ?: ""
                         def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
                         echo "${GIT_BRANCH}"
                         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
@@ -324,26 +319,26 @@ def target_JCK_Folder(){
                         def specificLine = "Total new folders detected : 0"
 
                         EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                        echo "${EXITCODE}"
+                        echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
                         sh "cat ${logFile}"
                         
                         // Use 'grep' to search for the specific line in the log file
-                        def grepCommand = "grep '${specificLine}' ${logFile}"
-                        def grepResult = sh(script: grepCommand, returnStatus: true)
+                        def grepCommand = "grep -c '${specificLine}' ${logFile}"
+                        def grepResult = sh(script: grepCommand, returnStatus: true, returnStdout: true).trim()
                         // grep last few lines after Done! to create comment
                         def fileContents = readFile(file: logFile).trim()
                         def delimiter = 'Done!'
                         def parts = fileContents.split(delimiter)
                         def linesAfterDone = parts[1].trim()
                         def lines = linesAfterDone.split('\n')
-                        def newVariable = lines.collect { it.trim() }.join('\\r\\n')
-                                
-                        if (grepResult == 0) {
+                        def commentBody = lines.collect { it.trim() }.join('\\r\\n')
+                        echo  "grepResult= ${grepResult}"     
+                        if (grepResult != 0) {
                         echo "Specific line found in the log file: '${specificLine}'"
-                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${newVariable} ```"
+                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} ```"
                         } else {
                         echo "Specific line not found in the log file"
-                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${newVariable} ``` "
+                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
                         }
                     }
                 }
