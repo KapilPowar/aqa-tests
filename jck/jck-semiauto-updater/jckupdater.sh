@@ -211,11 +211,7 @@ getJCKSources() {
 #install Java
 get_JAVA_SDK(){
 		if [[ $JAVA_HOME = "" ]] ; then
-			cd $WORKSPACE
-			pwd
-			cd ../../../../
-			pwd
-			cd openjdkbinary/j2sdk-image
+			cd $WORKSPACE/../../../../openjdkbinary/j2sdk-image
 			JAVA_SDK_PATH="$(pwd)"
 			echo $JAVA_SDK_PATH
 			$JAVA_SDK_PATH/bin/java -version
@@ -366,7 +362,7 @@ test() {
 
 	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
-	echo "PR Number=$pr_number"
+	echo "PR_Number=$pr_number"
 	export TEST_ENV="$pr_number"
 	echo "TEST_ENV== $TEST_ENV"
 	#echo "PR -- $pr_number"
@@ -395,7 +391,7 @@ parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
 	 #cleanup
-	setup
+	 #setup
 	# isLatestUpdate
 	# extract
 	# gitClone
