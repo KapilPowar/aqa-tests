@@ -145,7 +145,7 @@ def syncJckMaterial(){
                     def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
                     testJobs = [:]
-                    def jobLinks = [:]
+                    //def jobLinks = [:]
                     PLATFORMS.each { PLATFORM ->
                     def childParams = []
                     // loop through all the params and change the parameters if needed
@@ -170,12 +170,12 @@ def syncJckMaterial(){
                         build job: CHILD_JOB_NAME, parameters: childParams
                         // def childBuildInfo = build(job: CHILD_JOB_NAME, parameters: childParams, wait: false)
                         // def childBuildNumber = childBuildInfo.BUILD_NUMBER
-                        jobLinks[jobName] = "${env.BUILD_URL}${childBuildNumber}/"
+                        //jobLinks[jobName] = "${env.BUILD_URL}${childBuildNumber}/"
                     }
                 }
-                jobLinks.each { jobName, jobLink ->
-                    echo "Status of ${jobName}: ${jobLink}"
-                }
+                // jobLinks.each { jobName, jobLink ->
+                //     echo "Status of ${jobName}: ${jobLink}"
+                // }
                 parallel testJobs
 
                 // Wait for all jobs to complete
