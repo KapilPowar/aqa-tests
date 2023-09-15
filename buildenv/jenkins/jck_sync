@@ -241,7 +241,7 @@ def syncJckMaterial(){
                                         echo "${SCRIPT}"
                                         // def scriptOutput = sh(script: "${SCRIPT}",   returnStatus: true, returnStdout: true)
                                         def scriptOutput = sh(script: "${SCRIPT}",  returnStdout: true)
-                                        //EXITCODE =sh(script: "echo \$?", returnStatus: true).trim().toInteger()
+                                        EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                         echo "EXITCODE= ${EXITCODE}"
                                         def output = scriptOutput.trim()
                                         echo "Shell script output:"
@@ -270,8 +270,8 @@ def syncJckMaterial(){
                     //def comment="Test Jenkins job link $BUILD_URL"
                     
                     // createComment(comment)
-                   // target_JCK_Folder()
-                    //getSplitter()
+                    target_JCK_Folder()
+                    getSplitter()
                     
                 }
             }
