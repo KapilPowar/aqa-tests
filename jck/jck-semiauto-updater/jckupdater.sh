@@ -331,14 +331,14 @@ createPR(){
 	
 	# Assuming $response contains the JSON response
 	#pr=$(echo "$response" | grep -o '"number":[0-9]*' | awk -F':' '{print $2}' | tr -d '," ')
-	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
+	PR_NUMBER=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
 	# $pr_number now contains the PR number
-	echo "PR Number=$pr_number"
+	echo "PR_Number=$PR_NUMBER"
 
 	echo "Add comment to PR "
 	comment="Test comment from script"
-	comment_url="https://github.ibm.com/api/v3/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/issues/$pr_number/comments"
+	comment_url="https://github.ibm.com/api/v3/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/issues/$PR_NUMBER/comments"
 	echo "comment_url -- $comment_url"
 
 	comment_response=$(curl -X POST \
@@ -363,17 +363,17 @@ test() {
 	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
 	echo "PR_Number=$pr_number"
-	export TEST_ENV="$pr_number"
-	echo "TEST_ENV== $TEST_ENV"
+	# export TEST_ENV="$pr_number"
+	# echo "TEST_ENV== $TEST_ENV"
 	#echo "PR -- $pr_number"
-	file_path="$WORKSPACE/../../test/file.txt"
-	mkdir -p "$(dirname "$file_path")"
-	touch "$file_path"
-	echo "file path -- $file_path"
-	echo "$pr_number" > "$file_path"
-	echo "file contents--"
-	cat "$file_path"
-	chmod 0777 $file_path
+	# file_path="$WORKSPACE/../../test/file.txt"
+	# mkdir -p "$(dirname "$file_path")"
+	# touch "$file_path"
+	# echo "file path -- $file_path"
+	# echo "$pr_number" > "$file_path"
+	# echo "file contents--"
+	# cat "$file_path"
+	# chmod 0777 $file_path
 }
 
 cleanup() {
