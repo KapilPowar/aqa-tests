@@ -3,11 +3,11 @@
 def PR = 0
 def COMMENT = ""
 def EXITCODE = 0
-def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
-def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
-def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
-def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
-def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+// def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
+// def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
+// def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
+// def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+// def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
 
 timestamps{
     stage('Setup') {
@@ -106,12 +106,12 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
-        // def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
-        // def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
-        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
-        // def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
-        // def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
-        // def EXITCODE = 1
+        def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
+        def GIT_DEV_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
+        def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
+        def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+        def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+        def EXITCODE = 1
         //def jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
         
         stage('Build') {
