@@ -335,7 +335,7 @@ def target_JCK_Folder(){
                         def commentBody = lines.collect { it.trim() }.join('\\r\\n')
                         def count = 2
                         //JDK 8 will have 3 folders compiler, runtime and devtools
-                        if (params.JDK_VERSION = "8"){
+                        if (params.JDK_VERSION == "8"){
                             count = 3
                         }
                         if (grepResult.toInteger() == count) {
