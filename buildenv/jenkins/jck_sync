@@ -325,7 +325,7 @@ def target_JCK_Folder(){
                         // Use 'grep' to search for the specific line in the log file
                         def grepCommand = "grep -c '${specificLine}' ${logFile}"
                         def grepResult = sh(script: grepCommand, returnStdout: true)
-                        echo  "grepResult= ${grepResult}"     
+                        echo  "grepResult= ${grepResult}"
                         // grep last few lines after Done! to create comment
                         def fileContents = readFile(file: logFile).trim()
                         def delimiter = 'Done!'
@@ -333,7 +333,12 @@ def target_JCK_Folder(){
                         def linesAfterDone = parts[1].trim()
                         def lines = linesAfterDone.split('\n')
                         def commentBody = lines.collect { it.trim() }.join('\\r\\n')
-                        if (grepResult != 0) {
+                        def count = 2
+                        //JDK 8 will have 3 folders compiler, runtime and devtools
+                        if (params.JDK_VERSION = "8"){
+                            count = 3
+                        }
+                        if (grepResult.toInteger() == count) {
                         echo "Specific line found in the log file: '${specificLine}'"
                         COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} ```"
                         } else {
