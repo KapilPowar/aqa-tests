@@ -169,10 +169,8 @@ isLatestUpdate() {
 	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
 		#clean up after testing
-		#get_JAVA_SDK
-		getJCKSources
-		# cleanup
-		# exit -1
+		cleanup
+		exit 2
 	else	
 		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
 		get_JAVA_SDK
@@ -212,11 +210,12 @@ getJCKSources() {
 
 #install Java
 get_JAVA_SDK(){
-
-		cd $WORKSPACE/../../../../openjdkbinary/j2sdk-image
-		JAVA_SDK_PATH="$(pwd)"
-		echo $JAVA_SDK_PATH
-		$JAVA_SDK_PATH/bin/java -version
+		if [[ $JAVA_HOME = "" ]] ; then
+			cd $WORKSPACE/../../../../openjdkbinary/j2sdk-image
+			JAVA_SDK_PATH="$(pwd)"
+			echo $JAVA_SDK_PATH
+			$JAVA_SDK_PATH/bin/java -version
+		fi
 }
 
 #Unpack downloaded jar files 
@@ -229,10 +228,8 @@ extract() {
 		echo "Unpacking $f:"
 		
 		#using default java on machine for local
-		if [[ $JAVA_HOME = "" ]] ; then
-			#$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
-			java -version
-			java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
+		if [[ $JAVA_HOME != "" ]] ; then
+			$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
 		else
 			$JAVA_SDK_PATH/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
 		fi
@@ -401,7 +398,7 @@ if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != ""
 	# copyFilestoGITRepo
 	# checkChangesAndCommit
 	# cleanup
-	#get_JAVA_SDK
+	get_JAVA_SDK
 	test
 else 
 	echo "Please provide missing arguments"
