@@ -141,36 +141,32 @@ def syncJckMaterial(){
         stage('SanityTest') {
                script{
                    if (EXITCODE==0){
-                        //def test_job="Grinder_JCK"
-                        // jenkinsfile.addJobDescription()
-                        // jenkinsfile.addGrinderLink()
-                        //jenkinsfile.testExecution()
-                        // jenkinsfile.terminateTestProcesses()
-                        // build job: test_job, parameters: childParams
-                        def childParams = []
-                        // loop through all the params and change the parameters if needed
-                        params.each { param ->
-                            if (param.key == "PLATFORM") {
-                                childParams << string(name: param.key, value: PLATFORM)
-                            } else if (param.key == "JDK_VERSION") {
-                                childParams << string(name: param.key, value: JDK_VERSION)
-                            } else if (param.key == "JDK_IMPL") {
-                                childParams << string(name: param.key, value: JDK_IMPL)
+
+                    def childParams = []
+                    def PLATFORM="x86-64_linux,x86-64_windows"
+                    // loop through all the params and change the parameters if needed
+                    params.each { param ->
+                        if (param.key == "PLATFORM") {
+                            childParams << string(name: param.key, value: PLATFORM)
+                        } else if (param.key == "JDK_VERSION") {
+                            childParams << string(name: param.key, value: JDK_VERSION)
+                        } else if (param.key == "JDK_IMPL") {
+                            childParams << string(name: param.key, value: JDK_IMPL)
+                        } else {
+                            def value = param.value.toString()
+                            if (value == "true" || value == "false") {
+                                childParams << booleanParam(name: param.key, value: value.toBoolean())
                             } else {
-                                def value = param.value.toString()
-                                if (value == "true" || value == "false") {
-                                    childParams << booleanParam(name: param.key, value: value.toBoolean())
-                                } else {
-                                    childParams << string(name: param.key, value: value)
-                                }
+                                childParams << string(name: param.key, value: value)
                             }
                         }
-                        def CHILD_JOB_NAME="Grinder_JCK"
-                        //testJobs["openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM}"] = {
-                            build job: CHILD_JOB_NAME, parameters: childParams
-                        //}
                     }
+                    def CHILD_JOB_NAME="Grinder_JCK"
+                    //testJobs["openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM}"] = {
+                        build job: CHILD_JOB_NAME, parameters: childParams
+                    //}
                 }
+            }
         }
 }
 
