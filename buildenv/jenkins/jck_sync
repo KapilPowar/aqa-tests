@@ -238,7 +238,8 @@ def syncJckMaterial(){
                                     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                         def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${GIT_DEV_BRANCH}  ${JAVA_HOME} "
                                         echo "${SCRIPT}"
-                                        def scriptOutput = sh(script: "${SCRIPT}",   returnStatus: true, returnStdout: true)
+                                        // def scriptOutput = sh(script: "${SCRIPT}",   returnStatus: true, returnStdout: true)
+                                        def scriptOutput = sh(script: "${SCRIPT}",  returnStdout: true)
                                         //EXITCODE = scriptOutput.returnStatus
                                         echo "EXITCODE= ${EXITCODE}"
                                         def output = scriptOutput.trim()
@@ -249,6 +250,7 @@ def syncJckMaterial(){
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                         } else if (EXITCODE == 0) {
                                             echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
+                                            def number = extractNumber(output)
                                         } else {
                                             error("script failed with exit code ${EXITCODE}")
                                         }
@@ -494,3 +496,12 @@ def getPRNumber(){
                 return pr_number                
 }
 
+def extractNumber(output) {
+    def lines = output.readLines()
+    for (line in lines) {
+        if (line =~ /PR_Number=(\d+)/) {
+            return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
+        }
+    }
+    return null
+}
