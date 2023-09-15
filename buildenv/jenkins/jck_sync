@@ -147,6 +147,7 @@ def syncJckMaterial(){
                     testJobs = [:]
                     //def jobLinks = [:]
                     def buildNumbers = [:]
+                    def buildResults = [:]
                     PLATFORMS.each { PLATFORM ->
                     def childParams = []
                     // loop through all the params and change the parameters if needed
@@ -168,11 +169,12 @@ def syncJckMaterial(){
                     }
                     def build_url="https://hyc-runtimes-jenkins.swg-devops.com/job/Grinder_JCK/"
                     testJobs["openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM}"] = {
-                        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams, wait: false
+                        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
                         echo "Job ${PLATFORM} started with build number: ${buildInfo.number}"
                         echo "Initial Build URL: ${build_url}${buildInfo.number}/"
                         // Store the build number in the map
                         buildNumbers[PLATFORM] = buildInfo.number
+                        buildResults[PLATFORM] = buildInfo.result
                         // currentBuild.result = catchError {
                         //     echo "Job ${PLATFORM} completed with status: ${buildInfo.result}"
                         //     //echo "Build Number: ${buildInfo.number}"
@@ -183,13 +185,14 @@ def syncJckMaterial(){
                 parallel testJobs
 
                 PLATFORMS.each { PLATFORM ->
-                    def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams, wait: true
-                    def buildStatus = buildInfo.result
+                    //def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams, wait: true
+                    //def buildStatus = buildInfo.result
                     //def buildURL = "${env.BUILD_URL}${PLATFORM}/${buildInfo.number}/" // Adjust the URL as needed
-                    echo "Job openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildStatus}"
+                    echo "Job openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}"
+                    //echo "Job openjdk${JDK_VERSION}_${JDK_IMPL}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildStatus}"
 
-                    def buildURL = "${build_url}${buildNumbers[PLATFORM]}/"
-                    echo "Build URL: ${buildURL}"
+                    //def buildURL = "${build_url}${buildNumbers[PLATFORM]}/"
+                    //echo "Build URL: ${buildURL}"
                 }
             }
         }
