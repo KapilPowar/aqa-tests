@@ -398,7 +398,6 @@ if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != ""
 	# copyFilestoGITRepo
 	# checkChangesAndCommit
 	# cleanup
-	get_JAVA_SDK
 	test
 else 
 	echo "Please provide missing arguments"

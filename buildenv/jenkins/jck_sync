@@ -118,6 +118,7 @@
 //     ],
 // ]
 
+def PR = 0
 timestamps{
     stage('Setup') {
             //if (PLATFORM_MAP.containsKey(params.PLATFORM)) {
@@ -240,7 +241,7 @@ def syncJckMaterial(){
                                         echo "${SCRIPT}"
                                         // def scriptOutput = sh(script: "${SCRIPT}",   returnStatus: true, returnStdout: true)
                                         def scriptOutput = sh(script: "${SCRIPT}",  returnStdout: true)
-                                        //EXITCODE = scriptOutput.returnStatus
+                                        EXITCODE =sh(script: "echo \$?", returnStatus: true, returnStdout: true).trim().toInteger()
                                         echo "EXITCODE= ${EXITCODE}"
                                         def output = scriptOutput.trim()
                                         echo "Shell script output:"
@@ -250,8 +251,8 @@ def syncJckMaterial(){
                                             echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                         } else if (EXITCODE == 0) {
                                             echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                            def number = extractNumber(output)
-                                            echo "Value of PR NUMBER: $number"
+                                            PR = extractNumber(output)
+                                            echo "Value of PR NUMBER: $PR"
                                         } else {
                                             error("script failed with exit code ${EXITCODE}")
                                         }
@@ -469,9 +470,9 @@ def createComment(TestComment) {
                 echo "GIT_USER: $GIT_USER"
                 
                 JCK_VERSION = params.JDK_VERSION ?: ""
-                def pr_number = getPRNumber()
-                println "PR number returned is $pr_number" 
-                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${pr_number}/comments"
+                //def pr_number = getPRNumber()
+                println "PR number returned is $PR" 
+                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${PR}/comments"
                 def comment = "${TestComment}"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
