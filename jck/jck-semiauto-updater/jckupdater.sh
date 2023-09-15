@@ -395,7 +395,7 @@ parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
 	 #cleanup
-	 #setup
+	setup
 	# isLatestUpdate
 	# extract
 	# gitClone
