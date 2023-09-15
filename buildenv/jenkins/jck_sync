@@ -251,6 +251,7 @@ def syncJckMaterial(){
                                         } else if (EXITCODE == 0) {
                                             echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                             def number = extractNumber(output)
+                                            echo "Value of PR NUMBER: $number"
                                         } else {
                                             error("script failed with exit code ${EXITCODE}")
                                         }
