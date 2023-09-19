@@ -100,11 +100,11 @@ crossCheckTestFoldersIn() {
 			echo "New test folder detected: $line | Please add target: jck-$tokenToSearch"
 			# command='<command>$(JCK_CMD_TEMPLATE) -test-args=$(Q)tests='${tokens[1]}/${tokens[2]}',jckRoot=$(JCK_ROOT),jckversion=$(JCK_VERSION),testsuite='$testTypeToUpper'$(Q); \'
 			# status='$(TEST_STATUS)</command>'
-			command='<command>$(GEN_JTB_GENERIC) tests='${tokens[1]}/${tokens[2]}', testsuite='$testTypeToUpper'; \
-		$(EXEC_COMPILER_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests='${tokens[1]}/${tokens[2]}', testsuite='$testTypeToUpper'
-		</command>'
+			command='<command>$(GEN_JTB_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'; \
+	$(EXEC_COMPILER_TEST); \
+	$(TEST_STATUS); \
+	$(GEN_SUMMARY_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'
+	</command>'
 			echo "<test>"
 			echo "	<testCaseName>jck-$tokenToSearch</testCaseName>"
 			echo "	<variations>"
