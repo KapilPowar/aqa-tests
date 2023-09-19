@@ -132,8 +132,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE==0){
-                    //target_JCK_Folder()
-                    //getSplitter()
+                    target_JCK_Folder()
+                    getSplitter()
                 }
             }
         }
