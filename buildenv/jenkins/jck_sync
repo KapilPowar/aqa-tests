@@ -340,8 +340,8 @@ def target_JCK_Folder(){
                     // Use 'grep' to check if any new folders are detected
                     def grepCommand = "grep -c '${specificLine1}' ${logFile}"
                     def grepResult = sh(script: grepCommand, returnStdout: true)
-                    echo  "grepResult= ${grepResult}"
-                    def count = grepResult.toInteger()
+                    //echo  "grepResult= ${grepResult}"
+                    //def count = grepResult.toInteger()
 
                     // grep last few lines after Done! to create comment
                     def fileContents = readFile(file: logFile).trim()
@@ -355,11 +355,11 @@ def target_JCK_Folder(){
                     // if (params.JDK_VERSION == "8"){
                     //     count = 3
                     // }
-                    if (count > 0) {
-                        echo "Specific line found in the log file: '${specificLine}'"
+                    if (grepResult.toInteger() == 0)  {
+                        echo "Specific line not found in the log file: '${specificLine}'"
                         COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
                     } else {
-                        echo "Specific line not found in the log file : '${specificLine}'"
+                        echo "Specific line  found in the log file : '${specificLine}'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
                     }
                 }
