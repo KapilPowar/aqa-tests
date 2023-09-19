@@ -96,7 +96,7 @@ def syncJckMaterial(){
 
         stage('Build') {
                 script {
-                    //getJavaSDK()
+                    getJavaSDK()
                         
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
