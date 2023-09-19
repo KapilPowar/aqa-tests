@@ -330,13 +330,13 @@ def target_JCK_Folder(){
                     echo "${GIT_BRANCH}"
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
                     def logFile = "test.log"
-                    def specificLine = "Total new folders detected : 0"
+                    def specificLine = "New test folder detected:" 
 
                     EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                     echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
                     sh "cat ${logFile}"
                         
-                    // Use 'grep' to search for the specific line in the log file
+                    // Use 'grep' to check if any new folders are detected
                     def grepCommand = "grep -c '${specificLine}' ${logFile}"
                     def grepResult = sh(script: grepCommand, returnStdout: true)
                     echo  "grepResult= ${grepResult}"
@@ -348,16 +348,16 @@ def target_JCK_Folder(){
                     def linesAfterDone = parts[1].trim()
                     def lines = linesAfterDone.split('\n')
                     def commentBody = lines.collect { it.trim() }.join('\\r\\n')
-                    def count = 2
-                    //JDK 8 will have 3 folders compiler, runtime and devtools
-                    if (params.JDK_VERSION == "8"){
-                        count = 3
-                    }
-                    if (grepResult.toInteger() == count) {
-                        echo "Specific line found in the log file: '${specificLine}'"
+                    // def count = 2
+                    // //JDK 8 will have 3 folders compiler, runtime and devtools
+                    // if (params.JDK_VERSION == "8"){
+                    //     count = 3
+                    // }
+                    if (grepResult.toInteger() == 0) {
+                        echo "Specific line not found in the log file'"
                         COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
                     } else {
-                        echo "Specific line not found in the log file"
+                        echo "Specific line found in the log file : '${specificLine}'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
                     }
                 }
