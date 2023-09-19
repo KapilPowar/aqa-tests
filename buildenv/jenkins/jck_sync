@@ -243,7 +243,7 @@ def getSplitter(){
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
         def PR_NEEDED = false
-        def tesClasstList = []
+        def testClasstList = []
 
         TESTS_MAP.each { key, value ->
             if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
@@ -252,9 +252,9 @@ def getSplitter(){
                 echo "Calling splitter.sh for TESTS: $testsValue and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${testsValue}"
-                SCRIPT = "./splitter.sh ${TARGET}"
+                SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
                 def logFileName = "${testsValue}.log"
-                EXITCODE = sh(script: "${SCRIPT} ${groupValue} > ${logFileName}", returnStatus: true)
+                EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 //sh "cat ${logFileName}"
@@ -281,14 +281,14 @@ def getSplitter(){
                 } else {
                     //echo "The line is not present in $mkFileName"
                     echo "We need to update $mkFileName and create PR for --- $testsValue"
-                    tesClasstList.add(testsValue)
+                    testClasstList.add(testsValue)
                     PR_NEEDED=true
                 }
             }
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + tesClasstList.join(", ")    
+            COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
         }
@@ -322,7 +322,6 @@ def getJavaSDK(){
 def target_JCK_Folder(){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-            //def comment=""
                 
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
@@ -330,7 +329,6 @@ def target_JCK_Folder(){
                     echo "${GIT_BRANCH}"
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
                     def logFile = "test.log"
-                    //def specificLine = "Total new folders detected : 0" 
                     def specificLine = "New test folder detected:"
 
                     EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
@@ -340,12 +338,6 @@ def target_JCK_Folder(){
                     // Use 'grep' to check if any new folders are detected
                     def grepCommand = "grep '${specificLine}' ${logFile} || true"
                     def grepResult = sh(script: grepCommand, returnStatus: true)
-                    //def exitCode = sh(script: "echo \$?", returnStatus: true)
-                    // if (exitCode != 0) {
-                    //     echo "An error occurred while running grep: Exit code ${exitCode}"
-                    // }
-                    //echo  "grepResult= ${grepResult}"
-                    //def count = grepResult.toInteger()
 
                     // grep last few lines after Done! to create comment
                     def fileContents = readFile(file: logFile).trim()
@@ -354,17 +346,13 @@ def target_JCK_Folder(){
                     def linesAfterDone = parts[1].trim()
                     def lines = linesAfterDone.split('\n')
                     def commentBody = lines.collect { it.trim() }.join('\\r\\n')
-                    //def count = 0
-                    //JDK 8 will have 3 folders compiler, runtime and devtools
-                    // if (params.JDK_VERSION == "8"){
-                    //     count = 3
-                    // }
+
                     if (grepResult == 0)  {
                         echo "No new folders detected. No need to update playlist.xml '"
-                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
+                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
                     } else {
                         echo "New folders detected. Need to update playlist.xml'"
-                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} ``` "
+                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
                     }
                 }
             }
@@ -377,11 +365,8 @@ def createComment(TestComment) {
             ]) {
                 def JCK_GIT_REPO = params.JCK_GIT_REPO
                 def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
-                //echo "GIT_USER: $GIT_USER"
                 
                 JCK_VERSION = params.JDK_VERSION ?: ""
-                //def pr_number = getPRNumber()
-                //println "PR number created is $PR"
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JCK_VERSION}-unzipped/issues/${PR}/comments"
                 COMMENT = "${TestComment}"
                 def curlCommand = """
