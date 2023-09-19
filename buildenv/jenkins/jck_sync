@@ -339,8 +339,8 @@ def target_JCK_Folder(){
                         
                     // Use 'grep' to check if any new folders are detected
                     def grepCommand = "grep -c '${specificLine1}' ${logFile}"
-                    def grepResult = sh(script: grepCommand, returnStdout: true, returnStatus: true)
-                    def exitCode = sh(script: ":").returnStatus
+                    def grepResult = sh(script: grepCommand, returnStdout: true)
+                    def exitCode = sh(script: "echo \$?", returnStatus: true)
                     if (exitCode != 0) {
                         echo "An error occurred while running grep: Exit code ${exitCode}"
                     }
