@@ -367,7 +367,7 @@ def target_JCK_Folder(){
 
 def createPRForFolderCheck(){
     dir("${WORKSPACE}/aqa-tests/jck") {
-        sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+        sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
             sh """
                 git branch
                 git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
