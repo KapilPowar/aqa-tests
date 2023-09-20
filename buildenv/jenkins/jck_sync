@@ -327,13 +327,12 @@ def getJavaSDK(){
 def target_JCK_Folder(){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-                
+            def logFile = "test.log"
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
                     echo "${GIT_BRANCH}"
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
-                    def logFile = "test.log"
                     def specificLine = "New test folder detected:"
 
                     EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
