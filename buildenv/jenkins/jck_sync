@@ -426,7 +426,7 @@ def createPRForFolderCheck(){
                     echo "No target file mapping found for path: $path"
                 }
             }
-            def gitStatus = sh(script: 'git status --porcelain', returnStdout: true).trim()
+            def gitStatus = sh(script: 'git status', returnStdout: true)
             def files = gitStatus.readLines()
             def gitAddCommand = 'git add '
             files.each { fileStatus ->
