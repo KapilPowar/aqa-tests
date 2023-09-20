@@ -358,12 +358,68 @@ def target_JCK_Folder(){
                     } else {
                         echo "New folders detected. Need to update playlist.xml'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+                        createPRForFolderCheck(logFile)
                     }
                 }
             }
             createComment(COMMENT)
 }
 
+
+def createPRForFolderCheck(logFile){
+    dir("${WORKSPACE}/aqa-tests/jck") {
+    def sourceFilePath = logFile
+    def sourceFileContent = readFile(file: sourceFilePath)
+    def pattern = /(?s)(New test folder detected:(.*?)<\/test>)/
+    def matches = (sourceFileContent =~ pattern)
+    def compilerMap = [
+        '/lang': 'compiler.lang/playlist.xml',
+        '/api': 'compiler.api/playlist.xml'
+        // Add other mappings as needed
+    ]
+    def runtimeMap = [
+        '/lang': 'runtime.lang/playlist.xml',
+        '/api': 'runtime.api/playlist.xml',
+        '/vm': 'runtime.vm/playlist.xml'
+        // Add other mappings as needed
+    ]
+    matches.each { match ->
+        def fullMatch = match[0]
+        def pathMatch = fullMatch =~ /New test folder detected:\s*(\S+)/
+        def fullPath = pathMatch[0][1].trim()
+        // Extract just the directory path (e.g., /lang or /api)
+        def path = fullPath =~ /\/(\w+)\//
+        if (path.size() > 0) {
+            path = "/${path[0][1]}"
+        }
+        // Check if a target file path is defined for the path
+        def targetFilePath=""
+        if (fullMatch.contains("COMPILER")) {
+            targetFilePath = compilerMap[path]
+        } else{
+            targetFilePath = runtimeMap[path]
+        }
+
+        if (targetFilePath) {
+            // Read the current target file content
+            def targetFileContent = readFile(file: targetFilePath)
+            // Extract the content from <test> to </test> in the match block
+            def testContent = fullMatch =~ /(?s)(<test>(.*?)<\/test>)/
+            if (testContent) {
+                // Append the test block (excluding "New test folder detected" line) to the target file content
+                def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent[0]}\n</playlist>")
+                // Write the updated content back to the target XML file
+                writeFile(file: targetFilePath, text: updatedTargetContent)
+                echo "Updated target XML file: $targetFilePath"
+            } else {
+                echo "No match found."
+            }
+        } else {
+            echo "No target file mapping found for path: $path"
+        }
+    }
+    }
+}
 def createComment(TestComment) {
             withCredentials([
                 string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
