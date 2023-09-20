@@ -182,6 +182,7 @@ isLatestUpdate() {
 
 ## Download directly from given URL under current folder
 getJCKSources() {
+	cd $WORKSPACE/jckmaterial
 	echo "remove build.txt file after comparison"
 	rm -rf build.txt
 	echo "download jck materials..."
