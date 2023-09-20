@@ -426,9 +426,26 @@ def createPRForFolderCheck(){
                     echo "No target file mapping found for path: $path"
                 }
             }
+            def gitStatus = sh(script: 'git status --porcelain', returnStdout: true).trim()
+            def files = gitStatus.readLines()
+            def gitAddCommand = 'git add '
+            files.each { fileStatus ->
+                if (fileStatus =~ /^(M|A|R)\s+(.*)$/) {
+                    def filePath = it[1]
+                    if (filePath.endsWith('.xml') || filePath.endsWith('.mk')) {
+                                // Add the file to the 'git add' command
+                                gitAddCommand += "${filePath} "
+                            }
+                }
+            }
+            sh gitAddCommand.trim()
             sh """
                 git branch
                 git status
+                git config --global user.email "KapilPowar@in.ibm.com"
+		        git config --global user.name "KapilPowar"
+                git commit -am "update folder check"
+                git push origin1 test
             """
         }
     }
