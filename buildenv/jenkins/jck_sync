@@ -370,7 +370,10 @@ def createPRForFolderCheck(){
         sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
             sh """
                 git branch
-                git status
+                git remote add origin git@github.ibm.com:$GIT_USER/aqa-tests.git
+	            git remote add upstream git@github.ibm.com:$GIT_USER/aqa-tests.git
+                git checkout -b test
+                git branch -v
             """
             def sourceFilePath = createFile()
             //def sourceFilePath = logFile
@@ -423,6 +426,10 @@ def createPRForFolderCheck(){
                     echo "No target file mapping found for path: $path"
                 }
             }
+            sh """
+                git branch
+                git status
+            """
         }
     }
 }
