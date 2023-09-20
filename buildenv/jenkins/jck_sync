@@ -108,9 +108,14 @@ def syncJckMaterial(){
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                     def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${GIT_DEV_BRANCH}  ${JAVA_HOME} "
                                     echo "${SCRIPT}"
-                                    def scriptOutput = sh(script: "${SCRIPT}",  returnStdout: true)
-                                    EXITCODE = sh(script: "echo \$?", returnStatus: true)
+                                    def tempOutputFile = "temp_output.txt"
+                                    //create a temp output file 
+                                    new File(tempOutputFile).text = "This is the content you want to write to the file."
+                                    //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
+                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
+                                    def scriptOutput = readFile(tempOutputFile)
                                     def output = scriptOutput.trim()
                                     echo "Shell script output:"
                                     echo output
