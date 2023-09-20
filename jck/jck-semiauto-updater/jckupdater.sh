@@ -336,16 +336,16 @@ createPR(){
 	# $pr_number now contains the PR number
 	echo "PR_Number=$PR_NUMBER"
 
-	echo "Add comment to PR "
-	comment="Test comment from script"
-	comment_url="https://github.ibm.com/api/v3/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/issues/$PR_NUMBER/comments"
-	echo "comment_url -- $comment_url"
+	# echo "Add comment to PR "
+	# comment="Test comment from script"
+	# comment_url="https://github.ibm.com/api/v3/repos/$GIT_USER/JCK$JCK_VERSION-unzipped/issues/$PR_NUMBER/comments"
+	# echo "comment_url -- $comment_url"
 
-	comment_response=$(curl -X POST \
-        -H "Authorization: token $GIT_TOKEN" \
-        -H "Content-Type: application/json" \
-        -d "{\"body\":\"$comment\"}" \
-       	$comment_url)
+	# comment_response=$(curl -X POST \
+    #     -H "Authorization: token $GIT_TOKEN" \
+    #     -H "Content-Type: application/json" \
+    #     -d "{\"body\":\"$comment\"}" \
+    #    	$comment_url)
 
 }
 
@@ -390,15 +390,15 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
-	 #cleanup
-	 #setup
-	# isLatestUpdate
-	# extract
-	# gitClone
-	# copyFilestoGITRepo
-	# checkChangesAndCommit
-	# cleanup
-	test
+	cleanup
+	setup
+	isLatestUpdate
+	extract
+	gitClone
+	copyFilestoGITRepo
+	checkChangesAndCommit
+	cleanup
+	#test
 else 
 	echo "Please provide missing arguments"
 	usage; exit 1
