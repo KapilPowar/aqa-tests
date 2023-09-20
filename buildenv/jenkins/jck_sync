@@ -470,10 +470,10 @@ New test folder detected: ./lang/ANNOT1 | Please add target: jck-compiler-lang-A
 		<variations>
 			<variation>NoOptions</variation>
 		</variations>
-		<command>$(GEN_JTB_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER; \
-		$(EXEC_COMPILER_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER
+		<command>\$(GEN_JTB_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER; \\
+		\$(EXEC_COMPILER_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER
 		</command>
 		<levels>
 			<level>extended</level>
@@ -488,10 +488,10 @@ New test folder detected: ./lang/STMT1 | Please add target: jck-compiler-lang-ST
 		<variations>
 			<variation>NoOptions</variation>
 		</variations>
-		<command>$(GEN_JTB_GENERIC) tests=lang/STMT1 testsuite=COMPILER; \
-		$(EXEC_COMPILER_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests=lang/STMT1 testsuite=COMPILER
+		<command>\$(GEN_JTB_GENERIC) tests=lang/STMT1 testsuite=COMPILER; \\
+		\$(EXEC_COMPILER_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/STMT1 testsuite=COMPILER
 		</command>
 		<levels>
 			<level>extended</level>
@@ -510,10 +510,10 @@ New test folder detected: ./lang/ARR1 | Please add target: jck-runtime-lang-ARR1
 		<variations>
 			<variation>NoOptions</variation>
 		</variations>
-		<command>$(GEN_JTB_GENERIC) tests=lang/ARR1 testsuite=RUNTIME; \
-		$(EXEC_RUNTIME_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests=lang/ARR1 testsuite=RUNTIME
+		<command>\$(GEN_JTB_GENERIC) tests=lang/ARR1 testsuite=RUNTIME; \\
+		\$(EXEC_RUNTIME_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/ARR1 testsuite=RUNTIME
 		</command>
 		<levels>
 			<level>extended</level>
@@ -528,10 +528,10 @@ New test folder detected: ./api/test | Please add target: jck-runtime-api-test
 		<variations>
 			<variation>NoOptions</variation>
 		</variations>
-		<command>$(GEN_JTB_GENERIC) tests=api/test testsuite=RUNTIME; \
-		$(EXEC_RUNTIME_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests=api/test testsuite=RUNTIME
+		<command>\$(GEN_JTB_GENERIC) tests=api/test testsuite=RUNTIME; \\
+		\$(EXEC_RUNTIME_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=api/test testsuite=RUNTIME
 		</command>
 		<levels>
 			<level>extended</level>
