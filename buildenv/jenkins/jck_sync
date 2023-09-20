@@ -370,8 +370,8 @@ def createPRForFolderCheck(){
         sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
             sh """
                 git branch
-                git remote add origin1 git@github.ibm.com:KapilPowar/aqa-tests.git
-	            git remote add upstream1 git@github.ibm.com:KapilPowar/aqa-tests.git
+                git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
+	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
                 git checkout -b test
                 git branch -v
             """
@@ -427,6 +427,7 @@ def createPRForFolderCheck(){
                 }
             }
             def gitStatus = sh(script: 'git status', returnStdout: true)
+            echo "$gitStatus"
             def files = gitStatus.readLines()
             def gitAddCommand = 'git add '
             files.each { fileStatus ->
