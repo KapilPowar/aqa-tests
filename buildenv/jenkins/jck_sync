@@ -376,6 +376,7 @@ def createPRForFolderCheck(){
                 git branch -v
             """
             def sourceFilePath = createFile()
+            def modifiedFiles = []
             //def sourceFilePath = logFile
             def sourceFileContent = readFile(file: sourceFilePath)
             def pattern = /(?s)(New test folder detected:(.*?)<\/test>)/
@@ -419,6 +420,7 @@ def createPRForFolderCheck(){
                         // Write the updated content back to the target XML file
                         writeFile(file: targetFilePath, text: updatedTargetContent)
                         echo "Updated target XML file: $targetFilePath"
+                        modifiedFiles.add(targetFilePath)
                     } else {
                         echo "No match found."
                     }
@@ -426,20 +428,22 @@ def createPRForFolderCheck(){
                     echo "No target file mapping found for path: $path"
                 }
             }
-            def gitStatus = sh(script: 'git status', returnStdout: true)
-            echo "$gitStatus"
-            def files = gitStatus.readLines()
-            def gitAddCommand = 'git add '
-            files.each { fileStatus ->
-                if (fileStatus =~ /^(M|A|R)\s+(.*)$/) {
-                    def filePath = it[1]
-                    if (filePath.endsWith('.xml') || filePath.endsWith('.mk')) {
-                                // Add the file to the 'git add' command
-                                gitAddCommand += "${filePath} "
-                            }
-                }
-            }
-            sh gitAddCommand.trim()
+            // def gitStatus = sh(script: 'git status', returnStdout: true)
+            // echo "$gitStatus"
+            // def files = gitStatus.readLines()
+            // def gitAddCommand = 'git add '
+            // files.each { fileStatus ->
+            //     if (fileStatus =~ /^(M|A|R)\s+(.*)$/) {
+            //         def filePath = it[1]
+            //         if (filePath.endsWith('.xml') || filePath.endsWith('.mk')) {
+            //                     // Add the file to the 'git add' command
+            //                     gitAddCommand += "${filePath} "
+            //                 }
+            //     }
+            // }
+            def filesToStage = modifiedFiles.join(' ')
+            def gitAddCommand = "git add ${filesToStage}"
+            sh(script: gitAddCommand)
             sh """
                 git branch
                 git status
