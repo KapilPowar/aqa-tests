@@ -169,10 +169,10 @@ isLatestUpdate() {
 	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
 		#clean up after testing
-		# get_JAVA_SDK
-		# getJCKSources
-		cleanup
-		exit 2
+		get_JAVA_SDK
+		getJCKSources
+		# cleanup
+		# exit 2
 	else	
 		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
 		get_JAVA_SDK
