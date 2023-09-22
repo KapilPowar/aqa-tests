@@ -178,7 +178,7 @@ def syncJckMaterial(){
                 PLATFORMS.each { PLATFORM ->
                     //echo "going to print status and job number "
                     echo "Job openjdk${JDK_VERSION}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}"
-                    COMMENT= COMMENT +"Job [#${buildNumbers[PLATFORM]}](${build_url}${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}\\r\\n"
+                    COMMENT= COMMENT +"Job [openjdk${JDK_VERSION}_${PLATFORM} #${buildNumbers[PLATFORM]}](${build_url}${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}\\r\\n"
                 }
                 createComment(COMMENT)
             }
