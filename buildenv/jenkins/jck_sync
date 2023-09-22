@@ -1,8 +1,8 @@
 #!groovy
 
 def PR = 0
-def COMMENT = ""
-def EXITCODE = 0
+//def COMMENT = ""
+//def EXITCODE = 0
 
 timestamps{
     stage('Setup') {
@@ -103,7 +103,7 @@ def syncJckMaterial(){
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    def EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
@@ -136,7 +136,7 @@ def syncJckMaterial(){
 
         stage('SanityTest') {
                script{
-                   if (EXITCODE==0){ //change it to zero if want to run tests
+                   if (PR !=0){ //change it to zero if want to run tests
                     def TEST_PLATFORM="x86-64_linux,x86-64_windows"
                     def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
@@ -173,7 +173,7 @@ def syncJckMaterial(){
                     }
                 }
                 parallel testJobs
-                COMMENT=""
+                def COMMENT=""
                 //echo "JENKINS_URL--- ${JENKINS_URL}"
                 PLATFORMS.each { PLATFORM ->
                     //echo "going to print status and job number "
@@ -192,7 +192,7 @@ def getSplitter(){
         if (JDK_VERSION == "8") {
             JDK_VERSION = "8d"
         } else if (JDK_VERSION == "11"){
-             JDK_VERSION = "11"
+             JDK_VERSION = "11a"
         } 
         def TESTS_MAP = [
             'ANNOT' : [
@@ -238,6 +238,7 @@ def getSplitter(){
         ]
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
+        def COMMENT=""
         def PR_NEEDED = false
         def testClasstList = []
         def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
@@ -250,7 +251,7 @@ def getSplitter(){
                 TARGET="${TARGET_TO_SPLIT}/${testsValue}"
                 SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
                 def logFileName = "${testsValue}.log"
-                EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
+                def EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 //sh "cat ${logFileName}"
@@ -309,6 +310,7 @@ def target_JCK_Folder(){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
             def logFile = "test.log"
+            def COMMENT=""
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
@@ -316,7 +318,7 @@ def target_JCK_Folder(){
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
                     def specificLine = "New test folder detected:"
 
-                    EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                    def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
                     echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
                     sh "cat ${logFile}"
                         
@@ -445,7 +447,7 @@ def createComment(TestComment) {
                 
                 JDK_VERSION = params.JDK_VERSION
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR}/comments"
-                COMMENT = "${TestComment}"
+                def COMMENT = "${TestComment}"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
                     "body":"$COMMENT" 
