@@ -114,7 +114,7 @@ def syncJckMaterial(){
                                         echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                        PR = extractNumber(scriptOutput)
+                                        //PR = extractNumber(scriptOutput)
                                         echo "PR created with number : $PR"
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
@@ -178,7 +178,7 @@ def syncJckMaterial(){
                 PLATFORMS.each { PLATFORM ->
                     //echo "going to print status and job number "
                     echo "Job openjdk${JDK_VERSION}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}"
-                    COMMENT= COMMENT +"Job [openjdk${JDK_VERSION}_${PLATFORM} #${buildNumbers[PLATFORM]}](${build_url}${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}\\r\\n"
+                    COMMENT= COMMENT +"Job [${PLATFORM} #${buildNumbers[PLATFORM]}](${build_url}${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}\\r\\n"
                 }
                 createComment(COMMENT)
             }
