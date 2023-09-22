@@ -114,8 +114,7 @@ def syncJckMaterial(){
                                         echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                        //PR = extractNumber(scriptOutput)
-                                        PR =0
+                                        PR = extractNumber(scriptOutput)
                                         echo "PR created with number : $PR"
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
@@ -468,7 +467,7 @@ def extractNumber(output) {
     def lines = output.readLines()
     for (line in lines) {
         if (line =~ /PR_Number=(\d+)/) {
-            return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
+            //return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
         }
     }
     return 0
