@@ -127,7 +127,7 @@ def syncJckMaterial(){
 
         stage( 'Splitter'){
             script{
-                if (EXITCODE==0){
+                if (PR !=0){
                     //target_JCK_Folder()
                     //getSplitter()
                 }
@@ -470,7 +470,7 @@ def extractNumber(output) {
             return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
         }
     }
-    return null
+    return 0
 }
 
 def createFile(){
