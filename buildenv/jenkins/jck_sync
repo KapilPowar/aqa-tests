@@ -128,7 +128,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
+                    target_Folder_check()
                     getSplitter()
                 }
             }
@@ -207,14 +207,14 @@ def getSplitter(){
             // 'STMT' : ['TESTS' : 'STMT','GROUP' : '5',],
             'ANNOT': ['GROUP' : 5,],
             'CLSS' : ['GROUP' : 10,],
-            'CONV' : ['GROUP' : '5',],
-            'DASG' : ['GROUP' : '5',],
-            'EXPR' : ['GROUP' : '11',],
-            'INTF' : ['GROUP' : '5',],
-            'LMBD' : ['GROUP' : '5',],
-            'NAME' : ['GROUP' : '5',],
-            'TYPE' : ['GROUP' : '5',],
-            'STMT' : ['GROUP' : '5',],
+            'CONV' : ['GROUP' : 5,],
+            'DASG' : ['GROUP' : 5,],
+            'EXPR' : ['GROUP' : 11,],
+            'INTF' : ['GROUP' : 5,],
+            'LMBD' : ['GROUP' : 5,],
+            'NAME' : ['GROUP' : 5,],
+            'TYPE' : ['GROUP' : 5,],
+            'STMT' : ['GROUP' : 5,],
         ]
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
