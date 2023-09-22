@@ -2,7 +2,7 @@
 
 def PR=0
 //def COMMENT = ""
-//def EXITCODE = 0
+def EXITCODE = 0
 
 timestamps{
     stage('Setup') {
@@ -103,7 +103,7 @@ def syncJckMaterial(){
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    def EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
@@ -127,16 +127,16 @@ def syncJckMaterial(){
 
         stage( 'Splitter'){
             script{
-                if (PR !=0){
-                    //target_JCK_Folder()
-                    //getSplitter()
+                if (EXITCODE ==0){
+                    //target_Folder_check()
+                    getSplitter()
                 }
             }
         }
 
         stage('SanityTest') {
                script{
-                   if (PR !=0){ //change it to zero if want to run tests
+                   if (EXITCODE ==2){ //change it to zero if want to run tests
                     def TEST_PLATFORM="x86-64_linux"
                     def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
@@ -195,46 +195,26 @@ def getSplitter(){
              JDK_VERSION = "11a"
         } 
         def TESTS_MAP = [
-            'ANNOT' : [
-                'TESTS' : 'ANNOT',
-                'GROUP' : 5,
-            ],
-            'CLSS' : [
-                'TESTS' : 'CLSS',
-                'GROUP' : 10,
-            ],
-            'CONV' : [
-                'TESTS' : 'CONV',
-                'GROUP' : '5',
-            ],
-            'DASG' : [
-                'TESTS' : 'DASG',
-                'GROUP' : '5',
-            ],
-            'EXPR' : [
-                'TESTS' : 'EXPR',
-                'GROUP' : '11',
-            ],
-            'INTF' : [
-                'TESTS' : 'INTF',
-                'GROUP' : '5',
-            ],
-            'LMBD' : [
-                'TESTS' : 'LMBD',
-                'GROUP' : '5',
-            ],
-            'NAME' : [
-                'TESTS' : 'NAME',
-                'GROUP' : '5',
-            ],
-            'TYPE' : [
-                'TESTS' : 'TYPE',
-                'GROUP' : '5',
-            ],
-            'STMT' : [
-                'TESTS' : 'STMT',
-                'GROUP' : '5',
-            ],
+            // 'ANNOT' : ['TESTS' : 'ANNOT','GROUP' : 5,],
+            // 'CLSS' : ['TESTS' : 'CLSS','GROUP' : 10,],
+            // 'CONV' : ['TESTS' : 'CONV','GROUP' : '5',],
+            // 'DASG' : ['TESTS' : 'DASG','GROUP' : '5',],
+            // 'EXPR' : ['TESTS' : 'EXPR','GROUP' : '11',],
+            // 'INTF' : ['TESTS' : 'INTF','GROUP' : '5',],
+            // 'LMBD' : ['TESTS' : 'LMBD','GROUP' : '5',],
+            // 'NAME' : ['TESTS' : 'NAME','GROUP' : '5',],
+            // 'TYPE' : ['TESTS' : 'TYPE','GROUP' : '5',],
+            // 'STMT' : ['TESTS' : 'STMT','GROUP' : '5',],
+            'ANNOT': ['GROUP' : 5,],
+            'CLSS' : ['GROUP' : 10,],
+            'CONV' : ['GROUP' : '5',],
+            'DASG' : ['GROUP' : '5',],
+            'EXPR' : ['GROUP' : '11',],
+            'INTF' : ['GROUP' : '5',],
+            'LMBD' : ['GROUP' : '5',],
+            'NAME' : ['GROUP' : '5',],
+            'TYPE' : ['GROUP' : '5',],
+            'STMT' : ['GROUP' : '5',],
         ]
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
@@ -243,20 +223,20 @@ def getSplitter(){
         def testClasstList = []
         def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
         TESTS_MAP.each { key, value ->
-            if (value.containsKey('TESTS') && value.containsKey('GROUP')) {
-                def testsValue = value['TESTS']
+            if (value.containsKey('GROUP')) {
+                //def testsValue = value['TESTS']
                 def groupValue = value['GROUP']
-                echo "Calling splitter.sh for TESTS: $testsValue and GROUP:$groupValue"
+                echo "Calling splitter.sh for TESTS: $key and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
-                TARGET="${TARGET_TO_SPLIT}/${testsValue}"
+                TARGET="${TARGET_TO_SPLIT}/${key}"
                 SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
-                def logFileName = "${testsValue}.log"
+                def logFileName = "${key}.log"
                 def EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 //sh "cat ${logFileName}"
-                if (testsValue == "CLSS"){
-                    testsValue="CLASS"
+                if (key == "CLSS"){
+                    key="CLASS"
                 }
                 
                 def lastLine = null
@@ -264,7 +244,7 @@ def getSplitter(){
                 def logFileContents = readFile(file: logFileName).trim().split('\n')
                 for (int i = logFileContents.size() - 1; i >= 0; i--) {
                     def line = logFileContents[i]
-                    if (line.startsWith("COMPILER_LANG_${testsValue}_TESTS_GROUP")) {
+                    if (line.startsWith("COMPILER_LANG_${key}_TESTS_GROUP")) {
                         lastLine = line
                         break
                     }
@@ -274,11 +254,11 @@ def getSplitter(){
                 //echo "Last test group in ${logFileName}: ${lastLine}"
                 if (lastLine && mkFileContents.contains(lastLine)) {
                     //echo "The line is present in $mkFileName"
-                    echo "No need to create PR for --- $testsValue"
+                    echo "No need to create PR for --- $key"
                 } else {
                     //echo "The line is not present in $mkFileName"
-                    echo "We need to update $mkFileName and create PR for --- $testsValue"
-                    testClasstList.add(testsValue)
+                    echo "We need to update $mkFileName and create PR for --- $key"
+                    testClasstList.add(key)
                     PR_NEEDED=true
                 }
             }
@@ -306,7 +286,7 @@ def getJavaSDK(){
         }
 }
 
-def target_JCK_Folder(){
+def target_Folder_check(){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
             def logFile = "test.log"
@@ -467,7 +447,7 @@ def extractNumber(output) {
     def lines = output.readLines()
     for (line in lines) {
         if (line =~ /PR_Number=(\d+)/) {
-            //return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
+            return line.replaceAll(/.*PR_Number=(\d+).*/, '$1')
         }
     }
     return 0
