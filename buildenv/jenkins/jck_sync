@@ -1,6 +1,6 @@
 #!groovy
 
-def PR = 0
+def PR=0
 //def COMMENT = ""
 //def EXITCODE = 0
 
@@ -115,6 +115,7 @@ def syncJckMaterial(){
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         //PR = extractNumber(scriptOutput)
+                                        PR =0
                                         echo "PR created with number : $PR"
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
