@@ -385,10 +385,12 @@ def createPRForFolderCheck(){
                     // Read the current target file content
                     def targetFileContent = readFile(file: targetFilePath)
                     // Extract the content from <test> to </test> in the match block
-                    def testContent = fullMatch =~ /(?s)(<test>(.*?)<\/test>)/
-                    if (testContent) {
+                    def matcher = fullMatch =~ /(?s)(<test>(.*?)<\/test>)/
+                    def testContent=""
+                    if (matcher.find()) {
+                        testContent = matcher.group(0)
                         // Append the test block (excluding "New test folder detected" line) to the target file content
-                        def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent[0]}\n</playlist>")
+                        def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent}\n</playlist>")
                         // Write the updated content back to the target XML file
                          echo " testContent ---  ${testContent}"
                         //echo " updatedTargetContent ---  $updatedTargetContent"
