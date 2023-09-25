@@ -394,7 +394,7 @@ def createPRForFolderCheck(){
                         // Write the updated content back to the target XML file
                         echo " testContent ---  ${testContent}"
                         //echo " updatedTargetContent ---  $updatedTargetContent"
-                        //writeFile(file: targetFilePath, text: updatedTargetContent)
+                        writeFile(file: targetFilePath, text: updatedTargetContent)
                         echo "Updated target XML file: $targetFilePath"
                         modifiedFiles.add(targetFilePath)
                         // sh """
