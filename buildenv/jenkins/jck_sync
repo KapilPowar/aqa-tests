@@ -410,13 +410,14 @@ def createPRForFolderCheck(){
             }
             def filesToStage = modifiedFiles.join(' ')
             def gitAddCommand = "git add ${filesToStage}"
-            sh(script: gitAddCommand)
             sh """
                 git branch
-                git status
                 git config --global user.email "KapilPowar@in.ibm.com"
 		        git config --global user.name "KapilPowar"
-                git commit -am "update folder check"
+            """
+            sh(script: gitAddCommand)
+            sh """
+                git commit -m "update folder check"
                 git push origin1 test
             """
         }
@@ -428,6 +429,7 @@ def update_jckmk_file(testClasstList){
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
     def searchString = "ifeq (${JDK_VERSION}, \$(VERSION))"
+    sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
     testClasstList.each{ test ->
 
     def sourceFilePath = "${test}.log"
@@ -478,10 +480,11 @@ def update_jckmk_file(testClasstList){
     sh(script: gitAddCommand)
 
     sh """
-        git commit -am "update jck.mk"
+        git commit -m "update jck.mk"
         git push origin1 test
     """
 
+}
 }
 
 def createComment(TestComment) {
