@@ -128,8 +128,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
-                    //getSplitter()
+                    target_Folder_check()
+                    getSplitter()
                 }
             }
         }
@@ -265,6 +265,7 @@ def getSplitter(){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
+            update_jckmk_file(testClasstList)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
@@ -421,6 +422,68 @@ def createPRForFolderCheck(){
         }
     }
 }
+def update_jckmk_file(testClasstList){
+
+    //def sourceFilePath = "test.log"
+    def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
+    JDK_VERSION = params.JDK_VERSION
+    def searchString = "ifeq (${JDK_VERSION}, \$(VERSION))"
+    testClasstList.each{ test ->
+
+    def sourceFilePath = "${test}.log"
+    echo "file --- ${sourceFilePath}"
+
+    // Read all lines from the source file containing "="
+    def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
+
+    // Read the target file into a list
+    def targetLines = readFile(file: targetFilePath).readLines()
+
+    // Iterate through the source lines
+    sourceLines.each { sourceLine ->
+        // Split the source line by "="
+        def sourceParts = sourceLine.split('=')
+        def sourceKey = sourceParts[0]
+
+        // Initialize a flag to determine if we have replaced a line
+        def lineReplaced = false
+        def insideBlock = false
+        // Iterate through the target lines
+        def updatedTargetLines = targetLines.collect { line ->
+        if (line.contains(searchString)) {
+            insideBlock = true
+            line
+            } else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
+                lineReplaced = true
+                "\t${sourceLine}"
+            } else {
+                line
+            }
+        }
+
+        // Update the target lines for the next source line
+        targetLines = updatedTargetLines
+    }
+
+    // Write the updated target lines back to the target file
+    //new File(targetFilePath).text = targetLines.join('\n')
+    writeFile(file: targetFilePath, text: targetLines.join('\n'))
+    }
+    echo "jck.mk --- ${targetFilePath}"
+    sh """
+        git branch
+        git status
+    """
+    def gitAddCommand = "git add ${targetFilePath}"
+    sh(script: gitAddCommand)
+
+    sh """
+        git commit -am "update jck.mk"
+        git push origin1 test
+    """
+
+}
+
 def createComment(TestComment) {
             withCredentials([
                 string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')

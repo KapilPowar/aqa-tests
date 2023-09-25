@@ -24,12 +24,21 @@ split()
 	
 	testPathPrefix=$3
     numOfIndices=numOfGrps+1; 
-    testName=$(echo "$testPathPrefix" | awk -F'/' '{print $NF}')
-	if [[ ${testName} = "CLSS" ]]; then
-	        testName="CLASS"
+    lastPrefix=$(echo "$testPathPrefix" | awk -F'/' '{print $NF}')
+	firstPrefix=$(echo "$pathPrefix" | awk -F'/' '{print $1}' | tr '[:lower:]' '[:upper:]')
+	# if [[ "$path" =~ JCK-compiler ]]; then
+	# 	folderName="COMPILER"
+	# elif [[ "$path" =~ JCK-runtime ]]; then
+	# 	folderName="RUNTIME"
+	# elif [[ "$path" =~ JCK-devtools ]]; then
+	# 	folderName="DEVTOOLS"
+	# fi
+	if [[ ${lastPrefix} = "CLSS" ]]; then
+	        lastPrefix="CLASS"
 	fi
-	# Read in the sub-tests into an array 
 	
+	testName=COMPILER_${firstPrefix}_${lastPrefix}
+	# Read in the sub-tests into an array
 	i=0
 	while read line
 	do
@@ -90,7 +99,7 @@ split()
 		for ((i=0; i<$numOfGrps; i++));
 		do
 			value=${groups[$i]}
-			printf "%s\n\n" "COMPILER_LANG_${testName}_TESTS_GROUP$((i+1))=\$(Q)${value%?}\$(Q)"
+			printf "%s\n\n" "${testName}_TESTS_GROUP$((i+1))=\$(Q)${value%?}\$(Q)"
 		done
 		printf "%s\n\n" "Total subtests processed = $totalCounted"
 	else 
