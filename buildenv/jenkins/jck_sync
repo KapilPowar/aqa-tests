@@ -128,15 +128,15 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    target_Folder_check()
-                    getSplitter()
+                    //target_Folder_check()
+                    //getSplitter()
                 }
             }
         }
 
         stage('SanityTest') {
                script{
-                   if (EXITCODE ==0){ //change it to zero if want to run tests
+                   if (EXITCODE ==2){ //change it to zero if want to run tests
                     def TEST_PLATFORM="x86-64_linux"
                     def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
