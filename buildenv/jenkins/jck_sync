@@ -472,6 +472,7 @@ def update_jckmk_file(testClasstList){
     writeFile(file: targetFilePath, text: targetLines.join('\n'))
     }
     echo "jck.mk --- ${targetFilePath}"
+    sh "cat ${targetFilePath}"
     sh """
         git branch
         git status
@@ -480,7 +481,7 @@ def update_jckmk_file(testClasstList){
     sh(script: gitAddCommand)
 
     sh """
-        git commit -m "update jck.mk"
+        git commit -am "update jck.mk"
         git push origin1 test
     """
 
