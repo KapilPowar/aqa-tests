@@ -230,14 +230,14 @@ def getSplitter(){
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${key}"
                 SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
+                if (key == "CLSS"){
+                    key="CLASS"
+                }
                 def logFileName = "${key}.log"
                 def EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
                 
                 echo "EXITCODE in splitter =${EXITCODE}"
                 //sh "cat ${logFileName}"
-                if (key == "CLSS"){
-                    key="CLASS"
-                }
                 
                 def lastLine = null
                 // Read the last line starting with COMPILER_LANG_ANNOT_TESTS_GROUP from logFileName.log
