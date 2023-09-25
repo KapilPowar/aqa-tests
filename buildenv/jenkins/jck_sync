@@ -390,13 +390,14 @@ def createPRForFolderCheck(){
                         // Append the test block (excluding "New test folder detected" line) to the target file content
                         def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent[0]}\n</playlist>")
                         // Write the updated content back to the target XML file
-                        echo " updatedTargetContent ---  $updatedTargetContent"
-                        writeFile(file: targetFilePath, text: updatedTargetContent)
+                         echo " testContent ---  ${testContent[0]}"
+                        //echo " updatedTargetContent ---  $updatedTargetContent"
+                        //writeFile(file: targetFilePath, text: updatedTargetContent)
                         echo "Updated target XML file: $targetFilePath"
                         modifiedFiles.add(targetFilePath)
-                        sh """
-                        git diff targetFilePath
-                        """
+                        // sh """
+                        // git diff targetFilePath
+                        // """
                     } else {
                         echo "No match found."
                     }
@@ -420,14 +421,14 @@ def createPRForFolderCheck(){
             def filesToStage = modifiedFiles.join(' ')
             def gitAddCommand = "git add ${filesToStage}"
             sh(script: gitAddCommand)
-            sh """
-                git branch
-                git status
-                git config --global user.email "KapilPowar@in.ibm.com"
-		        git config --global user.name "KapilPowar"
-                git commit -am "update folder check"
-                git push origin1 test
-            """
+            // sh """
+            //     git branch
+            //     git status
+            //     git config --global user.email "KapilPowar@in.ibm.com"
+		    //     git config --global user.name "KapilPowar"
+            //     git commit -am "update folder check"
+            //     git push origin1 test
+            // """
         }
     }
 }
