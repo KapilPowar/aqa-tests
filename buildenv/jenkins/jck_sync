@@ -448,7 +448,7 @@ def update_jckmk_file(testClasstList){
         // Split the source line by "="
         def sourceParts = sourceLine.split('=')
         def sourceKey = sourceParts[0]
-         echo "${sourceKey}"
+        //echo "${sourceKey}"
         // Initialize a flag to determine if we have replaced a line
         def lineReplaced = false
         def insideBlock = false
@@ -457,13 +457,14 @@ def update_jckmk_file(testClasstList){
         if (line.contains(searchString)) {
             insideBlock = true
             line
-            } else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
-                lineReplaced = true
-                "\t${sourceLine}"
-            } else {
-                line
-            }
+        } else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
+            lineReplaced = true
+            echo "${sourceLine}"
+            "\t${sourceLine}"
+        } else {
+            line
         }
+    }
 
         // Update the target lines for the next source line
         targetLines = updatedTargetLines
@@ -471,7 +472,7 @@ def update_jckmk_file(testClasstList){
 
     // Write the updated target lines back to the target file
     //new File(targetFilePath).text = targetLines.join('\n')
-    echo "${targetLines}"
+    //echo "${targetLines}"
     writeFile(file: targetFilePath, text: targetLines.join('\n'))
     }
     echo "jck.mk --- ${targetFilePath}"
