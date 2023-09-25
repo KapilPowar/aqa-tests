@@ -342,8 +342,6 @@ def createPRForFolderCheck(){
         sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
             sh """
                 git branch
-                git remote remove origin1 2>/dev/null
-                git remote remove upstream1 2>/dev/null
                 git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
 	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
                 git checkout -b test
