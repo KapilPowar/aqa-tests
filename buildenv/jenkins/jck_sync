@@ -429,12 +429,14 @@ def update_jckmk_file(testClasstList){
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
     def searchString = "ifeq (${JDK_VERSION}, \$(VERSION))"
+
+    echo "searchString -- ${searchString}"
+
     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
     testClasstList.each{ test ->
 
     def sourceFilePath = "${test}.log"
     echo "file --- ${sourceFilePath}"
-
     // Read all lines from the source file containing "="
     def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
 
@@ -446,7 +448,7 @@ def update_jckmk_file(testClasstList){
         // Split the source line by "="
         def sourceParts = sourceLine.split('=')
         def sourceKey = sourceParts[0]
-
+         echo "${sourceKey}"
         // Initialize a flag to determine if we have replaced a line
         def lineReplaced = false
         def insideBlock = false
@@ -469,10 +471,11 @@ def update_jckmk_file(testClasstList){
 
     // Write the updated target lines back to the target file
     //new File(targetFilePath).text = targetLines.join('\n')
+    echo "${targetLines}"
     writeFile(file: targetFilePath, text: targetLines.join('\n'))
     }
     echo "jck.mk --- ${targetFilePath}"
-    sh "cat ${targetFilePath}"
+    //sh "cat ${targetFilePath}"
     sh """
         git branch
         git status
@@ -481,7 +484,7 @@ def update_jckmk_file(testClasstList){
     sh(script: gitAddCommand)
 
     sh """
-        git commit -am "update jck.mk"
+        git commit -m "update jck.mk"
         git push origin1 test
     """
 
