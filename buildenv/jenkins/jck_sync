@@ -390,9 +390,13 @@ def createPRForFolderCheck(){
                         // Append the test block (excluding "New test folder detected" line) to the target file content
                         def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent[0]}\n</playlist>")
                         // Write the updated content back to the target XML file
+                        echo " updatedTargetContent ---  $updatedTargetContent"
                         writeFile(file: targetFilePath, text: updatedTargetContent)
                         echo "Updated target XML file: $targetFilePath"
                         modifiedFiles.add(targetFilePath)
+                        sh """
+                        git diff targetFilePath
+                        """
                     } else {
                         echo "No match found."
                     }
