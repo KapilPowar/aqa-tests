@@ -392,7 +392,7 @@ def createPRForFolderCheck(){
                         // Append the test block (excluding "New test folder detected" line) to the target file content
                         def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${testContent}\n</playlist>")
                         // Write the updated content back to the target XML file
-                         echo " testContent ---  ${testContent}"
+                        echo " testContent ---  ${testContent}"
                         //echo " updatedTargetContent ---  $updatedTargetContent"
                         //writeFile(file: targetFilePath, text: updatedTargetContent)
                         echo "Updated target XML file: $targetFilePath"
@@ -423,14 +423,14 @@ def createPRForFolderCheck(){
             def filesToStage = modifiedFiles.join(' ')
             def gitAddCommand = "git add ${filesToStage}"
             sh(script: gitAddCommand)
-            // sh """
-            //     git branch
-            //     git status
-            //     git config --global user.email "KapilPowar@in.ibm.com"
-		    //     git config --global user.name "KapilPowar"
-            //     git commit -am "update folder check"
-            //     git push origin1 test
-            // """
+            sh """
+                git branch
+                git status
+                git config --global user.email "KapilPowar@in.ibm.com"
+		        git config --global user.name "KapilPowar"
+                git commit -am "update folder check"
+                git push origin1 test
+            """
         }
     }
 }
