@@ -347,7 +347,7 @@ def createPRForFolderCheck(){
                 git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
 	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
                 git checkout -b test
-                git branch -v
+                git branch
             """
             def sourceFilePath = createFile()
             def modifiedFiles = []
