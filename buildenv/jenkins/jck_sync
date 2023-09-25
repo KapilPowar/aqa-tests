@@ -87,7 +87,7 @@ def syncJckMaterial(){
 
         stage('Build') {
                 script {
-                    getJavaSDK()
+                    //getJavaSDK()
                     createPRForFolderCheck()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
