@@ -88,7 +88,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     getJavaSDK()
-                    udpateFolderCheck()
+                    //udpateFolderCheck()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
 					usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
