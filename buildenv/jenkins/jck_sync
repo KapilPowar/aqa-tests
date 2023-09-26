@@ -3,7 +3,7 @@
 def PR=0
 //def COMMENT = ""
 def EXITCODE = 0
-
+def SCRIPT_PR = false
 timestamps{
     stage('Setup') {
             //SPEC = "linux_x86-64"
@@ -88,7 +88,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     getJavaSDK()
-                    createPRForFolderCheck()
+                    udpateFolderCheck()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
 					usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
@@ -130,6 +130,9 @@ def syncJckMaterial(){
                 if (EXITCODE ==0){
                     target_Folder_check()
                     getSplitter()
+                    if (SCRIPT_PR){
+                        create_PR_for_scripts()
+                    }
                 }
             }
         }
@@ -195,16 +198,6 @@ def getSplitter(){
              JDK_VERSION = "11a"
         } 
         def TESTS_MAP = [
-            // 'ANNOT' : ['TESTS' : 'ANNOT','GROUP' : 5,],
-            // 'CLSS' : ['TESTS' : 'CLSS','GROUP' : 10,],
-            // 'CONV' : ['TESTS' : 'CONV','GROUP' : '5',],
-            // 'DASG' : ['TESTS' : 'DASG','GROUP' : '5',],
-            // 'EXPR' : ['TESTS' : 'EXPR','GROUP' : '11',],
-            // 'INTF' : ['TESTS' : 'INTF','GROUP' : '5',],
-            // 'LMBD' : ['TESTS' : 'LMBD','GROUP' : '5',],
-            // 'NAME' : ['TESTS' : 'NAME','GROUP' : '5',],
-            // 'TYPE' : ['TESTS' : 'TYPE','GROUP' : '5',],
-            // 'STMT' : ['TESTS' : 'STMT','GROUP' : '5',],
             'ANNOT': ['GROUP' : 5,],
             'CLSS' : ['GROUP' : 10,],
             'CONV' : ['GROUP' : 5,],
@@ -265,6 +258,7 @@ def getSplitter(){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
+            SCRIPT_PR=true
             update_jckmk_file(testClasstList)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
         } else {
@@ -330,15 +324,16 @@ def target_Folder_check(){
                     } else {
                         echo "New folders detected. Need to update playlist.xml'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+                        SCRIPT_PR=true
+                        udpateFolderCheck()
                     }
                 }
             }
             createComment(COMMENT)
-            //createPRForFolderCheck()
 }
 
 
-def createPRForFolderCheck(){
+def udpateFolderCheck(){
     dir("${WORKSPACE}/aqa-tests/jck") {
         sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
             sh """
@@ -461,7 +456,7 @@ def update_jckmk_file(testClasstList){
                 }else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
                         //println "source key -- ${sourceKey}"
                         lineReplaced = true
-                        println sourceLine
+                        //println sourceLine
                         "   ${sourceLine}"
                 }else {
                         line
@@ -486,6 +481,34 @@ def update_jckmk_file(testClasstList){
         git commit -m "update jck.mk"
         git push origin1 test
     """
+    }
+}
+
+def create_PR_for_scripts {
+
+    sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+        sh """
+        git branch
+        git status
+        """
+    title="Update jckmk and playlist.xml file"
+	body="This is a new pull request"
+	// echo " Creating PR from $JCK_GIT_BRANCH to main branch"
+	PERSONAL_GIT_TOKEN="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"
+    url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
+
+    def response = sh(script: """
+        curl -X POST \
+        -H "Authorization: token $pesonal_GIT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"master\"}" \
+            "$url")
+        """, returnStatus: true, returnStdout: true)
+        if (response == 0) {
+            echo "PR created"
+        } else {
+            error "Failed to create Pull Request"
+        }
     }
 }
 
