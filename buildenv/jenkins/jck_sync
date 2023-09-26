@@ -483,10 +483,10 @@ def update_jckmk_file(testClasstList){
     }
     echo "jck.mk --- ${targetFilePath}"
     //sh "cat ${targetFilePath}"
-    sh """
-        git branch
-        git status
-    """
+    // sh """
+    //     git branch
+    //     git status
+    // """
     def gitAddCommand = "git add ${targetFilePath}"
     sh(script: gitAddCommand)
 
