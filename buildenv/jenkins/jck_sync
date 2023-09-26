@@ -88,7 +88,7 @@ def syncJckMaterial(){
         stage('Build') {
                 script {
                     getJavaSDK()
-                    //udpateFolderCheck()
+                    udpateFolderCheck()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
 					usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
@@ -128,7 +128,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    target_Folder_check()
+                    //target_Folder_check()
                     getSplitter()
                     if (SCRIPT_PR){
                         create_PR_for_scripts()
@@ -343,6 +343,7 @@ def udpateFolderCheck(){
                 git checkout -b test
                 git branch
             """
+            SCRIPT_PR=true
             def sourceFilePath = createFile()
             def modifiedFiles = []
             //def sourceFilePath = logFile
