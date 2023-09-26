@@ -128,7 +128,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
+                    target_Folder_check()
                     getSplitter()
                     if (SCRIPT_PR){
                         create_PR_for_scripts()
@@ -422,6 +422,7 @@ def udpateFolderCheck(){
 def update_jckmk_file(testClasstList){
 
     //def sourceFilePath = "test.log"
+    //dir("${WORKSPACE}/aqa-tests/jck") {
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
     def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
@@ -483,10 +484,11 @@ def update_jckmk_file(testClasstList){
         git push origin1 test
     """
     }
+//}
 }
 
 def create_PR_for_scripts() {
-
+    dir("${WORKSPACE}/aqa-tests") {
     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
         sh """
         git branch
@@ -511,6 +513,7 @@ def create_PR_for_scripts() {
             error "Failed to create Pull Request"
         }
     }
+}
 }
 
 def createComment(TestComment) {
