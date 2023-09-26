@@ -522,7 +522,7 @@ def create_PR_for_scripts() {
                                 "base": "jcksync-copy"
                             }'
                     """
-    def response = sh(script: curlCommand, returnStatus: true,returnStdout: true).trim()
+    def response = sh(script: curlCommand, returnStatus: true,returnStdout: true)
     // def response = sh(script: """
     //     curl -X POST \
     //     -H "Authorization: token $PERSONAL_GIT_TOKEN" \
