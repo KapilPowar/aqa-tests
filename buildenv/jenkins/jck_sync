@@ -428,52 +428,50 @@ def update_jckmk_file(testClasstList){
     //def sourceFilePath = "test.log"
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
-    def searchString = "ifeq (${JDK_VERSION}, \$(VERSION))"
-
-    echo "searchString -- ${searchString}"
+    def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
 
     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
     testClasstList.each{ test ->
+        def sourceFilePath = "${test}.log"
+        echo "file --- ${sourceFilePath}"
+        // Read all lines from the source file containing "="
+        def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
 
-    def sourceFilePath = "${test}.log"
-    echo "file --- ${sourceFilePath}"
-    // Read all lines from the source file containing "="
-    def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
+        // Read the target file into a list
+        def targetLines = readFile(file: targetFilePath).readLines()
 
-    // Read the target file into a list
-    def targetLines = readFile(file: targetFilePath).readLines()
-
-    // Iterate through the source lines
-    sourceLines.each { sourceLine ->
-        // Split the source line by "="
-        def sourceParts = sourceLine.split('=')
-        def sourceKey = sourceParts[0]
-        //echo "${sourceKey}"
-        // Initialize a flag to determine if we have replaced a line
-        def lineReplaced = false
-        def insideBlock = false
-        // Iterate through the target lines
-        def updatedTargetLines = targetLines.collect { line ->
-        if (line.contains(searchString)) {
-            insideBlock = true
-            line
-        } else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
-            lineReplaced = true
-            echo "${sourceLine}"
-            "\t${sourceLine}"
-        } else {
-            line
+        // Iterate through the source lines
+        sourceLines.each { sourceLine ->
+            // Split the source line by "="
+            def sourceParts = sourceLine.split('=')
+            def sourceKey = sourceParts[0]
+            // Initialize a flag to determine if we have replaced a line
+            def lineReplaced = false
+            def insideBlock = false
+            def keywords = ["COMPILER", "VERIFIER", "RUNTIME"]
+            // Iterate through the target lines
+            def updatedTargetLines = targetLines.collect { line ->
+                def lineContainsKeywords =keywords.any { keyword -> line.contains(keyword) }
+                if (line.contains(blockCondition)) {
+                    insideBlock = true
+                    line
+                }else if (!(line.isEmpty() ||line.trim().isEmpty()) && !lineContainsKeywords) {
+                    insideBlock = false
+                    line
+                }else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
+                        //println "source key -- ${sourceKey}"
+                        lineReplaced = true
+                        println sourceLine
+                        "   ${sourceLine}"
+                }else {
+                        line
+                }
+            }
+            // Update the target lines for the next source line
+            targetLines = updatedTargetLines
         }
-    }
-
-        // Update the target lines for the next source line
-        targetLines = updatedTargetLines
-    }
-
-    // Write the updated target lines back to the target file
-    //new File(targetFilePath).text = targetLines.join('\n')
-    //echo "${targetLines}"
-    writeFile(file: targetFilePath, text: targetLines.join('\n'))
+        // Write the updated target lines back to the target file
+        writeFile(file: targetFilePath, text: targetLines.join('\n'))
     }
     echo "jck.mk --- ${targetFilePath}"
     //sh "cat ${targetFilePath}"
@@ -488,8 +486,7 @@ def update_jckmk_file(testClasstList){
         git commit -m "update jck.mk"
         git push origin1 test
     """
-
-}
+    }
 }
 
 def createComment(TestComment) {
