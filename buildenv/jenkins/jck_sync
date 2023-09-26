@@ -131,6 +131,7 @@ def syncJckMaterial(){
                     target_Folder_check()
                     getSplitter()
                     if (SCRIPT_PR){
+                        echo " Need to create PR ? -- $SCRIPT_PR"
                         create_PR_for_scripts()
                     }
                 }
@@ -515,7 +516,7 @@ def create_PR_for_scripts() {
         -H "Authorization: token $PERSONAL_GIT_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"master\"}" \
-            "$url")
+            "$url"
         """, returnStatus: true, returnStdout: true)
         if (response == 0) {
             echo "PR created"
