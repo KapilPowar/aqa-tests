@@ -484,7 +484,7 @@ def update_jckmk_file(testClasstList){
     }
 }
 
-def create_PR_for_scripts {
+def create_PR_for_scripts() {
 
     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
         sh """
