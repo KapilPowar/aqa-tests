@@ -508,14 +508,14 @@ def create_PR_for_scripts() {
     title="Update jck.mk and playlist.xml file"
 	body="This is a new pull request"
 	echo " Creating PR for jck.mk and playlist.xml file"
-	PERSONAL_GIT_TOKEN="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"
+	PERSONAL_GIT_TOKEN="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"
     url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
-
+     //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
     def response = sh(script: """
         curl -X POST \
         -H "Authorization: token $PERSONAL_GIT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
+            -d "{"title":"$title","body":"$body","head":"KapilPowar:test","base":"jcksync-copy"}" \
             "$url"
         """, returnStatus: true, returnStdout: true)
         if (response == 0) {
