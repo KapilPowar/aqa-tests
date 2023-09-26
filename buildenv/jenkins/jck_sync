@@ -258,7 +258,6 @@ def getSplitter(){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            SCRIPT_PR=true
             update_jckmk_file(testClasstList)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
         } else {
@@ -423,6 +422,17 @@ def update_jckmk_file(testClasstList){
 
     //def sourceFilePath = "test.log"
     //dir("${WORKSPACE}/aqa-tests/jck") {
+     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+    if (!SCRIPT_PR){  
+     SCRIPT_PR=true  
+     sh """
+                git branch
+                git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
+	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
+                git checkout -b test
+                git branch
+            """
+    }
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
     def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
@@ -484,7 +494,7 @@ def update_jckmk_file(testClasstList){
         git push origin1 test
     """
     }
-//}
+    }
 }
 
 def create_PR_for_scripts() {
@@ -502,7 +512,7 @@ def create_PR_for_scripts() {
 
     def response = sh(script: """
         curl -X POST \
-        -H "Authorization: token $pesonal_GIT_TOKEN" \
+        -H "Authorization: token $PERSONAL_GIT_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"master\"}" \
             "$url")
