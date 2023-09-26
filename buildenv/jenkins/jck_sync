@@ -501,13 +501,13 @@ def update_jckmk_file(testClasstList){
 def create_PR_for_scripts() {
     dir("${WORKSPACE}/aqa-tests") {
     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
-        sh """
-        git branch
-        git status
-        """
-    title="Update jckmk and playlist.xml file"
+        // sh """
+        // git branch
+        // git status
+        // """
+    title="Update jck.mk and playlist.xml file"
 	body="This is a new pull request"
-	// echo " Creating PR from $JCK_GIT_BRANCH to main branch"
+	echo " Creating PR for jck.mk and playlist.xml file"
 	PERSONAL_GIT_TOKEN="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"
     url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
 
@@ -515,7 +515,7 @@ def create_PR_for_scripts() {
         curl -X POST \
         -H "Authorization: token $PERSONAL_GIT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"master\"}" \
+            -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
             "$url"
         """, returnStatus: true, returnStdout: true)
         if (response == 0) {
