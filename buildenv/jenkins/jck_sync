@@ -500,46 +500,47 @@ def update_jckmk_file(testClasstList){
 }
 
 def create_PR_for_scripts() {
-    dir("${WORKSPACE}/aqa-tests") {
-    sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
-        // sh """
-        // git branch
-        // git status
-        // """
-    title="Update jck.mk and playlist.xml file"
-	body="This is a new pull request"
-	echo " Creating PR for jck.mk and playlist.xml file"
-	//PERSONAL_GIT_TOKEN="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"
-    PERSONAL_GIT_TOKEN="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"
-    url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
-     //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
-    def curlCommand = """
-                        curl -X POST "${url}" \\
-                            -H "Authorization: token ${PERSONAL_GIT_TOKEN}" \\
-                            -H "Content-Type: application/json" \\
-                            -d '{
-                                "title": "${title}",
-                                "body": "${body}",
-                                "head": "KapilPowar:test",
-                                "base": "jcksync-copy"
-                            }'
-                    """
-    def response = sh(script: curlCommand, returnStdout: true)
-    // def response = sh(script: """
-    //     curl -X POST \
-    //     -H "Authorization: token $PERSONAL_GIT_TOKEN" \
-    //         -H "Content-Type: application/json" \
-    //         -d '{"title":"$title","body":"$body","head":"KapilPowar:test","base":"jcksync-copy"}' \
-    //         "$url"
-    //     """, returnStatus: true, returnStdout: true)
-        // if (response == 0) {
-        //     echo "PR created"
-        // } else {
-        //     error "Failed to create Pull Request"
-        // }
-    echo " ${response}"
+    withCredentials([
+                string(credentialsId: "${params.PERSONAL_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
+            ]){
+            dir("${WORKSPACE}/aqa-tests") {
+                sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+                title="Update jck.mk and playlist.xml file"
+                body="This is a new pull request"
+                echo " Creating PR for jck.mk and playlist.xml file"
+                //PERSONAL_GIT_TOKEN="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"
+                //PERSONAL_GIT_TOKEN="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"
+                //PERSONAL_GIT_TOKEN=GIT_CREDENTIALS
+                url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
+                //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
+                def curlCommand = """
+                                    curl -X POST "${url}" \\
+                                        -H "Authorization: token ${PERSONAL_GIT_TOKEN}" \\
+                                        -H "Content-Type: application/json" \\
+                                        -d '{
+                                            "title": "${title}",
+                                            "body": "${body}",
+                                            "head": "KapilPowar:test",
+                                            "base": "jcksync-copy"
+                                        }'
+                                """
+                def response = sh(script: curlCommand, returnStdout: true)
+                // def response = sh(script: """
+                //     curl -X POST \
+                //     -H "Authorization: token $PERSONAL_GIT_TOKEN" \
+                //         -H "Content-Type: application/json" \
+                //         -d '{"title":"$title","body":"$body","head":"KapilPowar:test","base":"jcksync-copy"}' \
+                //         "$url"
+                //     """, returnStatus: true, returnStdout: true)
+                    // if (response == 0) {
+                    //     echo "PR created"
+                    // } else {
+                    //     error "Failed to create Pull Request"
+                    // }
+                echo " ${response}"
+                }
+        }
     }
-}
 }
 
 def createComment(TestComment) {
