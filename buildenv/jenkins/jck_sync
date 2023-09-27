@@ -550,7 +550,8 @@ def create_PR_for_scripts() {
                 //     PR_NUMBER = PR_NUMBER.trim()
                 //     }
                 // echo "PR Number after trim : ${PR_NUMBER}"
-                COMMENT=" PR [#${(PR_NUMBER)}] (${url}/${(PR_NUMBER)})  is created with changes in jck.mk and playlist.xml file .. "
+                PR_URL= "https://github.com/KapilPowar/aqa-tests/pull/"
+                COMMENT=" PR #[${(PR_NUMBER)}](${PR_URL}${(PR_NUMBER)})  is created with changes in jck.mk and playlist.xml file .. "
                 createComment(COMMENT)
 
                 }
