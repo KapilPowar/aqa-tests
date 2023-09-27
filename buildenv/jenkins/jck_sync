@@ -507,10 +507,7 @@ def create_PR_for_scripts() {
                 sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
                 title="Update jck.mk and playlist.xml file"
                 body="This is a new pull request"
-                echo " Creating PR for jck.mk and playlist.xml file"
-                //PERSONAL_GIT_TOKEN="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"
-                //PERSONAL_GIT_TOKEN="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"
-                //PERSONAL_GIT_TOKEN=GIT_CREDENTIALS
+                echo " Creating PR for jck.mk and playlist.xml file"\
                 url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                 def curlCommand = """
@@ -538,6 +535,11 @@ def create_PR_for_scripts() {
                     //     error "Failed to create Pull Request"
                     // }
                 echo " ${response}"
+                PR_NUMBER=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
+                echo "PR_NUMBER = ${PR_NUMBER}"
+                COMMENT=" PR [#${(PR_NUMBER)}] (${url}/${(PR_NUMBER)}) ${url}/${(PR_NUMBER)}  is created for changes in jck.mk and playlist.xml file"
+                createComment(COMMENT)
+
                 }
         }
     }
