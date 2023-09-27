@@ -510,7 +510,7 @@ def create_PR_for_scripts() {
 	body="This is a new pull request"
 	echo " Creating PR for jck.mk and playlist.xml file"
 	//PERSONAL_GIT_TOKEN="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"
-    PERSONAL_GIT_TOKEN="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"
+    PERSONAL_GIT_TOKEN="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"
     url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
      //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
     def curlCommand = """
