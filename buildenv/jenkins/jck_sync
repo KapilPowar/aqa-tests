@@ -535,10 +535,13 @@ def create_PR_for_scripts() {
                     //     error "Failed to create Pull Request"
                     // }
                 echo " ${response}"
-                PR_NUMBER=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
-                echo "PR_NUMBER = ${PR_NUMBER}"
-                COMMENT=" PR [#${(PR_NUMBER)}] (${url}/${(PR_NUMBER)}) ${url}/${(PR_NUMBER)}  is created for changes in jck.mk and playlist.xml file"
+                def PR = (response =~ /"number":\s*([0-9]+)/).find { it }
+                def prNumberInt = PR[1].toInteger()
+                echo "prNumberInt = ${prNumberInt}"
+                COMMENT=" PR [#${(prNumberInt)}] (${url}/${(prNumberInt)}) ${url}/${(prNumberInt)}  is created for changes in jck.mk and playlist.xml file"
                 createComment(COMMENT)
+                PR_NUMBER= sh(script: 'echo $response | grep -o \'"number": *[0-9]*\' | awk -F\':\' \'{print $2}\' | tr -d \' ,"\'', returnStdout: true)
+                echo "PR_NUMBER = ${PR_NUMBER}"
 
                 }
         }
