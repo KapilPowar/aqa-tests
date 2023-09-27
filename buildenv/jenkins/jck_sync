@@ -538,7 +538,10 @@ def create_PR_for_scripts() {
                 //def PR = (response =~ /"number":\s*([0-9]+)/).find { it }
                 //def prNumberInt = PR[1].toInteger()
                 //echo "prNumberInt = ${prNumberInt}"
-                def command="echo ${response} | grep -o \'"number": *[0-9]*\' | awk -F\':\' \'{print $2}\' | tr -d \' ,"\"
+                def command = """
+                    echo \${response} | grep -o '"number": *[0-9]*' | awk -F':' '{print \$2}' | tr -d ' ,"' 
+                """
+                //def command="echo ${response} | grep -o \'"number": *[0-9]*\' | awk -F\':\' \'{print $2}\' | tr -d \' ,"\"
                 PR_NUMBER= sh(script: '${command}', returnStdout: true)
                 echo "PR_NUMBER = ${PR_NUMBER}"
                 COMMENT=" PR [#${(PR_NUMBER)}] (${url}/${(PR_NUMBER)})  is created with changes in jck.mk and playlist.xml file .. "
