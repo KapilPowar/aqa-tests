@@ -78,7 +78,7 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
-        def JCK_VERSION = params.JDK_VERSION ? '-j ${params.JDK_VERSION}': ''
+        def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
         def JCK_GIT_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
@@ -98,7 +98,7 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = './jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} '
+                                    def SCRIPT = './jckupdater.sh $JCK_VERSION -at $ARTIFACTORY_CREDENTIALS $JCK_GIT_REPO  -gt $GIT_CREDENTIALS  $ARTIFACTORY_URL  $JCK_GIT_BRANCH '
                                     echo '${SCRIPT}'
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
