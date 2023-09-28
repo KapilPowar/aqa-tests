@@ -98,13 +98,13 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = './jckupdater.sh $JCK_VERSION -at $ARTIFACTORY_CREDENTIALS $JCK_GIT_REPO  -gt $GIT_CREDENTIALS  $ARTIFACTORY_URL  $JCK_GIT_BRANCH '
+                                    def SCRIPT = "./jckupdater.sh $JCK_VERSION -at $ARTIFACTORY_CREDENTIALS $JCK_GIT_REPO  -gt $GIT_CREDENTIALS  $ARTIFACTORY_URL  $JCK_GIT_BRANCH "
                                     echo '${SCRIPT}'
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    EXITCODE = sh(script: '${SCRIPT} > ${tempOutputFile}',  returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
@@ -270,7 +270,7 @@ def getSplitter(){
 }
 
 def getJavaSDK(){
-        JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
+        JDK_VERSION_OPTION = env.JDK_VERSION ? '-j ${env.JDK_VERSION}' : ''
         JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
@@ -280,10 +280,10 @@ def getJavaSDK(){
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
 			withCredentials([usernamePassword(credentialsId: "${params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-				sh '$GET_SH_CMD'
+				sh "$GET_SH_CMD"
 			}
 		} else {
-			sh '$GET_SH_CMD'
+			sh "$GET_SH_CMD"
 		}
             // sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true) {
             //     sh "$GET_SH_CMD"
