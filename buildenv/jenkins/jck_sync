@@ -98,8 +98,8 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
-                                    echo "${SCRIPT}"
+                                    def SCRIPT = './jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} '
+                                    echo '${SCRIPT}'
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
@@ -129,8 +129,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
-                    //getSplitter()
+                    target_Folder_check()
+                    getSplitter()
                     // if (SCRIPT_PR){
                     //     echo " Need to create PR ? -- $SCRIPT_PR"
                      //    create_PR_for_scripts()
@@ -224,7 +224,7 @@ def getSplitter(){
                 echo "Calling splitter.sh for TESTS: $key and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${key}"
-                SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
+                SCRIPT = './splitter.sh ${TARGET} ${groupValue}'
                 if (key == "CLSS"){
                     key="CLASS"
                 }
@@ -275,15 +275,15 @@ def getJavaSDK(){
         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
 
-        GET_SH_CMD = "./get.sh -s `pwd`/.. -p $PLATFORM -r ${SDK_RESOURCE} ${JDK_VERSION_OPTION} ${JDK_IMPL_OPTION} ${CUSTOMIZED_SDK_URL_OPTION} ${CLONE_OPENJ9_OPTION}"// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} "
+        GET_SH_CMD = './get.sh -s `pwd`/.. -p $PLATFORM -r ${SDK_RESOURCE} ${JDK_VERSION_OPTION} ${JDK_IMPL_OPTION} ${CUSTOMIZED_SDK_URL_OPTION} ${CLONE_OPENJ9_OPTION}"// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} '
         dir("${WORKSPACE}/aqa-tests") {
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
 			withCredentials([usernamePassword(credentialsId: "${params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-				sh "$GET_SH_CMD"
+				sh '$GET_SH_CMD'
 			}
 		} else {
-			sh "$GET_SH_CMD"
+			sh '$GET_SH_CMD'
 		}
             // sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true) {
             //     sh "$GET_SH_CMD"
@@ -300,7 +300,7 @@ def target_Folder_check(){
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
                     echo "${GIT_BRANCH}"
-                    def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
+                    def SCRIPT = './jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}'
                     def specificLine = "New test folder detected:"
 
                     def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
