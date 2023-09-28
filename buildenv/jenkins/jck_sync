@@ -270,7 +270,7 @@ def getSplitter(){
 }
 
 def getJavaSDK(){
-        JDK_VERSION_OPTION = env.JDK_VERSION ? '-j ${env.JDK_VERSION}' : ''
+        JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
         JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
