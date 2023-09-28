@@ -275,7 +275,7 @@ def getJavaSDK(){
         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
         echo "getJavaSDK"
-        GET_SH_CMD = './get.sh -s `pwd`/.. -p $PLATFORM -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION '// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} '
+        GET_SH_CMD = "./get.sh -s `pwd`/.. -p $PLATFORM -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} 
         dir("${WORKSPACE}/aqa-tests") {
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
