@@ -87,7 +87,7 @@ def syncJckMaterial(){
 
         stage('JCKUpdater') {
                 script {
-                    getJavaSDK()
+                    //getJavaSDK()
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
@@ -129,8 +129,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    target_Folder_check()
-                    getSplitter()
+                    //target_Folder_check()
+                    //getSplitter()
                     // if (SCRIPT_PR){
                     //     echo " Need to create PR ? -- $SCRIPT_PR"
                      //    create_PR_for_scripts()
