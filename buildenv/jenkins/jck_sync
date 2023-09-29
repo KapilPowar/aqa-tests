@@ -588,7 +588,7 @@ def createComment(TestComment) {
                 def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR}/comments"
                 def COMMENT = "${TestComment}"
                 def curlCommand = """
-                    curl -X POST -H "Authorization: token ${GIT_CREDENTIALS}" -d '{ 
+                    curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\" -d '{ 
                     "body":"$COMMENT" 
                     }' "$comment_url"
                 """
