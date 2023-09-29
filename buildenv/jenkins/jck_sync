@@ -308,7 +308,7 @@ def target_Folder_check(){
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
                     echo "${GIT_BRANCH}"
-                    def SCRIPT = './jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}'
+                    def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
                     def specificLine = "New test folder detected:"
 
                     def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
