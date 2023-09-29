@@ -105,7 +105,7 @@ def syncJckMaterial(){
                                     echo "JCK_GIT_BRANCH -- ${JCK_GIT_BRANCH}"
                                     def arguments = "${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
                                     echo "arguments --- ${arguments}"
-                                    def SCRIPT = '''./jckupdater.sh ${arguments}'''
+                                    def SCRIPT = `./jckupdater.sh ${arguments}`
                                     echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
