@@ -539,7 +539,7 @@ def create_PR_for_scripts() {
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                 def curlCommand = """
                                     curl -X POST "${url}" \\
-                                        -H "Authorization: token \"\$PERSONAL_GIT_TOKEN\" \\
+                                        -H "Authorization: token \"\$PERSONAL_GIT_TOKEN\"" \\
                                         -H "Content-Type: application/json" \\
                                         -d '{
                                             "title": "${title}",
