@@ -98,11 +98,12 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def ARTIFACTORY_CRED = credentials(ARTIFACTORY_CREDENTIALS)
+                                    def ARTIFACTORY_CRED = credentials(params.ARTIFACTORY_CREDENTIALS)
                                     // echo "JCK_VERSION --- ${JCK_VERSION}"
                                     // echo "JCK_GIT_REPO -- ${JCK_GIT_REPO}"
                                     // echo "ARTIFACTORY_URL-- ${ARTIFACTORY_URL}"
                                     // echo "JCK_GIT_BRANCH -- ${JCK_GIT_BRANCH}"
+                                    echo "ARTIFACTORY_CREDENTIALS --- ${ARTIFACTORY_CRED}"
                                      def arguments = "${JCK_VERSION} -at ${ARTIFACTORY_CRED} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
                                     // echo "arguments --- ${arguments}"
                                     def SCRIPT = """./jckupdater.sh ${arguments} """//'${JCK_VERSION}' -at '${ARTIFACTORY_CREDENTIALS}' '${JCK_GIT_REPO}'  -gt '${GIT_CREDENTIALS}'  '${ARTIFACTORY_URL}'  '${JCK_GIT_BRANCH}'"""
