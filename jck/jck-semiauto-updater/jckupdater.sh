@@ -73,6 +73,7 @@ setup(){
 	echo "GIT_REPO=$GIT_REPO"
 	echo "JCK_VERSION=$JCK_VERSION"
 	echo "JCK_GIT_REPO=$JCK_GIT_REPO"
+	echo "GIT_TOKEN=$GIT_TOKEN"
 
 	#Extract GIT_USER and JCK_REPO_NAME  from JCK_GIT_REPO
 	IFS=":" read -ra parts <<< "$JCK_GIT_REPO"
