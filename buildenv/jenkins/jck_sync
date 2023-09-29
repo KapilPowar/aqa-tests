@@ -344,7 +344,17 @@ def target_Folder_check(){
 
 def udpateFolderCheck(){
     dir("${WORKSPACE}/aqa-tests/jck") {
+        // rename {params.EXTN_GIT_CREDS} to SSH creds
         sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+            try {
+                    sh """
+                    git remote remove origin1
+                    git remote remove upstream1
+                    """
+                } catch (Exception e) {
+                    // Handle the error here, but do not throw it
+                    echo "Error removing remote: ${e.message}"
+                }
             sh """
                 git branch
                 git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
