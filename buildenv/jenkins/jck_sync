@@ -108,14 +108,12 @@ def syncJckMaterial(){
                                     //def arguments = "${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CRED}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
                                     // echo "arguments --- ${arguments}"
                                     //def SCRIPT = """./jckupdater.sh ${JCK_VERSION} -at "${ARTIFACTORY_CREDENTIALS}" ${JCK_GIT_REPO}  -gt "${GIT_CREDENTIALS}"  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} """
-                                    def SCRIPT = '''
-                                        ./jckupdater.sh ${JCK_VERSION} \
-                                        -at "${env.ARTIFACTORY_CREDENTIALS}" \
-                                        "${env.JCK_GIT_REPO}" \
-                                        -gt "${env.GIT_CREDENTIALS}" \
-                                        "${env.ARTIFACTORY_URL}" \
-                                        "${env.JCK_GIT_BRANCH}"
-                                    '''
+                                    def SCRIPT = """./jckupdater.sh ${JCK_VERSION} \
+                                            -at "${params.ARTIFACTORY_CREDENTIALS}" \
+                                            "${params.JCK_GIT_REPO}" \
+                                            -gt "${params.GIT_CREDENTIALS}" \
+                                            "${params.ARTIFACTORY_URL}" \
+                                            "${params.JCK_GIT_BRANCH}" """
                                     echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
