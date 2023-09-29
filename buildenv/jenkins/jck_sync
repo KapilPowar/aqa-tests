@@ -443,8 +443,17 @@ def update_jckmk_file(testClasstList){
     //def sourceFilePath = "test.log"
     //dir("${WORKSPACE}/aqa-tests/jck") {
      sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
-   // if (!SCRIPT_PR){  
-     //SCRIPT_PR=true  
+   if (!SCRIPT_PR){  
+     SCRIPT_PR=true 
+     try {
+            sh """
+            git remote remove origin1
+            git remote remove upstream1
+            """
+        } catch (Exception e) {
+            // Handle the error here, but do not throw it
+            echo "Error removing remote: ${e.message}"
+        } 
      sh """
                 git branch
                 git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
@@ -452,7 +461,7 @@ def update_jckmk_file(testClasstList){
                 git checkout -b test
                 git branch
             """
-    //}
+    }
     def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
     JDK_VERSION = params.JDK_VERSION
     def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
