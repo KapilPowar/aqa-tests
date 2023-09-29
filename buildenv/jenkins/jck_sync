@@ -88,7 +88,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 script {
                     getJavaSDK()
-                    //udpateFolderCheck()
+                    udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -104,7 +104,7 @@ def syncJckMaterial(){
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    EXITCODE = sh(script: "$SCRIPT > $tempOutputFile",  returnStatus: true)
+                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
@@ -129,12 +129,12 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
-                    //getSplitter()
-                    // if (SCRIPT_PR){
-                    //     echo " Need to create PR ? -- $SCRIPT_PR"
-                     //    create_PR_for_scripts()
-                    // }
+                    target_Folder_check()
+                    getSplitter()
+                    if (SCRIPT_PR){
+                        echo " Need to create PR ? -- $SCRIPT_PR"
+                        create_PR_for_scripts()
+                    }
                 }
             }
         }
@@ -520,7 +520,7 @@ def create_PR_for_scripts() {
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                 def curlCommand = """
                                     curl -X POST "${url}" \\
-                                        -H "Authorization: token ${PERSONAL_GIT_TOKEN}" \\
+                                        -H "Authorization: token \"\$PERSONAL_GIT_TOKEN\" \\
                                         -H "Content-Type: application/json" \\
                                         -d '{
                                             "title": "${title}",

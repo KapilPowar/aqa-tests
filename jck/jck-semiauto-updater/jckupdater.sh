@@ -170,10 +170,10 @@ isLatestUpdate() {
 	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
 		#clean up after testing
-		get_JAVA_SDK
-		getJCKSources
-		# cleanup
-		# exit 2
+		# get_JAVA_SDK
+		# getJCKSources
+		cleanup
+		exit 2
 	else	
 		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
 		get_JAVA_SDK
@@ -394,15 +394,15 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
-	cleanup
-	setup
-	isLatestUpdate
-	extract
-	gitClone
-	copyFilestoGITRepo
-	checkChangesAndCommit
-	cleanup
-	#test
+	# cleanup
+	# setup
+	# isLatestUpdate
+	# extract
+	# gitClone
+	# copyFilestoGITRepo
+	# checkChangesAndCommit
+	# cleanup
+	test
 else 
 	echo "Please provide missing arguments"
 	usage; exit 1
