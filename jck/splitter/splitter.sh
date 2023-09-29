@@ -37,7 +37,11 @@ split()
 	        lastPrefix="CLASS"
 	fi
 	
-	testName=COMPILER_${firstPrefix}_${lastPrefix}
+	if [[ $testPathPrefix == *"vm/verifier"* ]]; then
+		testName=VERIFIER_INSTRUCTIONS
+	else
+		testName=COMPILER_${firstPrefix}_${lastPrefix}
+	fi
 	# Read in the sub-tests into an array
 	i=0
 	while read line
@@ -109,7 +113,11 @@ split()
 
 targetTestPath=$1 
 numOfGrps=$2
-pathPrefix=$(echo "$1" | rev | cut -d"/" -f1-2 | rev)
+if [[ "$1" == *"vm/verifier"* ]]; then
+	pathPrefix=$(echo "$1" | rev | cut -d"/" -f1-3 | rev)
+else
+	pathPrefix=$(echo "$1" | rev | cut -d"/" -f1-2 | rev)
+fi
 
 split $targetTestPath $numOfGrps $pathPrefix
 

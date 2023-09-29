@@ -87,7 +87,7 @@ def syncJckMaterial(){
 
         stage('JCKUpdater') {
                 script {
-                    //getJavaSDK()
+                    getJavaSDK()
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
@@ -104,7 +104,7 @@ def syncJckMaterial(){
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    EXITCODE = sh(script: "$SCRIPT > $tempOutputFile",  returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
@@ -129,8 +129,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //target_Folder_check()
-                    //getSplitter()
+                    target_Folder_check()
+                    getSplitter()
                     // if (SCRIPT_PR){
                     //     echo " Need to create PR ? -- $SCRIPT_PR"
                      //    create_PR_for_scripts()
@@ -210,6 +210,7 @@ def getSplitter(){
             'NAME' : ['GROUP' : 5,],
             'TYPE' : ['GROUP' : 5,],
             'STMT' : ['GROUP' : 5,],
+            'VERIFIER' : ['GROUP' : 4,],
         ]
         def TARGET_TO_SPLIT = "${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
         def SCRIPT=""
@@ -218,13 +219,19 @@ def getSplitter(){
         def testClasstList = []
         def mkFileName = "${WORKSPACE}/aqa-tests/jck/jck.mk"
         TESTS_MAP.each { key, value ->
-            if (value.containsKey('GROUP')) {
+            //no verifier group available for JDK8
+            if (key == "VERIFIER" && JDK_VERSION == "8d"){
+                echo "No need to create PR for --- $key"
+            } else if (value.containsKey('GROUP')) {
                 //def testsValue = value['TESTS']
                 def groupValue = value['GROUP']
                 echo "Calling splitter.sh for TESTS: $key and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${key}"
-                SCRIPT = './splitter.sh ${TARGET} ${groupValue}'
+                if (key == "VERIFIER"){
+                    TARGET="${WORKSPACE}/test/JCK-runtime-${JDK_VERSION}/tests/vm/verifier/instructions"
+                }
+                SCRIPT = "./splitter.sh ${TARGET} ${groupValue}"
                 if (key == "CLSS"){
                     key="CLASS"
                 }
@@ -239,7 +246,7 @@ def getSplitter(){
                 def logFileContents = readFile(file: logFileName).trim().split('\n')
                 for (int i = logFileContents.size() - 1; i >= 0; i--) {
                     def line = logFileContents[i]
-                    if (line.startsWith("COMPILER_LANG_${key}_TESTS_GROUP")) {
+                    if (line.startsWith("COMPILER_LANG_${key}_TESTS_GROUP") || line.startsWith("VERIFIER_INSTRUCTIONS_TESTS_GROUP") ) {
                         lastLine = line
                         break
                     }
@@ -262,6 +269,7 @@ def getSplitter(){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
             update_jckmk_file(testClasstList)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
+            echo "${testClasstList}"
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
         }
