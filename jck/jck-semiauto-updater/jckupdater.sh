@@ -394,14 +394,14 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
-	 cleanup
-	 setup
-	 isLatestUpdate
-	# extract
-	# gitClone
-	# copyFilestoGITRepo
-	# checkChangesAndCommit
-	# cleanup
+	cleanup
+	setup
+	isLatestUpdate
+	extract
+	gitClone
+	copyFilestoGITRepo
+	checkChangesAndCommit
+	cleanup
 	#test
 else 
 	echo "Please provide missing arguments"
