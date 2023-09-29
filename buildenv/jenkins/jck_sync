@@ -268,7 +268,7 @@ def getSplitter(){
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
             update_jckmk_file(testClasstList)
-            COMMENT=" Splitter.sh resulted in new test groups.\\r\\nWe need to create PR to update jck.mk file for below test group\\r\\n" + testClasstList.join(", ")
+            COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
