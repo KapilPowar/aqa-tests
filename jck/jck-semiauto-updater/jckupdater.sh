@@ -169,8 +169,8 @@ isLatestUpdate() {
 	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
 		#clean up after testing
-		get_JAVA_SDK
-		getJCKSources
+		#get_JAVA_SDK
+		#getJCKSources
 		# cleanup
 		# exit 2
 	else	
@@ -393,8 +393,8 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
-	# cleanup
-	# setup
+	 cleanup
+	 setup
 	# isLatestUpdate
 	# extract
 	# gitClone
