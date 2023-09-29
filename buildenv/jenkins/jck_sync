@@ -98,8 +98,9 @@ def syncJckMaterial(){
                             def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = "./jckupdater.sh $JCK_VERSION -at $ARTIFACTORY_CREDENTIALS $JCK_GIT_REPO  -gt $GIT_CREDENTIALS  $ARTIFACTORY_URL  $JCK_GIT_BRANCH "
-                                    //echo "${SCRIPT}"
+                                    //def ARTIFACTORY_CRED = credentials(ARTIFACTORY_CREDENTIALS)
+                                    def SCRIPT = """./jckupdater.sh ${JCK_VERSION} -at ${ARTIFACTORY_CREDENTIALS} ${JCK_GIT_REPO}  -gt ${GIT_CREDENTIALS}  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} """
+                                    echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
@@ -129,8 +130,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    target_Folder_check()
-                    getSplitter()
+                    //target_Folder_check()
+                    //getSplitter()
                     // if (SCRIPT_PR){
                     //     echo " Need to create PR ? -- $SCRIPT_PR"
                      //    create_PR_for_scripts()
