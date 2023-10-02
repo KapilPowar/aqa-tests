@@ -300,7 +300,7 @@ def getJavaSDK(){
         }
 }
 
-def target_Folder_check(SCRIPT_PR){
+def target_Folder_check(){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
             def logFile = "test.log"
@@ -342,6 +342,7 @@ def target_Folder_check(SCRIPT_PR){
             createComment(COMMENT)
             udpateFolderCheck() //remove after testing
             echo "SCRIPT_PR --  $SCRIPT_PR"
+            SCRIPT_PR=true
             return SCRIPT_PR
 }
 
