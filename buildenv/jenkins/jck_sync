@@ -1,6 +1,6 @@
 #!groovy
 
-def PR=0
+def PR_NUMBER=0
 //def COMMENT = ""
 //def EXITCODE = 0
 //def SCRIPT_PR = false
@@ -115,9 +115,9 @@ def syncJckMaterial(){
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         //PR = extractNumber(scriptOutput)
                                         //echo "PR created with number : $PR"
-                                        matcher = (scriptOutput =~ /PR_Number=\s*(\d+)/)
-                                        def PR_NUMBER = matcher ? matcher[0][1] : null
-                                        echo "PR_NUMBER = ${PR_NUMBER}"
+                                        def matcher = (scriptOutput =~ /PR_Number=\s*(\d+)/)
+                                        PR_NUMBER = matcher ? matcher[0][1] : null
+                                        echo "PR created with number : ${PR_NUMBER}"
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
                                     }
@@ -127,23 +127,23 @@ def syncJckMaterial(){
                     }
                 }
 
-        stage( 'Splitter'){
-            script{
-                if (EXITCODE ==0){
-                    def SCRIPT_PR= false
-                    //def SCRIPT_PR=target_Folder_check()
-                    //SCRIPT_PR=getSplitter(SCRIPT_PR)
-                    echo " Need to create PR ? -- $SCRIPT_PR"
-                    if (SCRIPT_PR){                       
-                        //create_PR_for_scripts()
-                    }
-                }
-            }
-        }
+        // stage( 'Splitter'){
+        //     script{
+        //         if (EXITCODE ==0){
+        //             def SCRIPT_PR= false
+        //             //def SCRIPT_PR=target_Folder_check()
+        //             //SCRIPT_PR=getSplitter(SCRIPT_PR)
+        //             echo " Need to create PR ? -- $SCRIPT_PR"
+        //             if (SCRIPT_PR){                       
+        //                 //create_PR_for_scripts()
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('SanityTest') {
                script{
-                   if (EXITCODE ==2){ //change it to zero if want to run tests
+                   if (EXITCODE ==0){ //change it to zero if want to run tests
                     def TEST_PLATFORM="x86-64_linux"
                     def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
@@ -606,7 +606,7 @@ def createComment(TestComment) {
                 def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
                 //def PR=4 //delete after test
                 JDK_VERSION = params.JDK_VERSION
-                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR}/comments"
+                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR_NUMBER}/comments"
                 def COMMENT = "${TestComment}"
                 def curlCommand = """
                     curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
