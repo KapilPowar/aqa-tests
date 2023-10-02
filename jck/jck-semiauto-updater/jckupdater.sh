@@ -338,7 +338,7 @@ createPR(){
 	PR_NUMBER=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
 	# $pr_number now contains the PR number
-	echo "PR_Number=$PR_NUMBER"
+	echo "PR_NUMBER=$PR_NUMBER"
 
 	# echo "Add comment to PR "
 	# comment="Test comment from script"
@@ -366,7 +366,7 @@ test() {
 
 	#env.TEST_ENV =${pr_number}
 	#echo "TEST_ENV== ${env.TEST_ENV}"
-	echo "PR_Number=$pr_number"
+	echo "PR_NUMBER=$pr_number"
 	# export TEST_ENV="$pr_number"
 	# echo "TEST_ENV== $TEST_ENV"
 	#echo "PR -- $pr_number"
@@ -394,15 +394,15 @@ begin_time="$(date -u +%s)"
 parseCommandLineArgs "$@"
 
 if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != "" ] && [ "$ARTIFACTORY_TOKEN" != "" ] && [ "$ARTIFACTORY_DOWNLOAD_URL" != "" ]  ; then
-	# cleanup
-	# setup
-	# isLatestUpdate
-	# extract
-	# gitClone
-	# copyFilestoGITRepo
-	# checkChangesAndCommit
-	# cleanup
-	test
+	cleanup
+	setup
+	isLatestUpdate
+	extract
+	gitClone
+	copyFilestoGITRepo
+	checkChangesAndCommit
+	cleanup
+	#test
 else 
 	echo "Please provide missing arguments"
 	usage; exit 1

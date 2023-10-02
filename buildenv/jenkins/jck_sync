@@ -115,7 +115,7 @@ def syncJckMaterial(){
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         //PR = extractNumber(scriptOutput)
                                         //echo "PR created with number : $PR"
-                                        def matcher = (scriptOutput =~ /PR_Number=\s*(\d+)/)
+                                        def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
                                         echo "PR created with number : ${PR_NUMBER}"
                                     } else {
