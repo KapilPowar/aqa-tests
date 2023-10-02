@@ -105,10 +105,16 @@ def syncJckMaterial(){
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
                                     //EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
-                                    result = sh(script: "${SCRIPT}", returnStdout: true, returnStatus: true)
+                                    SCRIPT1 = sh(script: """
+                                                $SCRIPT
+                                                status=\$?
+                                                echo "EXIT_STATUS=\$status"
+                                            """)
+                                    result = sh(script: "${SCRIPT1}", returnStdout: true, returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
-                                    EXITCODE = result.returnStatus
-                                    def stdout = result.returnStdout
+                                    def matcher = result =~ /EXIT_STATUS=(\d+)/
+                                    EXITCODE = matcher ? matcher[0][1].toInteger() : -1
+                                    def stdout = result.trim().replaceAll(/^EXIT_STATUS=\d+\s*/, '')
                                     echo "EXITCODE= ${EXITCODE}"
                                     //def scriptOutput = readFile(tempOutputFile).trim()
                                     //def output = scriptOutput.trim()
