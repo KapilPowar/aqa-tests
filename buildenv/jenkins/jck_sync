@@ -131,7 +131,7 @@ def syncJckMaterial(){
                 if (EXITCODE ==0){
                     def SCRIPT_PR= false
                     SCRIPT_PR=target_Folder_check()
-                    getSplitter(SCRIPT_PR)
+                    SCRIPT_PR=getSplitter(SCRIPT_PR)
                     echo " Need to create PR ? -- $SCRIPT_PR"
                     if (SCRIPT_PR){                       
                         create_PR_for_scripts()
@@ -268,13 +268,15 @@ def getSplitter(SCRIPT_PR){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            update_jckmk_file(testClasstList)
+            update_jckmk_file(testClasstList,SCRIPT_PR)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
+            SCRIPT_PR =true
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
         }
         createComment(COMMENT)
+        return SCRIPT_PR
     }
 }
 
@@ -367,8 +369,8 @@ def udpateFolderCheck(){
                 git checkout -b test
                 git branch
             """
-            echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
-            SCRIPT_PR=true
+            //echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
+            //SCRIPT_PR=true
             def sourceFilePath = createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log 
             def modifiedFiles = []
             //def sourceFilePath = logFile
@@ -444,7 +446,7 @@ def udpateFolderCheck(){
         }
     }
 }
-def update_jckmk_file(testClasstList){
+def update_jckmk_file(testClasstList,SCRIPT_PR){
 
     //def sourceFilePath = "test.log"
     //dir("${WORKSPACE}/aqa-tests/jck") {
