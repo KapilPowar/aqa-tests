@@ -114,8 +114,9 @@ def syncJckMaterial(){
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
                                     def matcher = result =~ /EXIT_STATUS=(\d+)/
                                     EXITCODE = matcher ? matcher[0][1].toInteger() : -1
-                                    def stdout = result.trim().replaceAll(/^EXIT_STATUS=\d+\s*/, '')
                                     echo "EXITCODE= ${EXITCODE}"
+                                    def stdout = result.replaceAll(/^EXIT_STATUS=\d+\s*/, '')
+                                    
                                     //def scriptOutput = readFile(tempOutputFile).trim()
                                     //def output = scriptOutput.trim()
                                     //echo "jckupdater script output:"
