@@ -309,7 +309,7 @@ def target_Folder_check(){
             def COMMENT=""
             def SCRIPT_PR = false
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
-                sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+               // sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
                     echo "${GIT_BRANCH}"
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
@@ -340,11 +340,11 @@ def target_Folder_check(){
                         SCRIPT_PR=true
                         udpateFolderCheck()
                     }
-                }
+                //}
             }
             createComment(COMMENT)
             //udpateFolderCheck() //remove after testing
-            echo "SCRIPT_PR --  $SCRIPT_PR"
+            //echo "SCRIPT_PR --  $SCRIPT_PR"
             //SCRIPT_PR=true
             return SCRIPT_PR
 }
