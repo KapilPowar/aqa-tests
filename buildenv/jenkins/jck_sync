@@ -129,8 +129,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    def SCRIPT_PR= false
-                    SCRIPT_PR=target_Folder_check()
+                    //def SCRIPT_PR= false
+                    def SCRIPT_PR=target_Folder_check()
                     SCRIPT_PR=getSplitter(SCRIPT_PR)
                     echo " Need to create PR ? -- $SCRIPT_PR"
                     if (SCRIPT_PR){                       
@@ -307,6 +307,7 @@ def target_Folder_check(){
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
             def logFile = "test.log"
             def COMMENT=""
+            def SCRIPT_PR = false
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
