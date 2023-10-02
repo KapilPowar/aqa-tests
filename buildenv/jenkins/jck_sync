@@ -104,20 +104,23 @@ def syncJckMaterial(){
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
-                                    EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    //EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+                                    result = sh(script: "${SCRIPT}", returnStdout: true, returnStatus: true)
                                     //EXITCODE = sh(script: "echo \$?", returnStatus: true)
+                                    EXITCODE = result.returnStatus
+                                    def stdout = result.returnStdout
                                     echo "EXITCODE= ${EXITCODE}"
-                                    def scriptOutput = readFile(tempOutputFile).trim()
+                                    //def scriptOutput = readFile(tempOutputFile).trim()
                                     //def output = scriptOutput.trim()
-                                    echo "jckupdater script output:"
-                                    echo scriptOutput
+                                    //echo "jckupdater script output:"
+                                    //echo scriptOutput
                                     if (EXITCODE == 2) {
                                         echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                        PR = extractNumber(scriptOutput)
+                                        //PR = extractNumber(scriptOutput)
                                         echo "PR created with number : $PR"
-                                        def matcher = (scriptOutput =~ /PR_Number=\s*(\d+)/)
+                                        def matcher = (stdout =~ /PR_Number=\s*(\d+)/)
                                         def PR_NUMBER = matcher ? matcher[0][1] : null
                                         echo "PR_NUMBER = ${PR_NUMBER}"
                                     } else {
