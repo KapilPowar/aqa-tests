@@ -1,6 +1,6 @@
 #!groovy
 
-//def PR=0
+def PR=0
 //def COMMENT = ""
 //def EXITCODE = 0
 //def SCRIPT_PR = false
@@ -84,10 +84,10 @@ def syncJckMaterial(){
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
         def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
         def EXITCODE = 1
-        def PR=0
+        //def PR=0
         stage('JCKUpdater') {
                 script {
-                    getJavaSDK()
+                    //getJavaSDK()
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
