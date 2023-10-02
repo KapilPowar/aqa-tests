@@ -343,9 +343,9 @@ def target_Folder_check(){
                 }
             }
             createComment(COMMENT)
-            udpateFolderCheck() //remove after testing
+            //udpateFolderCheck() //remove after testing
             echo "SCRIPT_PR --  $SCRIPT_PR"
-            SCRIPT_PR=true
+            //SCRIPT_PR=true
             return SCRIPT_PR
 }
 
