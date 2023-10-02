@@ -117,6 +117,9 @@ def syncJckMaterial(){
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         PR = extractNumber(scriptOutput)
                                         echo "PR created with number : $PR"
+                                        def matcher = (scriptOutput =~ /PR_NUMBER:\s*(\d+)/)
+                                        def PR_NUMBER = matcher ? matcher[0][1] : null
+                                        echo "PR_NUMBER = ${PR_NUMBER}"
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
                                     }
@@ -130,7 +133,7 @@ def syncJckMaterial(){
             script{
                 if (EXITCODE ==0){
                     //def SCRIPT_PR= false
-                    def SCRIPT_PR=target_Folder_check()
+                    //def SCRIPT_PR=target_Folder_check()
                     //SCRIPT_PR=getSplitter(SCRIPT_PR)
                     echo " Need to create PR ? -- $SCRIPT_PR"
                     if (SCRIPT_PR){                       
