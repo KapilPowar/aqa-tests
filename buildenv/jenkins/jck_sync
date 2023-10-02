@@ -132,7 +132,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
-                    //def SCRIPT_PR= false
+                    def SCRIPT_PR= false
                     //def SCRIPT_PR=target_Folder_check()
                     //SCRIPT_PR=getSplitter(SCRIPT_PR)
                     echo " Need to create PR ? -- $SCRIPT_PR"
