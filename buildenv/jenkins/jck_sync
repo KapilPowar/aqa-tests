@@ -115,7 +115,7 @@ def syncJckMaterial(){
                                     def matcher = result =~ /EXIT_STATUS=(\d+)/
                                     EXITCODE = matcher ? matcher[0][1].toInteger() : -1
                                     echo "EXITCODE= ${EXITCODE}"
-                                    def stdout = result.replaceAll(/^EXIT_STATUS=\d+\n/, '')
+                                    def stdout = result
                                     
                                     //def scriptOutput = readFile(tempOutputFile).trim()
                                     //def output = scriptOutput.trim()
