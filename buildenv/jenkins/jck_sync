@@ -2,8 +2,8 @@
 
 def PR=0
 //def COMMENT = ""
-def EXITCODE = 0
-def SCRIPT_PR = false
+//def EXITCODE = 0
+//def SCRIPT_PR = false
 timestamps{
     stage('Setup') {
             //SPEC = "linux_x86-64"
@@ -83,12 +83,12 @@ def syncJckMaterial(){
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
         def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
-        //def EXITCODE = 1
+        def EXITCODE = 1
 
         stage('JCKUpdater') {
                 script {
                     getJavaSDK()
-                    udpateFolderCheck()
+                    //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
                         usernamePassword(credentialsId: "${params.ARTIFACTORY_CREDENTIALS}",
@@ -129,6 +129,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             script{
                 if (EXITCODE ==0){
+                    def SCRIPT_PR= false
                     target_Folder_check()
                     getSplitter()
                     if (SCRIPT_PR){
@@ -339,6 +340,7 @@ def target_Folder_check(){
                 }
             }
             createComment(COMMENT)
+            udpateFolderCheck() //remove after testing
 }
 
 
