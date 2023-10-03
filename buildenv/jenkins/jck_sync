@@ -119,16 +119,14 @@ def syncJckMaterial(){
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
                                         //currentBuild.result = 'SUCCESS'
                                         //error('Condition met, stopping pipeline gracefully.') 
-                                        return
+                                        exit
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                        //PR = extractNumber(scriptOutput)
-                                        //echo "PR created with number : $PR"
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
                                         if (PR_NUMBER == null) {
                                             echo "Error: PR_NUMBER not found in script output."
-                                            return
+                                            error "PR_NUMBER not found in script output."
                                         } else {
                                             echo "PR created with number : ${PR_NUMBER}"
                                         }
@@ -139,9 +137,9 @@ def syncJckMaterial(){
                             }
                         }
                    // }
-                   if (EXITCODE ==2){
-                        return
-                   }
+                //    if (EXITCODE ==2){
+                //         return
+                //    }
                 }
 
         stage( 'Splitter'){
@@ -162,33 +160,12 @@ def syncJckMaterial(){
 
         stage('Test') {
                //script{
-                   //if (EXITCODE ==0){ //change it to zero if want to run tests
-                    //def TEST_PLATFORM="x86-64_linux"
-                    //def PLATFORMS = params.PLATFORM.trim().split("\\s*,\\s*");
+                   if (EXITCODE ==0){ //change it to zero if want to run tests
                     def CHILD_JOB_NAME="Grinder_JCK"
-                    // def TEST_JOBS = [:]
-                    // def BUILD_NUMBERS = [:]
-                    // def BUILD_RESULTS = [:]
-                    //def BUILD_URL="https://hyc-runtimes-jenkins.swg-devops.com/job/Grinder_JCK/"
-                    echo "JENKINS_URL -- ${JENKINS_URL}"
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
-
-                    //build job: JOB_NAME, parameters: childParams
-                    
-                        // Store the build number in the map
-                        // BUILD_NUMBERS[PLATFORM] = BUILD_INFO.number
-                        // BUILD_RESULTS[PLATFORM] = BUILD_INFO.result
-                //     PLATFORMS.each { PLATFORM ->
-                     def CHILD_PARAMS = []
-                //     // loop through all the params and change the parameters if needed
+                    def CHILD_PARAMS = []
+                    // loop through all the params and change the parameters if needed
                     params.each { param ->
-                        // if (param.key == "PLATFORM") {
-                        //     CHILD_PARAMS << string(name: param.key, value: PLATFORM)
-                        // // } else if (param.key == "JDK_VERSION") {
-                        // //     CHILD_PARAMS << string(name: param.key, value: JDK_VERSION)
-                        // // } else if (param.key == "JDK_IMPL") {
-                        // //     CHILD_PARAMS << string(name: param.key, value: JDK_IMPL)
-                        //  } else {
                             def value = param.value.toString()
                             if (value == "true" || value == "false") {
                                 CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
@@ -196,28 +173,10 @@ def syncJckMaterial(){
                                 CHILD_PARAMS << string(name: param.key, value: value)
                             }
                         }
-                    //}
                     def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    
-                //     TEST_JOBS["openjdk${JDK_VERSION}_${PLATFORM}"] = {
-                //         def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                //         // Store the build number in the map
-                //         BUILD_NUMBERS[PLATFORM] = BUILD_INFO.number
-                //         BUILD_RESULTS[PLATFORM] = BUILD_INFO.result
-                //     }
-                // }
-                //parallel TEST_JOBS
-                def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-                //echo "JENKINS_URL--- ${JENKINS_URL}"
-                //PLATFORMS.each { PLATFORM ->
-                    //echo "going to print status and job number "
-                    //echo "Job openjdk${JDK_VERSION}_${PLATFORM} (Build ${BUILD_NUMBERS[PLATFORM]}) completed with status: ${BUILD_RESULTS[PLATFORM]}"
-                    //COMMENT= COMMENT +"Job [${PLATFORM} #${BUILD_NUMBERS[PLATFORM]}](${BUILD_URL}${BUILD_NUMBERS[PLATFORM]}) completed with status: ${BUILD_RESULTS[PLATFORM]}\\r\\n"
-                //}
-
-                createComment(COMMENT)
-            //}
-        //}
+                    def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+                    createComment(COMMENT)
+        }
     }
 }
 
