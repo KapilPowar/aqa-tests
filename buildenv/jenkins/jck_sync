@@ -186,7 +186,7 @@ def syncJckMaterial(){
                                 CHILD_PARAMS << string(name: param.key, value: value)
                             }
                         }
-                    }
+                    //}
                     def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                     
                 //     TEST_JOBS["openjdk${JDK_VERSION}_${PLATFORM}"] = {
