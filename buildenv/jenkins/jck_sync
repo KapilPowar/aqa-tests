@@ -86,7 +86,7 @@ def syncJckMaterial(){
         def EXITCODE = 1
         //def PR=0
         stage('JCKUpdater') {
-                script {
+                //script {
                     getJavaSDK()
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
@@ -99,97 +99,104 @@ def syncJckMaterial(){
                             dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                     def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
-                                    echo "${SCRIPT}"
+                                    //echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
                                     //tempOutputFile.text  = "This is the content you want to write to the file."
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
                                     EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
-                                    echo "EXITCODE= ${EXITCODE}"
+                                    //echo "EXITCODE= ${EXITCODE}"
                                     def scriptOutput = readFile(tempOutputFile).trim()
                                     echo "jckupdater script output:"
                                     echo scriptOutput
                                     if (EXITCODE == 2) {
-                                        echo "script returned exit code 2, No new update available. Marking the job as SUCCESS. "
+                                        echo "script returned exit code 2, No new update available. The job is completed without further action. "
+                                        return
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         //PR = extractNumber(scriptOutput)
                                         //echo "PR created with number : $PR"
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
-                                        echo "PR created with number : ${PR_NUMBER}"
+                                        if (PR_NUMBER == null) {
+                                            echo "Error: PR_NUMBER not found in script output."
+                                            return
+                                        } else {
+                                            echo "PR created with number : ${PR_NUMBER}"
+                                        }
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
+                                        return
                                     }
                                 }
                             }
                         }
-                    }
+                   // }
                 }
 
-        // stage( 'Splitter'){
-        //     script{
-        //         if (EXITCODE ==0){
-        //             def SCRIPT_PR= false
-        //             //def SCRIPT_PR=target_Folder_check()
-        //             //SCRIPT_PR=getSplitter(SCRIPT_PR)
-        //             echo " Need to create PR ? -- $SCRIPT_PR"
-        //             if (SCRIPT_PR){                       
-        //                 //create_PR_for_scripts()
-        //             }
-        //         }
-        //     }
-        // }
+        stage( 'Splitter'){
+            //script{
+                if (EXITCODE ==0){
+                    //def SCRIPT_PR= false
+                    //def SCRIPT_PR=target_Folder_check()
+                    //SCRIPT_PR=getSplitter(SCRIPT_PR)
+                    echo " Need to create PR ? -- $SCRIPT_PR"
+                    if (SCRIPT_PR){                       
+                        //create_PR_for_scripts()
+                    }
+                }
+           // }
+        }
 
-        stage('SanityTest') {
-               script{
-                   if (EXITCODE ==0){ //change it to zero if want to run tests
-                    def TEST_PLATFORM="x86-64_linux"
-                    def PLATFORMS = TEST_PLATFORM.trim().split("\\s*,\\s*");
+        stage('Test') {
+               //script{
+                   //if (EXITCODE ==0){ //change it to zero if want to run tests
+                    //def TEST_PLATFORM="x86-64_linux"
+                    def PLATFORMS = params.PLATFORM.trim().split("\\s*,\\s*");
                     def CHILD_JOB_NAME="Grinder_JCK"
-                    def testJobs = [:]
-                    def buildNumbers = [:]
-                    def buildResults = [:]
-                    //def build_url="https://hyc-runtimes-jenkins.swg-devops.com/job/Grinder_JCK/"
-                    def build_url="${JENKINS_URL}/job/${CHILD_JOB_NAME}/"
+                    def TEST_JOBS = [:]
+                    def BUILD_NUMBERS = [:]
+                    def BUILD_RESULTS = [:]
+                    //def BUILD_URL="https://hyc-runtimes-jenkins.swg-devops.com/job/Grinder_JCK/"
+                    def BUILD_URL="${JENKINS_URL}/job/${CHILD_JOB_NAME}/"
                     PLATFORMS.each { PLATFORM ->
-                    def childParams = []
+                    def CHILD_PARAMS = []
                     // loop through all the params and change the parameters if needed
                     params.each { param ->
                         if (param.key == "PLATFORM") {
-                            childParams << string(name: param.key, value: PLATFORM)
+                            CHILD_PARAMS << string(name: param.key, value: PLATFORM)
                         // } else if (param.key == "JDK_VERSION") {
-                        //     childParams << string(name: param.key, value: JDK_VERSION)
+                        //     CHILD_PARAMS << string(name: param.key, value: JDK_VERSION)
                         // } else if (param.key == "JDK_IMPL") {
-                        //     childParams << string(name: param.key, value: JDK_IMPL)
+                        //     CHILD_PARAMS << string(name: param.key, value: JDK_IMPL)
                          } else {
                             def value = param.value.toString()
                             if (value == "true" || value == "false") {
-                                childParams << booleanParam(name: param.key, value: value.toBoolean())
+                                CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
                             } else {
-                                childParams << string(name: param.key, value: value)
+                                CHILD_PARAMS << string(name: param.key, value: value)
                             }
                         }
                     }
                     
-                    testJobs["openjdk${JDK_VERSION}_${PLATFORM}"] = {
-                        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+                    TEST_JOBS["openjdk${JDK_VERSION}_${PLATFORM}"] = {
+                        def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                         // Store the build number in the map
-                        buildNumbers[PLATFORM] = buildInfo.number
-                        buildResults[PLATFORM] = buildInfo.result
+                        BUILD_NUMBERS[PLATFORM] = BUILD_INFO.number
+                        BUILD_RESULTS[PLATFORM] = BUILD_INFO.result
                     }
                 }
-                parallel testJobs
+                parallel TEST_JOBS
                 def COMMENT=""
                 //echo "JENKINS_URL--- ${JENKINS_URL}"
                 PLATFORMS.each { PLATFORM ->
                     //echo "going to print status and job number "
-                    echo "Job openjdk${JDK_VERSION}_${PLATFORM} (Build ${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}"
-                    COMMENT= COMMENT +"Job [${PLATFORM} #${buildNumbers[PLATFORM]}](${build_url}${buildNumbers[PLATFORM]}) completed with status: ${buildResults[PLATFORM]}\\r\\n"
+                    echo "Job openjdk${JDK_VERSION}_${PLATFORM} (Build ${BUILD_NUMBERS[PLATFORM]}) completed with status: ${BUILD_RESULTS[PLATFORM]}"
+                    COMMENT= COMMENT +"Job [${PLATFORM} #${BUILD_NUMBERS[PLATFORM]}](${BUILD_URL}${BUILD_NUMBERS[PLATFORM]}) completed with status: ${BUILD_RESULTS[PLATFORM]}\\r\\n"
                 }
                 createComment(COMMENT)
-            }
-        }
+            //}
+        //}
     }
 }
 
@@ -286,8 +293,8 @@ def getJavaSDK(){
         JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
         CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
         CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
-        echo "getJavaSDK"
-        GET_SH_CMD = "./get.sh -s `pwd`/.. -p $PLATFORM -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} 
+        //echo "getJavaSDK"
+        GET_SH_CMD = "./get.sh -s `pwd`/.. -p x86-64_linux -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} 
         dir("${WORKSPACE}/aqa-tests") {
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
@@ -309,43 +316,43 @@ def target_Folder_check(){
             def logFile = "test.log"
             def COMMENT=""
             def SCRIPT_PR = false
-            // dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
-            //     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-            //         def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
-            //         echo "${GIT_BRANCH}"
-            //         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
-            //         def specificLine = "New test folder detected:"
+            dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
+                sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+                    def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
+                    echo "${GIT_BRANCH}"
+                    def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
+                    def specificLine = "New test folder detected:"
 
-            //         def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-            //         echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
-            //         sh "cat ${logFile}"
+                    def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                    echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
+                    sh "cat ${logFile}"
                         
-            //         // Use 'grep' to check if any new folders are detected
-            //         def grepCommand = "grep '${specificLine}' ${logFile} || true"
-            //         def grepResult = sh(script: grepCommand, returnStatus: true)
+                    // Use 'grep' to check if any new folders are detected
+                    def grepCommand = "grep '${specificLine}' ${logFile} || true"
+                    def grepResult = sh(script: grepCommand, returnStatus: true)
 
-            //         // grep last few lines after Done! to create comment
-            //         def fileContents = readFile(file: logFile).trim()
-            //         def delimiter = 'Done!'
-            //         def parts = fileContents.split(delimiter)
-            //         def linesAfterDone = parts[1].trim()
-            //         def lines = linesAfterDone.split('\n')
-            //         def commentBody = lines.collect { it.trim() }.join('\\r\\n')
+                    // grep last few lines after Done! to create comment
+                    def fileContents = readFile(file: logFile).trim()
+                    def delimiter = 'Done!'
+                    def parts = fileContents.split(delimiter)
+                    def linesAfterDone = parts[1].trim()
+                    def lines = linesAfterDone.split('\n')
+                    def commentBody = lines.collect { it.trim() }.join('\\r\\n')
 
-            //         if (grepResult == 0)  {
-            //             echo "No new folders detected. No need to update playlist.xml '"
-            //             COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
-            //         } else {
-            //             echo "New folders detected. Need to update playlist.xml'"
-            //             COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
-            //             SCRIPT_PR=true
-            //             udpateFolderCheck()
-            //         }
-            //     }
-            // }
+                    if (grepResult == 0)  {
+                        echo "No new folders detected. No need to update playlist.xml '"
+                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
+                    } else {
+                        echo "New folders detected. Need to update playlist.xml'"
+                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+                        SCRIPT_PR=true
+                        udpateFolderCheck()
+                    }
+                }
+            }
             COMMENT="No new folders detected. No need to update playlist.xml "
             createComment(COMMENT)
-            //udpateFolderCheck() //remove after testing
+            udpateFolderCheck() //remove after testing
             //echo "SCRIPT_PR --  $SCRIPT_PR"
             //SCRIPT_PR=true
             return SCRIPT_PR
@@ -374,7 +381,7 @@ def udpateFolderCheck(){
             """
             //echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
             //SCRIPT_PR=true
-            def sourceFilePath = createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log 
+            def sourceFilePath = "aqa-tests/jck/jck_target_folder_check/test.log" //createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log 
             def modifiedFiles = []
             //def sourceFilePath = logFile
             def sourceFileContent = readFile(file: sourceFilePath)
@@ -549,7 +556,7 @@ def create_PR_for_scripts() {
                 echo " Creating PR for jck.mk and playlist.xml file"
                 url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
-                def curlCommand = """
+                def CURL_COMMAND = """
                                     curl -X POST "${url}" \\
                                         -H "Authorization: token \"\$PERSONAL_GIT_TOKEN\"" \\
                                         -H "Content-Type: application/json" \\
@@ -560,7 +567,7 @@ def create_PR_for_scripts() {
                                             "base": "jcksync-copy"
                                         }'
                                 """
-                def response = sh(script: curlCommand, returnStdout: true)
+                def response = sh(script: CURL_COMMAND, returnStdout: true)
                 // def response = sh(script: """
                 //     curl -X POST \
                 //     -H "Authorization: token $PERSONAL_GIT_TOKEN" \
@@ -602,24 +609,26 @@ def createComment(TestComment) {
             withCredentials([
                 string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
             ]) {
-                def JCK_GIT_REPO = params.JCK_GIT_REPO
-                def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
+                //def JCK_GIT_REPO = params.JCK_GIT_REPO
+                //def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
+                def PARTS = params.JCK_GIT_REPO.split(/[@:]/)
                 //def PR=4 //delete after test
                 JDK_VERSION = params.JDK_VERSION
-                def comment_url="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR_NUMBER}/comments"
+                //def COMMENT_URL="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR_NUMBER}/comments"
+                def COMMENT_URL="https://${PARTS[1]}/api/v3/repos/${PARTS[2]}/issues/${PR_NUMBER}/comments"
                 def COMMENT = "${TestComment}"
-                def curlCommand = """
+                def CURL_COMMAND = """
                     curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
                     -d '{ 
                     "body":"$COMMENT" 
-                    }' "$comment_url"
+                    }' "$COMMENT_URL"
                 """
                 //Execute the curl command using sh
-                def exitCode = sh(script: curlCommand, returnStatus: true, returnStdout: true)
-                if (exitCode == 0) {    
-                    echo "Comment added successfully."
+                def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
+                if (STATUS == 0) {    
+                    echo "Comment added successfully to PR ${PARTS[1]}/${PARTS[2]}/pull/${PR_NUMBER} "
                 } else {
-                    error "Failed to add a comment."
+                    error "Failed to add a comment to PR ${PARTS[1]}/${PARTS[2]}/pull/${PR_NUMBER}"
                 }
             }
 }
