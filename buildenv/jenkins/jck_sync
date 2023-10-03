@@ -137,6 +137,8 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             //script{
                 if (EXITCODE ==0){
+                    createComment("TEST COMMENT")
+
                     //def SCRIPT_PR= false
                     //def SCRIPT_PR=target_Folder_check()
                     //SCRIPT_PR=getSplitter(SCRIPT_PR)
