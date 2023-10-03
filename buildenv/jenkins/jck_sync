@@ -624,15 +624,15 @@ def createComment(TestComment) {
                 def CURL_COMMAND = """
                     curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
                     -d '{ 
-                    "body":"$COMMENT" 
+                    "body":"$COMMENT"
                     }' "$COMMENT_URL"
                 """
                 //Execute the curl command using sh
                 def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
                 if (STATUS == 0) {    
-                    echo "Comment added successfully to PR ${PARTS[1]}/${PARTS[2]}/pull/${PR_NUMBER} "
+                    echo "Comment added successfully to PR ${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
                 } else {
-                    error "Failed to add a comment to PR ${PARTS[1]}/${PARTS[2]}/pull/${PR_NUMBER}"
+                    error "Failed to add a comment to PR ${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
                 }
             }
 }
