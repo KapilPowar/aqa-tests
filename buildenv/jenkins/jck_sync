@@ -31,7 +31,11 @@ timestamps{
                         [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
-                    syncJckMaterial()
+                    def shouldExit = syncJckMaterial()
+                    if (shouldExit) {
+            echo "Script returned exit code 2, No new update available. The job is completed without further action."
+            return // Exit the pipeline
+        }
 
                 } catch (Exception e) {
                     println("Exception: " + e.toString())
@@ -111,7 +115,7 @@ def syncJckMaterial(){
                                     echo scriptOutput
                                     if (EXITCODE == 2) {
                                         echo "script returned exit code 2, No new update available. The job is completed without further action. "
-                                        return
+                                        return true
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         //PR = extractNumber(scriptOutput)
@@ -126,7 +130,6 @@ def syncJckMaterial(){
                                         }
                                     } else {
                                         error("script failed with exit code ${EXITCODE}")
-                                        return
                                     }
                                 }
                             }
@@ -137,7 +140,7 @@ def syncJckMaterial(){
         stage( 'Splitter'){
             //script{
                 if (EXITCODE ==0){
-                    createComment("TEST COMMENT")
+                    //createComment("TEST COMMENT")
 
                     //def SCRIPT_PR= false
                     //def SCRIPT_PR=target_Folder_check()
