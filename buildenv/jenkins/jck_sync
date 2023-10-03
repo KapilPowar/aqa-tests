@@ -170,8 +170,8 @@ def syncJckMaterial(){
                     }
                     params.each { param ->
                             if (param.key == "JCK_GIT_BRANCH") {
-                                childParams << string(name: param.key, value: JCK_GIT_BRANCH)
-                                echo "$childParams"
+                                CHILD_PARAMS << string(name: param.key, value: JCK_GIT_BRANCH)
+                                echo "$CHILD_PARAMS"
                             } else {
                                 def value = param.value.toString()
                                 if (value == "true" || value == "false") {
