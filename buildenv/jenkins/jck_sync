@@ -169,6 +169,7 @@ def syncJckMaterial(){
                     //     JCK_GIT_BRANCH = "autoBranch" //default branch name given in JCKUpdater.sh script
                     // }
                     params.each { param ->
+                            def value = param.value.toString()
                             if (param.key == "JCK_GIT_BRANCH") {
                                 if (value == null){
                                     value = "autoBranch" //default branch name given in JCKUpdater.sh script
@@ -176,7 +177,6 @@ def syncJckMaterial(){
                                 CHILD_PARAMS << string(name: param.key, value: value)
                                 echo "$CHILD_PARAMS"
                             } else {
-                                def value = param.value.toString()
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
                                 } else {
