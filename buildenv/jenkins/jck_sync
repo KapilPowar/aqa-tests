@@ -607,9 +607,9 @@ def createComment(TestComment) {
                 //Execute the curl command using sh
                 def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
                 if (STATUS == 0) {    
-                    echo "Comment added successfully to PR https:\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
+                    echo "Comment added successfully to PR https:\\\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
                 } else {
-                    error "Failed to add a comment to PR https:\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
+                    error "Failed to add a comment to PR https:\\\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
                 }
             }
 }
