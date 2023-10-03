@@ -119,7 +119,7 @@ def syncJckMaterial(){
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
                                         //currentBuild.result = 'SUCCESS'
                                         //error('Condition met, stopping pipeline gracefully.') 
-                                        exit
+                                        //exit
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
@@ -160,7 +160,7 @@ def syncJckMaterial(){
 
         stage('Test') {
                //script{
-                   if (EXITCODE ==0){ //change it to zero if want to run tests
+                   if (EXITCODE ==2){ //change it to zero if want to run tests
                     def CHILD_JOB_NAME="Grinder_JCK"
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     def CHILD_PARAMS = []
@@ -607,9 +607,9 @@ def createComment(TestComment) {
                 //Execute the curl command using sh
                 def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
                 if (STATUS == 0) {    
-                    echo "Comment added successfully to PR ${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
+                    echo "Comment added successfully to PR https:\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
                 } else {
-                    error "Failed to add a comment to PR ${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
+                    error "Failed to add a comment to PR https:\\${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
                 }
             }
 }
