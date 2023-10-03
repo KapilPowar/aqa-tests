@@ -124,7 +124,7 @@ def syncJckMaterial(){
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
-                                        if (PR_NUMBER == null) {
+                                        if (PR_NUMBER == null || PR_NUMBER == 0) {
                                             echo "Error: PR_NUMBER not found in script output."
                                             error "PR_NUMBER not found in script output."
                                         } else {
@@ -160,7 +160,7 @@ def syncJckMaterial(){
 
         stage('Test') {
                //script{
-                   if (EXITCODE ==2){ //change it to zero if want to run tests
+                   if (EXITCODE ==0){ //change it to zero if want to run tests
                     def CHILD_JOB_NAME="Grinder_JCK"
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     def CHILD_PARAMS = []
