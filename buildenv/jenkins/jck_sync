@@ -160,7 +160,8 @@ def syncJckMaterial(){
                     def BUILD_NUMBERS = [:]
                     def BUILD_RESULTS = [:]
                     //def BUILD_URL="https://hyc-runtimes-jenkins.swg-devops.com/job/Grinder_JCK/"
-                    def BUILD_URL="${JENKINS_URL}/job/${CHILD_JOB_NAME}/"
+                    echo "JENKINS_URL -- ${JENKINS_URL}"
+                    def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     PLATFORMS.each { PLATFORM ->
                     def CHILD_PARAMS = []
                     // loop through all the params and change the parameters if needed
@@ -613,11 +614,12 @@ def createComment(TestComment) {
             ]) {
                 //def JCK_GIT_REPO = params.JCK_GIT_REPO
                 //def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
-                def PARTS = params.JCK_GIT_REPO.split(/[@:]/)
+                def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)
+                def REPO = DOMAIN[2].split('\\.')
                 //def PR=4 //delete after test
                 JDK_VERSION = params.JDK_VERSION
                 //def COMMENT_URL="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR_NUMBER}/comments"
-                def COMMENT_URL="https://${PARTS[1]}/api/v3/repos/${PARTS[2]}/issues/${PR_NUMBER}/comments"
+                def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${PR_NUMBER}/comments"
                 def COMMENT = "${TestComment}"
                 def CURL_COMMAND = """
                     curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
