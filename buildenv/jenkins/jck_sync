@@ -171,13 +171,13 @@ def syncJckMaterial(){
                     params.each { param ->
                             def value = param.value.toString()
                             if (param.key == "JCK_GIT_BRANCH") {
-                                echo "value -- $value"
-                                if (value == null || value.trim() == ""){
+                                //echo "value -- $value"
+                                if (value.trim() == ""){
                                     value = "autoBranch" //default branch name given in JCKUpdater.sh script
                                 }
-                                echo "value -- $value"
+                                //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                                //echo "$CHILD_PARAMS"
+                                echo "$CHILD_PARAMS"
                             } else {
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
@@ -186,9 +186,9 @@ def syncJckMaterial(){
                                 }
                             }
                         }
-                    // def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    // def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-                    // createComment(COMMENT)
+                    def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+                    def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+                    createComment(COMMENT)
         }
     }
 }
