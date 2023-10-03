@@ -87,7 +87,7 @@ def syncJckMaterial(){
         //def PR=0
         stage('JCKUpdater') {
                 //script {
-                    getJavaSDK()
+                    //getJavaSDK()
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
@@ -164,29 +164,30 @@ def syncJckMaterial(){
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
 
                     //build job: JOB_NAME, parameters: childParams
-                    def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: params
+                    
                         // Store the build number in the map
                         // BUILD_NUMBERS[PLATFORM] = BUILD_INFO.number
                         // BUILD_RESULTS[PLATFORM] = BUILD_INFO.result
                 //     PLATFORMS.each { PLATFORM ->
-                //     def CHILD_PARAMS = []
+                     def CHILD_PARAMS = []
                 //     // loop through all the params and change the parameters if needed
-                //     params.each { param ->
-                //         if (param.key == "PLATFORM") {
-                //             CHILD_PARAMS << string(name: param.key, value: PLATFORM)
-                //         // } else if (param.key == "JDK_VERSION") {
-                //         //     CHILD_PARAMS << string(name: param.key, value: JDK_VERSION)
-                //         // } else if (param.key == "JDK_IMPL") {
-                //         //     CHILD_PARAMS << string(name: param.key, value: JDK_IMPL)
-                //          } else {
-                //             def value = param.value.toString()
-                //             if (value == "true" || value == "false") {
-                //                 CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
-                //             } else {
-                //                 CHILD_PARAMS << string(name: param.key, value: value)
-                //             }
-                //         }
-                //     }
+                    params.each { param ->
+                        // if (param.key == "PLATFORM") {
+                        //     CHILD_PARAMS << string(name: param.key, value: PLATFORM)
+                        // // } else if (param.key == "JDK_VERSION") {
+                        // //     CHILD_PARAMS << string(name: param.key, value: JDK_VERSION)
+                        // // } else if (param.key == "JDK_IMPL") {
+                        // //     CHILD_PARAMS << string(name: param.key, value: JDK_IMPL)
+                        //  } else {
+                            def value = param.value.toString()
+                            if (value == "true" || value == "false") {
+                                CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
+                            } else {
+                                CHILD_PARAMS << string(name: param.key, value: value)
+                            }
+                        }
+                    }
+                    def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                     
                 //     TEST_JOBS["openjdk${JDK_VERSION}_${PLATFORM}"] = {
                 //         def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
