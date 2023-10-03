@@ -165,15 +165,15 @@ def syncJckMaterial(){
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     def CHILD_PARAMS = []
                     // loop through all the params and change the parameters if needed
-                    if (params.JCK_GIT_BRANCH == null){
-                        JCK_GIT_BRANCH = "autoBranch" //default branch name given in JCKUpdater.sh script
-                    }
+                    // if (params.JCK_GIT_BRANCH == null){
+                    //     JCK_GIT_BRANCH = "autoBranch" //default branch name given in JCKUpdater.sh script
+                    // }
                     params.each { param ->
                             if (param.key == "JCK_GIT_BRANCH") {
-                                if (JCK_GIT_BRANCH == null){
-                                    JCK_GIT_BRANCH = "autoBranch" //default branch name given in JCKUpdater.sh script
+                                if (value == null){
+                                    value = "autoBranch" //default branch name given in JCKUpdater.sh script
                                 }
-                                CHILD_PARAMS << string(name: param.key, value: JCK_GIT_BRANCH)
+                                CHILD_PARAMS << string(name: param.key, value: value)
                                 echo "$CHILD_PARAMS"
                             } else {
                                 def value = param.value.toString()
