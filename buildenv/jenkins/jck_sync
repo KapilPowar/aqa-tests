@@ -39,14 +39,17 @@ timestamps{
         // }
 
                 } catch (Exception e) {
-                    println("Exception: " + e.toString())
+                    //println("Exception: " + e.toString())
                     // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
                     // if there is an exception, set currentBuild.result to ABORTED/FAILURE
-                    if (e.toString().contains("Condition met, stopping execution of pipeline")){
+                    if (e.toString().contains("Gracefully stop execution of pipeline")){
+                        println("No new update available. The job is completed.")
                         currentBuild.result = "SUCCESS"
-                    }else if (e.toString().contains("FlowInterruptedException")) {
+                    } else if (e.toString().contains("FlowInterruptedException")) {
+                        println("Exception: " + e.toString())
                         currentBuild.result = 'ABORTED'
                     } else {
+                        println("Exception: " + e.toString())
                         currentBuild.result = 'FAILURE'
                     }
                 } finally {
@@ -120,7 +123,7 @@ def syncJckMaterial(){
                                         echo "script returned exit code 2, No new update available. The job is completed without further action. "
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
                                         //currentBuild.result = 'SUCCESS'
-                                        error('Condition met, stopping execution of pipeline.') 
+                                        error("JCKUpdater script returned exit code 2, as no new update available. Gracefully stop execution of pipeline.") 
                                         currentBuild.result = "SUCCESS"
                                         //exit
                                     } else if (EXITCODE == 0) {
