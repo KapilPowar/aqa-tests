@@ -52,23 +52,24 @@ timestamps{
                         println("Exception: " + e.toString())
                         currentBuild.result = 'FAILURE'
                     }
-                } finally {
-                        timeout(time: 15, unit: 'MINUTES') {
-                            if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
-                                echo "Build was successful."
-                                currentBuild.result = "SUCCESS"
-                            } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
-                                echo "Build failed."
-                                currentBuild.result = "FAILED"
-                            } else {
-                                echo "Build status is unknown or unstable."
-                                currentBuild.result = "UNSTABLE"
-                            }
-                            def build_status=("${env.JOB_NAME} #${env.BUILD_NUMBER} result is $currentBuild.result .")
-                            println "$build_status"
-                            //createComment(build_status)
-                        }
-                }
+                } 
+                // finally {
+                //         timeout(time: 15, unit: 'MINUTES') {
+                //             if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+                //                 echo "Build was successful."
+                //                 currentBuild.result = "SUCCESS"
+                //             } else if (currentBuild.resultIsWorseOrEqualTo('FAILURE')) {
+                //                 echo "Build failed."
+                //                 currentBuild.result = "FAILED"
+                //             } else {
+                //                 echo "Build status is unknown or unstable."
+                //                 currentBuild.result = "UNSTABLE"
+                //             }
+                //             def build_status=("${env.JOB_NAME} #${env.BUILD_NUMBER} result is $currentBuild.result .")
+                //             println "$build_status"
+                //             //createComment(build_status)
+                //         }
+                // }
             }
     }
 }
