@@ -181,7 +181,7 @@ def syncJckMaterial(){
                                 CHILD_PARAMS << string(name: param.key, value: "")
                             } else if (param.key == "LABEL") {
                                 CHILD_PARAMS << string(name: param.key, value: "")
-                            else {
+                            } else {
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
                                 } else {
