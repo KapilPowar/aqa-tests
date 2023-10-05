@@ -44,8 +44,7 @@ timestamps{
                     // if there is an exception, set currentBuild.result to ABORTED/FAILURE
                     if (e.toString().contains("Condition met, stopping execution of pipeline")){
                         currentBuild.result = "SUCCESS"
-                    }
-                    if (e.toString().contains("FlowInterruptedException")) {
+                    }else if (e.toString().contains("FlowInterruptedException")) {
                         currentBuild.result = 'ABORTED'
                     } else {
                         currentBuild.result = 'FAILURE'
