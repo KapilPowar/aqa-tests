@@ -177,8 +177,9 @@ def syncJckMaterial(){
                                 }
                                 //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                            } else if (param.key == "CUSTOMIZED_SDK_URL") {
-                                CHILD_PARAMS << string(name: param.key, value: "")
+                            // } else if (param.key == "CUSTOMIZED_SDK_URL") {
+                            //     //echo ("not passing CUSTOMIZED_SDK_URL")
+                            //     CHILD_PARAMS << string(name: param.key, value: "")
                             } else if (param.key == "LABEL") {
                                 CHILD_PARAMS << string(name: param.key, value: "")
                             } else {
@@ -188,8 +189,9 @@ def syncJckMaterial(){
                                     CHILD_PARAMS << string(name: param.key, value: value)
                                 }
                             }
-                            echo "$CHILD_PARAMS"
+                            
                         }
+                    echo "$CHILD_PARAMS"
                     def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                     def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
                     createComment(COMMENT,PR_NUMBER)
