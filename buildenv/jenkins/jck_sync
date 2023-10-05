@@ -118,7 +118,8 @@ def syncJckMaterial(){
                                         echo "script returned exit code 2, No new update available. The job is completed without further action. "
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
                                         //currentBuild.result = 'SUCCESS'
-                                        //error('Condition met, stopping pipeline gracefully.') 
+                                        error('Condition met, stopping execution of pipeline.') 
+                                        currentBuild.result = "SUCCESS"
                                         //exit
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
