@@ -177,9 +177,10 @@ def syncJckMaterial(){
                                 }
                                 //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                            // } else if (param.key == "CUSTOMIZED_SDK_URL") {
-                            //     //echo ("not passing CUSTOMIZED_SDK_URL")
-                            //     CHILD_PARAMS << string(name: param.key, value: "")
+                            } else if (param.key == "SDK_RESOURCE") {
+                                CHILD_PARAMS << string(name: param.key, value: "releases")
+                            } else if (param.key == "CUSTOMIZED_SDK_URL") {
+                                CHILD_PARAMS << string(name: param.key, value: "")
                             } else if (param.key == "LABEL") {
                                 CHILD_PARAMS << string(name: param.key, value: "")
                             } else {
