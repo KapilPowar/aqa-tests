@@ -42,6 +42,9 @@ timestamps{
                     println("Exception: " + e.toString())
                     // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
                     // if there is an exception, set currentBuild.result to ABORTED/FAILURE
+                    if (e.toString().contains("Condition met, stopping execution of pipeline")){
+                        currentBuild.result = "SUCCESS"
+                    }
                     if (e.toString().contains("FlowInterruptedException")) {
                         currentBuild.result = 'ABORTED'
                     } else {
