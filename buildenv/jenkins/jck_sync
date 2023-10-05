@@ -43,7 +43,7 @@ timestamps{
                     // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
                     // if there is an exception, set currentBuild.result to ABORTED/FAILURE
                     if (e.toString().contains("Gracefully stop execution of pipeline")){
-                        println("No new update available. The job is completed.")
+                        println("JCKUpdater script returned exit code 2, as no new update available. The job is completed without further action")
                         currentBuild.result = "SUCCESS"
                     } else if (e.toString().contains("FlowInterruptedException")) {
                         println("Exception: " + e.toString())
@@ -121,7 +121,7 @@ def syncJckMaterial(){
                                     echo "jckupdater script output:"
                                     echo scriptOutput
                                     if (EXITCODE == 2) {
-                                        echo "script returned exit code 2, No new update available. The job is completed without further action. "
+                                        //echo "script returned exit code 2, No new update available. The job is completed without further action. "
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
                                         //currentBuild.result = 'SUCCESS'
                                         error("JCKUpdater script returned exit code 2, as no new update available. Gracefully stop execution of pipeline.") 
