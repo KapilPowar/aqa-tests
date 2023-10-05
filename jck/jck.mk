@@ -171,7 +171,7 @@ ifeq ($(JDK_VERSION), 11)
 endif
 
 ifeq (8, $(JDK_VERSION))
-   include jck8.mk
+   include $(TEST_ROOT)/jck/jck8.mk
 endif 
 
 ifeq (11, $(JDK_VERSION))
