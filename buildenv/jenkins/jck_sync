@@ -160,7 +160,7 @@ def syncJckMaterial(){
 
         stage('Test') {
                //script{
-                   if (EXITCODE ==0){ //change it to zero if want to run tests
+                   //if (EXITCODE ==0){ //change it to zero if want to run tests
                     def CHILD_JOB_NAME="Grinder_JCK"
                     def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     def CHILD_PARAMS = []
@@ -177,19 +177,23 @@ def syncJckMaterial(){
                                 }
                                 //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                                echo "$CHILD_PARAMS"
-                            } else {
+                            } else if (param.key == "CUSTOMIZED_SDK_URL") {
+                                CHILD_PARAMS << string(name: param.key, value: "")
+                            } else if (param.key == "LABEL") {
+                                CHILD_PARAMS << string(name: param.key, value: "")
+                            else {
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
                                 } else {
                                     CHILD_PARAMS << string(name: param.key, value: value)
                                 }
                             }
+                            echo "$CHILD_PARAMS"
                         }
                     def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                     def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-                    createComment(COMMENT)
-        }
+                    createComment(COMMENT,PR_NUMBER)
+        //}
     }
 }
 
@@ -598,33 +602,28 @@ def create_PR_for_scripts() {
     }
 }
 
-def createComment(TestComment) {
-            withCredentials([
-                string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
-            ]) {
-                //def JCK_GIT_REPO = params.JCK_GIT_REPO
-                //def GIT_USER = JCK_GIT_REPO.split(':')[1].split('/')[0]
-                def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)
-                def REPO = DOMAIN[2].split('\\.')
-                //def PR=4 //delete after test
-                JDK_VERSION = params.JDK_VERSION
-                //def COMMENT_URL="https://github.ibm.com/api/v3/repos/${GIT_USER}/JCK${JDK_VERSION}-unzipped/issues/${PR_NUMBER}/comments"
-                def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${PR_NUMBER}/comments"
-                def COMMENT = "${TestComment}"
-                def CURL_COMMAND = """
-                    curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
-                    -d '{ 
-                    "body":"$COMMENT"
-                    }' "$COMMENT_URL"
-                """
-                //Execute the curl command using sh
-                def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
-                if (STATUS == 0) {    
-                    echo "Comment added successfully to PR https://${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER} "
-                } else {
-                    error "Failed to add a comment to PR https://${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
-                }
-            }
+def createComment(Comment,Number) {
+    withCredentials([
+        string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
+    ]) {
+        def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)
+        def REPO = DOMAIN[2].split('\\.')
+        def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${Number}/comments"
+        def PR_URL="https://${DOMAIN[1]}/${REPO[0]}/pull/${Number}"
+        echo ("${Comment}")
+        def CURL_COMMAND = """
+            curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
+            -d '{
+            "body":"${Comment}"
+            }' "$COMMENT_URL"
+        """
+        def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
+        if (STATUS == 0) {
+            echo ("Comment added successfully to PR ${PR_URL} ")
+        } else {
+            error ("Failed to add a comment to PR ${PR_URL} ")
+        }
+    }
 }
 
 def extractNumber(output) {
