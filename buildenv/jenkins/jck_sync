@@ -1,21 +1,23 @@
 #!groovy
 
-def PR_NUMBER=0
+//def PR_NUMBER=0
 //def COMMENT = ""
 //def EXITCODE = 0
 //def SCRIPT_PR = false
 timestamps{
     stage('Setup') {
             //SPEC = "linux_x86-64"
-            if (params.LABEL) {
-                LABEL = params.LABEL
-            } else {
-                LABEL = "ci.role.test&&hw.arch.x86&&sw.os.linux"
-            }
-            node(LABEL) {
+            // if (params.LABEL) {
+            //     LABEL = params.LABEL
+            // } else {
+            //     LABEL = "ci.role.test&&hw.arch.x86&&sw.os.linux"
+            // }
+            def SYNC_LABEL = params.SYNC_LABEL ?: "ci.role.test&&hw.arch.x86&&sw.os.linux"
+            println "SYNC_LABEL: ${SYNC_LABEL}"
+            node(SYNC_LABEL) {
                 echo "clone the SCM GIT repo"
                // println "SPEC: ${SPEC}"
-                println "LABEL: ${LABEL}"
+                //println "LABEL: ${LABEL}"
                 try {
                     def gitConfig = scm.getUserRemoteConfigs().get(0)
                     // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
@@ -95,6 +97,7 @@ def syncJckMaterial(){
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
         def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
         def EXITCODE = 1
+        def PR_NUMBER=0
         //def PR=0
         stage('JCKUpdater') {
                 //script {
@@ -106,8 +109,9 @@ def syncJckMaterial(){
 					usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS'),
                         string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
                     ]) {
-                            def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
-                            dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
+                            //def currentDirectory = sh(script: 'pwd', returnStdout: true).trim()
+                            dir("${WORKSPACE}/aqa-tests/jck/jck-semiauto-updater"){
+                            //dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                                     def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
                                     //echo "${SCRIPT}"
@@ -117,9 +121,7 @@ def syncJckMaterial(){
                                     //def scriptOutput = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStdout: true)
                                     EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
                                     //echo "EXITCODE= ${EXITCODE}"
-                                    def scriptOutput = readFile(tempOutputFile).trim()
-                                    echo "jckupdater script output:"
-                                    echo scriptOutput
+                                    //def scriptOutput = readFile(tempOutputFile).trim()
                                     if (EXITCODE == 2) {
                                         //echo "script returned exit code 2, No new update available. The job is completed without further action. "
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
@@ -129,6 +131,9 @@ def syncJckMaterial(){
                                         //exit
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
+                                        def scriptOutput = readFile(tempOutputFile).trim()
+                                        echo "jckupdater script output:"
+                                        echo scriptOutput
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
                                         if (PR_NUMBER == null || PR_NUMBER == 0) {
@@ -184,12 +189,12 @@ def syncJckMaterial(){
                                 }
                                 //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                            } else if (param.key == "SDK_RESOURCE") {
-                                CHILD_PARAMS << string(name: param.key, value: "releases")
-                            } else if (param.key == "CUSTOMIZED_SDK_URL") {
-                                CHILD_PARAMS << string(name: param.key, value: "")
-                            } else if (param.key == "LABEL") {
-                                CHILD_PARAMS << string(name: param.key, value: "")
+                            // } else if (param.key == "SDK_RESOURCE") {
+                            //     CHILD_PARAMS << string(name: param.key, value: "releases")
+                            // } else if (param.key == "CUSTOMIZED_SDK_URL") {
+                            //     CHILD_PARAMS << string(name: param.key, value: "")
+                            // } else if (param.key == "LABEL") {
+                            //     CHILD_PARAMS << string(name: param.key, value: "")
                             } else {
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
@@ -296,12 +301,13 @@ def getSplitter(SCRIPT_PR){
 }
 
 def getJavaSDK(){
-        JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
-        JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
-        CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
-        CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
+        def JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
+        def JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
+        def CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
+        def CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
         //echo "getJavaSDK"
-        GET_SH_CMD = "./get.sh -s `pwd`/.. -p x86-64_linux -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} 
+        def PLATFORM_OPTION = "-p x86-64_linux"
+        def GET_SH_CMD = "./get.sh -s `pwd`/.. $PLATFORM_OPTION -r $SDK_RESOURCE $JDK_VERSION_OPTION $JDK_IMPL_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION}
         dir("${WORKSPACE}/aqa-tests") {
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
@@ -325,13 +331,13 @@ def target_Folder_check(){
             def SCRIPT_PR = false
             dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                    def GIT_BRANCH = params.JCK_GIT_BRANCH ?: ""
+                    def GIT_BRANCH = params.JCK_GIT_BRANCH ?: "autoBranch" //default branch name in jckupdater.sh
                     echo "${GIT_BRANCH}"
                     def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
                     def specificLine = "New test folder detected:"
 
-                    def EXITCODE = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                    echo "EXITCODE for jck_target_folder_check = ${EXITCODE}"
+                    def STATUS = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                    echo "EXITCODE for jck_target_folder_check = ${STATUS}"
                     sh "cat ${logFile}"
                         
                     // Use 'grep' to check if any new folders are detected
