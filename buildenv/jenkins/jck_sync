@@ -167,7 +167,7 @@ def syncJckMaterial(){
                     //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
                     echo " Need to create PR ? -- $SCRIPT_PR"
                     if (SCRIPT_PR){                       
-                        create_PR_for_scripts(PR_NUMBER)
+                        createPRForScripts(PR_NUMBER)
                     }
                 
            // }
@@ -401,7 +401,8 @@ def udpateFolderCheck(){
             """
             //echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
             //SCRIPT_PR=true
-            def sourceFilePath = "aqa-tests/jck/jck_target_folder_check/test.log" //createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log 
+            def sourceFilePath = createFile()
+            //def sourceFilePath = "aqa-tests/jck/jck_target_folder_check/test.log" //createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log
             def modifiedFiles = []
             //def sourceFilePath = logFile
             def sourceFileContent = readFile(file: sourceFilePath)
@@ -416,6 +417,15 @@ def udpateFolderCheck(){
                 '/lang': 'runtime.lang/playlist.xml',
                 '/api': 'runtime.api/playlist.xml',
                 '/vm': 'runtime.vm/playlist.xml'
+                '/xml_schema': 'runtime.xml_schema/playlist.xml'
+                // Add other mappings as needed
+            ]
+            def devtoolsMap = [
+                '/java2schema': 'devtools.java2schema/playlist.xml',
+                '/jaxws': 'devtools.jaxws/playlist.xml',
+                '/schema_bind': 'devtools.schema_bind/playlist.xml'
+                '/schema2java': 'devtools.schema2java/playlist.xml'
+                '/xml_schema': 'devtools.xml_schema/playlist.xml'
                 // Add other mappings as needed
             ]
             matches.each { match ->
@@ -431,8 +441,10 @@ def udpateFolderCheck(){
                 def targetFilePath=""
                 if (fullMatch.contains("COMPILER")) {
                     targetFilePath = compilerMap[path]
-                } else{
+                } else if(fullMatch.contains("RUNTIME")) {
                     targetFilePath = runtimeMap[path]
+                } else  {
+                    targetFilePath = devtoolsMap[path]
                 }
 
                 if (targetFilePath) {
@@ -490,7 +502,6 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
             git remote remove upstream1
             """
         } catch (Exception e) {
-            // Handle the error here, but do not throw it
             echo "Error removing remote: ${e.message}"
         } 
      sh """
@@ -509,7 +520,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
     testClasstList.each{ test ->
         def sourceFilePath = "${test}.log"
         echo "file --- ${sourceFilePath}"
-        sh "cat ${sourceFilePath}"
+        //sh "cat ${sourceFilePath}"
         // Read all lines from the source file containing "="
         def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
 
@@ -550,11 +561,6 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
         writeFile(file: targetFilePath, text: targetLines.join('\n'))
     }
     echo "jck.mk --- ${targetFilePath}"
-    //sh "cat ${targetFilePath}"
-    // sh """
-    //     git branch
-    //     git status
-    // """
     def gitAddCommand = "git add ${targetFilePath}"
     sh(script: gitAddCommand)
 
@@ -566,7 +572,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
     }
 }
 
-def create_PR_for_scripts(number) {
+def createPRForScripts(number) {
     withCredentials([
                 string(credentialsId: "${params.PERSONAL_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
             ]){
@@ -589,36 +595,11 @@ def create_PR_for_scripts(number) {
                                         }'
                                 """
                 def response = sh(script: CURL_COMMAND, returnStdout: true)
-                // def response = sh(script: """
-                //     curl -X POST \
-                //     -H "Authorization: token $PERSONAL_GIT_TOKEN" \
-                //         -H "Content-Type: application/json" \
-                //         -d '{"title":"$title","body":"$body","head":"KapilPowar:test","base":"jcksync-copy"}' \
-                //         "$url"
-                //     """, returnStatus: true, returnStdout: true)
-                    // if (response == 0) {
-                    //     echo "PR created"
-                    // } else {
-                    //     error "Failed to create Pull Request"
-                    // }
-                echo " ${response}"
-                //def PR = (response =~ /"number":\s*([0-9]+)/).find { it }
-                //def prNumberInt = PR[1].toInteger()
-                //echo "prNumberInt = ${prNumberInt}"
-                // def command = """
-                //     echo \${response} | grep -o '"number": *[0-9]*' | awk -F':' '{print \$2}' | tr -d ' ,"' 
-                // """
-                //def command="echo ${response} | grep -o \'"number": *[0-9]*\' | awk -F\':\' \'{print $2}\' | tr -d \' ,"\"
-                //PR_NUMBER= sh(script: '${command}', returnStdout: true)
                 def matcher = (response =~ /"number":\s*(\d+)/)
-                def PR_NUMBER = matcher ? matcher[0][1] : null
-                echo "PR_NUMBER = ${PR_NUMBER}"
-                // if (PR_NUMBER) {
-                //     PR_NUMBER = PR_NUMBER.trim()
-                //     }
-                // echo "PR Number after trim : ${PR_NUMBER}"
+                def PR = matcher ? matcher[0][1] : null
+                echo "PR_NUMBER = ${PR}"
                 PR_URL= "https://github.com/KapilPowar/aqa-tests/pull/"
-                COMMENT=" PR #[${(PR_NUMBER)}](${PR_URL}${(PR_NUMBER)})  is created with changes in jck.mk and playlist.xml file .. "
+                COMMENT=" PR #[${(PR)}](${PR_URL}${(PR)})  is created with changes in jck.mk and playlist.xml file .. "
                 createComment(COMMENT, number)
 
                 }
@@ -743,6 +724,27 @@ New test folder detected: ./api/test | Please add target: jck-runtime-api-test
 		<groups>
 			<group>jck</group>
 		</groups>
+	</test>
+New test folder detected: ./xml_schema/sunData1 | Please add target: jck-devtools-xml_schema-sunData1
+	<test>
+		<testCaseName>jck-devtools-xml_schema-sunData1</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>$(GEN_JTB_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS; \
+		$(EXEC_DEVTOOLS_TEST); \
+		$(TEST_STATUS); \
+		$(GEN_SUMMARY_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+		<versions>
+			<version>8</version>
+		</versions>
 	</test>
 Total new folders detected : 2
 Wed Sep 20 18:43:17 IST 2023
