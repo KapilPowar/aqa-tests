@@ -416,15 +416,15 @@ def udpateFolderCheck(){
             def runtimeMap = [
                 '/lang': 'runtime.lang/playlist.xml',
                 '/api': 'runtime.api/playlist.xml',
-                '/vm': 'runtime.vm/playlist.xml'
+                '/vm': 'runtime.vm/playlist.xml',
                 '/xml_schema': 'runtime.xml_schema/playlist.xml'
                 // Add other mappings as needed
             ]
             def devtoolsMap = [
                 '/java2schema': 'devtools.java2schema/playlist.xml',
                 '/jaxws': 'devtools.jaxws/playlist.xml',
-                '/schema_bind': 'devtools.schema_bind/playlist.xml'
-                '/schema2java': 'devtools.schema2java/playlist.xml'
+                '/schema_bind': 'devtools.schema_bind/playlist.xml',
+                '/schema2java': 'devtools.schema2java/playlist.xml',
                 '/xml_schema': 'devtools.xml_schema/playlist.xml'
                 // Add other mappings as needed
             ]
