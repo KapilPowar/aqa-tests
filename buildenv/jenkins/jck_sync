@@ -258,9 +258,9 @@ def targetFolderCheck(number){
             //COMMENT="No new folders detected. No need to update playlist.xml "
             echo "PR_NUMBER -- ${number}"
             createComment(COMMENT, number)
-            //udpateFolderCheck() //remove after testing
+            udpateFolderCheck() //remove after testing
             //echo "SCRIPT_PR --  $SCRIPT_PR"
-            //SCRIPT_PR=true
+            SCRIPT_PR=true
             return SCRIPT_PR
 }
 
