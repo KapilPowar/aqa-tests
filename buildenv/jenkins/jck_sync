@@ -341,7 +341,7 @@ def getSplitter(script_pr,number){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            updateJCKmkFile(testClasstList,script_pr)
+            //updateJCKmkFile(testClasstList,script_pr)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
             script_pr =true
