@@ -164,11 +164,11 @@ def syncJckMaterial(){
                     def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
                     echo "SCRIPT_PR -- ${SCRIPT_PR}"
                     SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
-                    echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    //echo " Need to create PR ? -- $SCRIPT_PR"
-                    //if (SCRIPT_PR){                       
-                        //create_PR_for_scripts()
-                    //}
+                    //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
+                    echo " Need to create PR ? -- $SCRIPT_PR"
+                    if (SCRIPT_PR){                       
+                        create_PR_for_scripts(PR_NUMBER)
+                    }
                 
            // }
         }
@@ -566,7 +566,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
     }
 }
 
-def create_PR_for_scripts() {
+def create_PR_for_scripts(number) {
     withCredentials([
                 string(credentialsId: "${params.PERSONAL_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
             ]){
@@ -619,7 +619,7 @@ def create_PR_for_scripts() {
                 // echo "PR Number after trim : ${PR_NUMBER}"
                 PR_URL= "https://github.com/KapilPowar/aqa-tests/pull/"
                 COMMENT=" PR #[${(PR_NUMBER)}](${PR_URL}${(PR_NUMBER)})  is created with changes in jck.mk and playlist.xml file .. "
-                createComment(COMMENT)
+                createComment(COMMENT, number)
 
                 }
         }
