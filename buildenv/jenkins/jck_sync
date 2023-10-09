@@ -154,16 +154,17 @@ def syncJckMaterial(){
                 //    }
                 }
 
-        stage( 'Splitter'){
+        stage( 'Scripts'){
             //script{
                     //def comment ="TEST COMMENT"
                     //createComment(comment, PR_NUMBER)
 
                     //def SCRIPT_PR= false
                     echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
-                    def SCRIPT_PR=target_Folder_check(PR_NUMBER)
+                    def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
                     echo "SCRIPT_PR -- ${SCRIPT_PR}"
-                    //SCRIPT_PR=getSplitter(SCRIPT_PR)
+                    SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
+                    echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
                     //echo " Need to create PR ? -- $SCRIPT_PR"
                     //if (SCRIPT_PR){                       
                         //create_PR_for_scripts()
@@ -214,7 +215,7 @@ def syncJckMaterial(){
     }
 }
 
-def target_Folder_check(number){
+def targetFolderCheck(number){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
             def logFile = "test.log"
@@ -264,7 +265,7 @@ def target_Folder_check(number){
 }
 
 
-def getSplitter(SCRIPT_PR){
+def getSplitter(script_pr,number){
     dir("${WORKSPACE}/aqa-tests/jck/splitter") {
         def JDK_VERSION= params.JDK_VERSION
         if (JDK_VERSION == "8") {
@@ -340,15 +341,15 @@ def getSplitter(SCRIPT_PR){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            //update_jckmk_file(testClasstList,SCRIPT_PR)
+            updateJCKmkFile(testClasstList,script_pr)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
-            SCRIPT_PR =true
+            script_pr =true
         } else {
             COMMENT =" No need to creat PR to update jck.mk file."
         }
-        createComment(COMMENT)
-        return SCRIPT_PR
+        createComment(COMMENT, number)
+        return script_pr
     }
 }
 
@@ -475,7 +476,7 @@ def udpateFolderCheck(){
         }
     }
 }
-def update_jckmk_file(testClasstList,SCRIPT_PR){
+def updateJCKmkFile(testClasstList,SCRIPT_PR){
 
     //def sourceFilePath = "test.log"
     //dir("${WORKSPACE}/aqa-tests/jck") {
