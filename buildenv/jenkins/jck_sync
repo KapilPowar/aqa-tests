@@ -159,9 +159,9 @@ def syncJckMaterial(){
                     //def comment ="TEST COMMENT"
                     //createComment(comment, PR_NUMBER)
 
-                    def SCRIPT_PR= false
+                    //def SCRIPT_PR= false
                     echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
-                    //def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
+                    def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
                     echo "SCRIPT_PR -- ${SCRIPT_PR}"
                     SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
                     echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
