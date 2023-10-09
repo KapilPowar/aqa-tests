@@ -731,10 +731,10 @@ New test folder detected: ./xml_schema/sunData1 | Please add target: jck-devtool
 		<variations>
 			<variation>NoOptions</variation>
 		</variations>
-		<command>$(GEN_JTB_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS; \
-		$(EXEC_DEVTOOLS_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS
+		<command>\$(GEN_JTB_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS; \\
+		\$(EXEC_DEVTOOLS_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS
 		</command>
 		<levels>
 			<level>extended</level>
