@@ -208,9 +208,9 @@ def syncJckMaterial(){
                             
                         }
                     //echo "$CHILD_PARAMS"
-                    //def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    //def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-                    //createComment(COMMENT,PR_NUMBER)
+                    def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+                    def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+                    createComment(COMMENT,PR_NUMBER)
         //}
     }
 }
