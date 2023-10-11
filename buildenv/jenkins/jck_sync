@@ -94,17 +94,22 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
-        def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
+        //def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
         def JCK_GIT_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
         def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+        def match = gitUrl =~ /(\d+)/
+        env.JDK_VERSION = match[0][0]
+        println "Extracted number: $env.JDK_VERSION"
+        def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
         def EXITCODE = 1
         def PR_NUMBER=0
         //def PR=0
         stage('JCKUpdater') {
                 //script {
                     getJavaSDK()
+
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
                     withCredentials([
@@ -210,10 +215,10 @@ def syncJckMaterial(){
                             }
                             
                         }
-                    //echo "$CHILD_PARAMS"
-                    def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-                    createComment(COMMENT,PR_NUMBER)
+                    echo "$CHILD_PARAMS"
+                    // def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+                    // def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+                    // createComment(COMMENT,PR_NUMBER)
         //}
     }
 }
