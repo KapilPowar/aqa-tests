@@ -99,7 +99,7 @@ def syncJckMaterial(){
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
         def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
         def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
-        def match = gitUrl =~ /(\d+)/
+        def match = params.ARTIFACTORY_URL =~ /(\d+)/
         env.JDK_VERSION = match[0][0]
         println "Extracted number: $env.JDK_VERSION"
         def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
