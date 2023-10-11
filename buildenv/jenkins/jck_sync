@@ -105,12 +105,13 @@ def syncJckMaterial(){
         //def PR=0
         stage('JCKUpdater') {
                 //script {
-                def match = params.ARTIFACTORY_URL =~ /(\d+)/
+                def match = ARTIFACTORY_URL =~ /(\d+)/
                 if (match) {
                     env.JDK_VERSION = match[0][0]
-                    println "Extracted number: $env.JDK_VERSION"
+                    echo "Extracted number: $env.JDK_VERSION"
                 }
                 def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
+                echo "${JCK_VERSION}"
                     getJavaSDK()
 
                     //udpateFolderCheck()
