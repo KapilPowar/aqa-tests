@@ -94,6 +94,7 @@ def forceCleanWS() {
 
 def syncJckMaterial(){
         echo "Starting script to sync JCK materials ....."
+        echo "Check JDK VERSION"
         //def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
         def JCK_GIT_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
@@ -112,7 +113,7 @@ def syncJckMaterial(){
                 }
                 def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
                 echo "${JCK_VERSION}"
-                    getJavaSDK()
+                getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
