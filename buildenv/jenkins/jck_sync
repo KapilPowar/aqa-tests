@@ -8,6 +8,9 @@ timestamps{
             echo ("clone the SCM GIT repo")
             try {
                 def gitConfig = scm.getUserRemoteConfigs().get(0)
+                timeout(time: 1, unit: 'HOURS') {
+                    forceCleanWS()
+                }
                 checkout scm: [$class: 'GitSCM',
                 branches: [[name: "${scm.branches[0].name}"]],
                 extensions: [
@@ -32,6 +35,19 @@ timestamps{
                 }
             }
         }
+    }
+}
+
+def forceCleanWS() {
+    try {
+        cleanWs disableDeferredWipeout: true, deleteDirs: true
+    } catch (Exception e) {
+        echo 'Exception: ' + e.toString()
+        //cleanWs has issue to delete workspace that contains non-ASCII filename in TKG output https://issues.jenkins.io/browse/JENKINS-33478
+        //cannot delete workspace directly. Otherwise, Jenkins job will abort due to missing workspace
+        sh "rm -rf ${env.WORKSPACE}/aqa-tests/TKG"
+        // call cleanWs() again
+        cleanWs disableDeferredWipeout: true, deleteDirs: true
     }
 }
 
@@ -77,10 +93,29 @@ def syncJckMaterial(){
             }
         }
     }
+
+    stage('Scripts'){
+        def CHILD_JOB_NAME="JCK_Scripts"
+        def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
+        def childParams = []
+        params.each { param ->
+            def value = param.value.toString()
+            if (value == "true" || value == "false") {
+                childParams << booleanParam(name: param.key, value: value.toBoolean())
+            } else {
+                childParams << string(name: param.key, value: value)
+            }
+        }
+        childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
+        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+        def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+        createComment(comment,PR_NUMBER)
+    }
+
     stage('Test') {
         def CHILD_JOB_NAME="Grinder_JCK"
-        def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
-        def CHILD_PARAMS = []
+        def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
+        def childParams = []
         // loop through all the params and change the parameters if needed
         params.each { param ->
             def value = param.value.toString()
@@ -88,18 +123,18 @@ def syncJckMaterial(){
                 if (value.trim() == ""){
                     value = "autoBranch" //default branch name given in JCKUpdater.sh script
                 }
-                CHILD_PARAMS << string(name: param.key, value: value)
+                childParams << string(name: param.key, value: value)
             } else {
                 if (value == "true" || value == "false") {
-                    CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
+                    childParams << booleanParam(name: param.key, value: value.toBoolean())
                 } else {
-                    CHILD_PARAMS << string(name: param.key, value: value)
+                    childParams << string(name: param.key, value: value)
                 }
             }
         }
-        def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-        def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}"
-        createComment(COMMENT,PR_NUMBER)
+        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+        def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}"
+        createComment(comment,PR_NUMBER)
     }
 }
 
