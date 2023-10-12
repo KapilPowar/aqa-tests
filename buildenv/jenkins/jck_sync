@@ -266,7 +266,6 @@ def targetFolderCheck(number){
                 }
             }
             //COMMENT="No new folders detected. No need to update playlist.xml "
-            echo "PR_NUMBER -- ${number}"
             createComment(COMMENT, number)
             //udpateFolderCheck() //remove after testing
             //echo "SCRIPT_PR --  $SCRIPT_PR"
@@ -309,7 +308,7 @@ def getSplitter(script_pr,number){
             } else if (value.containsKey('GROUP')) {
                 //def testsValue = value['TESTS']
                 def groupValue = value['GROUP']
-                echo "Calling splitter.sh for TESTS: $key and GROUP:$groupValue"
+                //echo "Calling splitter.sh for TESTS: $key and GROUP:$groupValue"
                 // Call the test.sh script here, passing testsValue as an argument
                 TARGET="${TARGET_TO_SPLIT}/${key}"
                 if (key == "VERIFIER"){
@@ -322,7 +321,7 @@ def getSplitter(script_pr,number){
                 def logFileName = "${key}.log"
                 def EXITCODE = sh(script: "${SCRIPT} > ${logFileName}", returnStatus: true)
                 
-                echo "EXITCODE in splitter =${EXITCODE}"
+                //echo "EXITCODE in splitter =${EXITCODE}"
                 //sh "cat ${logFileName}"
                 
                 def lastLine = null
@@ -343,18 +342,16 @@ def getSplitter(script_pr,number){
                     echo "No need to create PR for --- $key"
                 } else {
                     //echo "The line is not present in $mkFileName"
-                    echo "We need to update $mkFileName and create PR for --- $key"
+                    echo "We need to create PR for --- $key"
                     testClasstList.add(key)
                     PR_NEEDED=true
                 }
             }
         }
         if (PR_NEEDED){
-            echo "create comment as PR_NEEDED is ${PR_NEEDED}"
             script_pr=updateJCKmkFile(testClasstList,script_pr)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
-            echo "updateJCKmkFile ---- ${script_pr}"
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
         }
@@ -393,7 +390,7 @@ def udpateFolderCheck(){
 
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
-    if (ADOPTIUM_GIT_USER == ""){
+    if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
         return false
     } else {
@@ -409,13 +406,11 @@ def udpateFolderCheck(){
                         echo "Error removing remote: ${e.message}"
                 }
                 def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
-                def upstream ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                def upstream ="git@github.com:adoptium/aqa-tests.git"
                 sh """
-                    git branch
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
                     git checkout -b test
-                    git branch
                     git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
                 """
@@ -510,7 +505,7 @@ def udpateFolderCheck(){
 def updateJCKmkFile(testClasstList,SCRIPT_PR){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
-    if (ADOPTIUM_GIT_USER == ""){
+    if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
         return false
     } else {
@@ -526,13 +521,11 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
                     echo "Error removing remote: ${e.message}"
                 }
                 def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
-                def upstream ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                def upstream ="git@github.com:adoptium/aqa-tests.git"
                 sh """
-                    git branch
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
                     git checkout -b test
-                    git branch
                     git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
                 """
@@ -611,7 +604,7 @@ def createPRForScripts(number) {
             dir("${WORKSPACE}/aqa-tests") {
                 sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
                 title="Update jck.mk and playlist.xml file"
-                body="This is a new pull request"
+                body="Creating PR to update jck.mk and playlist file"
                 echo " Creating PR for jck.mk and playlist.xml file"
                 url="https://api.github.com/repos/${ADOPTIUM_GIT_USER}/aqa-tests/pulls"
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
@@ -623,7 +616,7 @@ def createPRForScripts(number) {
                                             "title": "${title}",
                                             "body": "${body}",
                                             "head": "${ADOPTIUM_GIT_USER}:test",
-                                            "base": "jcksync-copy"
+                                            "base": "master"
                                         }'
                                 """
                 def response = sh(script: CURL_COMMAND, returnStdout: true)
