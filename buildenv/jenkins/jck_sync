@@ -177,9 +177,9 @@ def syncJckMaterial(){
                     SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
                     //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
                     echo " Need to create PR ? -- $SCRIPT_PR"
-                    // if (SCRIPT_PR){                       
-                    //     createPRForScripts(PR_NUMBER)
-                    // }
+                    if (SCRIPT_PR){                       
+                        createPRForScripts(PR_NUMBER)
+                    }
                 
            // }
         }
@@ -261,17 +261,16 @@ def targetFolderCheck(number){
                     } else {
                         echo "New folders detected. Need to update playlist.xml'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
-                        SCRIPT_PR=true
-                        udpateFolderCheck()
+                        SCRIPT_PR=udpateFolderCheck()
                     }
                 }
             }
             //COMMENT="No new folders detected. No need to update playlist.xml "
             echo "PR_NUMBER -- ${number}"
             createComment(COMMENT, number)
-            udpateFolderCheck() //remove after testing
+            //udpateFolderCheck() //remove after testing
             //echo "SCRIPT_PR --  $SCRIPT_PR"
-            SCRIPT_PR=true
+            //SCRIPT_PR=true
             return SCRIPT_PR
 }
 
@@ -352,10 +351,10 @@ def getSplitter(script_pr,number){
         }
         if (PR_NEEDED){
             echo "create comment as PR_NEEDED is ${PR_NEEDED}"
-            updateJCKmkFile(testClasstList,script_pr)
+            script_pr=updateJCKmkFile(testClasstList,script_pr)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
-            script_pr =true
+            echo "${script_pr}"
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
         }
@@ -391,200 +390,222 @@ def getJavaSDK(){
 
 
 def udpateFolderCheck(){
-    dir("${WORKSPACE}/aqa-tests/jck") {
-        // rename {params.EXTN_GIT_CREDS} to SSH creds
-        sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-            try {
-                    sh """
-                    git remote remove origin1
-                    git remote remove upstream1
-                    """
-                } catch (Exception e) {
-                    // Handle the error here, but do not throw it
-                    echo "Error removing remote: ${e.message}"
-                }
-            sh """
-                git branch
-                git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
-	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
-                git checkout -b test
-                git branch
-            """
-            //echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
-            //SCRIPT_PR=true
-            def sourceFilePath = createFile()
-            //def sourceFilePath = "aqa-tests/jck/jck_target_folder_check/test.log" //createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log
-            def modifiedFiles = []
-            //def sourceFilePath = logFile
-            def sourceFileContent = readFile(file: sourceFilePath)
-            def pattern = /(?s)(New test folder detected:(.*?)<\/test>)/
-            def matches = (sourceFileContent =~ pattern)
-            def compilerMap = [
-                '/lang': 'compiler.lang/playlist.xml',
-                '/api': 'compiler.api/playlist.xml'
-                // Add other mappings as needed
-            ]
-            def runtimeMap = [
-                '/lang': 'runtime.lang/playlist.xml',
-                '/api': 'runtime.api/playlist.xml',
-                '/vm': 'runtime.vm/playlist.xml',
-                '/xml_schema': 'runtime.xml_schema/playlist.xml'
-                // Add other mappings as needed
-            ]
-            def devtoolsMap = [
-                '/java2schema': 'devtools.java2schema/playlist.xml',
-                '/jaxws': 'devtools.jaxws/playlist.xml',
-                '/schema_bind': 'devtools.schema_bind/playlist.xml',
-                '/schema2java': 'devtools.schema2java/playlist.xml',
-                '/xml_schema': 'devtools.xml_schema/playlist.xml'
-                // Add other mappings as needed
-            ]
-            matches.each { match ->
-                def fullMatch = match[0]
-                def pathMatch = fullMatch =~ /New test folder detected:\s*(\S+)/
-                def fullPath = pathMatch[0][1].trim()
-                // Extract just the directory path (e.g., /lang or /api)
-                def path = fullPath =~ /\/(\w+)\//
-                if (path.size() > 0) {
-                    path = "/${path[0][1]}"
-                }
-                // Check if a target file path is defined for the path
-                def targetFilePath=""
-                if (fullMatch.contains("COMPILER")) {
-                    targetFilePath = compilerMap[path]
-                } else if(fullMatch.contains("RUNTIME")) {
-                    targetFilePath = runtimeMap[path]
-                } else  {
-                    targetFilePath = devtoolsMap[path]
-                }
 
-                if (targetFilePath) {
-                    // Read the current target file content
-                    def targetFileContent = readFile(file: targetFilePath)
-                    // Extract the content from <test> to </test> in the match block
-                    def matcher = fullMatch =~ /(?s)(<test>(.*?)<\/test>)/
-                    //def testContent=""
-                    if (matcher.find()) {
-                        //testContent = matcher.group(0)
-                        // Append the test block (excluding "New test folder detected" line) to the target file content
-                        def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${matcher.group(0)}\n</playlist>")
-                        // Write the updated content back to the target XML file
-                        //echo " testContent ---  ${testContent}"
-                        //echo " updatedTargetContent ---  $updatedTargetContent"
-                        writeFile(file: targetFilePath, text: updatedTargetContent)
-                        echo "Updated target XML file: $targetFilePath"
-                        modifiedFiles.add(targetFilePath)
-                        // sh """
-                        // git diff targetFilePath
-                        // """
-                    } else {
-                        echo "No match found."
-                    }
-                } else {
-                    echo "No target file mapping found for path: $path"
+    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
+
+    if (ADOPTIUM_GIT_USER == ""){
+        echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
+        return false
+    } else {
+        dir("${WORKSPACE}/aqa-tests/jck") {
+            sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
+                try {
+                        sh """
+                        git remote remove origin
+                        git remote remove upstream
+                        """
+                } catch (Exception e) {
+                        // Handle the error here, but do not throw it
+                        echo "Error removing remote: ${e.message}"
                 }
+                def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                def upstream ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                sh """
+                    git branch
+                    git remote add origin ${origin}
+                    git remote add upstream ${upstream}
+                    git checkout -b test
+                    git branch
+                    git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
+                    git config --global user.name "${ADOPTIUM_GIT_USER}"
+                """
+                //echo "SCRIPT_PR in udpateFolderCheck -- $SCRIPT_PR"
+                //SCRIPT_PR=true
+                def sourceFilePath = createFile()
+                //def sourceFilePath = "aqa-tests/jck/jck_target_folder_check/test.log" //createFile() //change to aqa-tests/jck/jck_target_folder_check/test.log
+                def modifiedFiles = []
+                //def sourceFilePath = logFile
+                def sourceFileContent = readFile(file: sourceFilePath)
+                def pattern = /(?s)(New test folder detected:(.*?)<\/test>)/
+                def matches = (sourceFileContent =~ pattern)
+                def compilerMap = [
+                    '/lang': 'compiler.lang/playlist.xml',
+                    '/api': 'compiler.api/playlist.xml'
+                    // Add other mappings as needed
+                ]
+                def runtimeMap = [
+                    '/lang': 'runtime.lang/playlist.xml',
+                    '/api': 'runtime.api/playlist.xml',
+                    '/vm': 'runtime.vm/playlist.xml',
+                    '/xml_schema': 'runtime.xml_schema/playlist.xml'
+                    // Add other mappings as needed
+                ]
+                def devtoolsMap = [
+                    '/java2schema': 'devtools.java2schema/playlist.xml',
+                    '/jaxws': 'devtools.jaxws/playlist.xml',
+                    '/schema_bind': 'devtools.schema_bind/playlist.xml',
+                    '/schema2java': 'devtools.schema2java/playlist.xml',
+                    '/xml_schema': 'devtools.xml_schema/playlist.xml'
+                    // Add other mappings as needed
+                ]
+                matches.each { match ->
+                    def fullMatch = match[0]
+                    def pathMatch = fullMatch =~ /New test folder detected:\s*(\S+)/
+                    def fullPath = pathMatch[0][1].trim()
+                    // Extract just the directory path (e.g., /lang or /api)
+                    def path = fullPath =~ /\/(\w+)\//
+                    if (path.size() > 0) {
+                        path = "/${path[0][1]}"
+                    }
+                    // Check if a target file path is defined for the path
+                    def targetFilePath=""
+                    if (fullMatch.contains("COMPILER")) {
+                        targetFilePath = compilerMap[path]
+                    } else if(fullMatch.contains("RUNTIME")) {
+                        targetFilePath = runtimeMap[path]
+                    } else  {
+                        targetFilePath = devtoolsMap[path]
+                    }
+
+                    if (targetFilePath) {
+                        // Read the current target file content
+                        def targetFileContent = readFile(file: targetFilePath)
+                        // Extract the content from <test> to </test> in the match block
+                        def matcher = fullMatch =~ /(?s)(<test>(.*?)<\/test>)/
+                        //def testContent=""
+                        if (matcher.find()) {
+                            //testContent = matcher.group(0)
+                            // Append the test block (excluding "New test folder detected" line) to the target file content
+                            def updatedTargetContent = targetFileContent.replace('</playlist>', "\t${matcher.group(0)}\n</playlist>")
+                            // Write the updated content back to the target XML file
+                            //echo " testContent ---  ${testContent}"
+                            //echo " updatedTargetContent ---  $updatedTargetContent"
+                            writeFile(file: targetFilePath, text: updatedTargetContent)
+                            echo "Updated target XML file: $targetFilePath"
+                            modifiedFiles.add(targetFilePath)
+                            // sh """
+                            // git diff targetFilePath
+                            // """
+                        } else {
+                            echo "No match found."
+                        }
+                    } else {
+                        echo "No target file mapping found for path: $path"
+                    }
+                }
+                def filesToStage = modifiedFiles.join(' ')
+                def gitAddCommand = "git add ${filesToStage}"
+
+                sh(script: gitAddCommand)
+                sh """
+                    git commit -m "update folder check"
+                    git push origin test
+                """
             }
-            def filesToStage = modifiedFiles.join(' ')
-            def gitAddCommand = "git add ${filesToStage}"
-            sh """
-                git branch
-                git config --global user.email "KapilPowar@in.ibm.com"
-		        git config --global user.name "KapilPowar"
-            """
-            sh(script: gitAddCommand)
-            sh """
-                git commit -m "update folder check"
-                git push origin1 test
-            """
         }
+    return true
     }
 }
+
 def updateJCKmkFile(testClasstList,SCRIPT_PR){
+    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
 
-    //def sourceFilePath = "test.log"
-    //dir("${WORKSPACE}/aqa-tests/jck") {
-     sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-        echo "SCRIPT_PR in update_jckmk_file --- $SCRIPT_PR"
-   if (!SCRIPT_PR){  
-     SCRIPT_PR=true 
-     try {
-            sh """
-            git remote remove origin1
-            git remote remove upstream1
-            """
-        } catch (Exception e) {
-            echo "Error removing remote: ${e.message}"
-        } 
-     sh """
-                git branch
-                git remote add origin1 git@github.com:KapilPowar/aqa-tests.git
-	            git remote add upstream1 git@github.com:KapilPowar/aqa-tests.git
-                git checkout -b test
-                git branch
-            """
-    }
-    def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
-    JDK_VERSION = params.JDK_VERSION
-    def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
-
-    sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-    testClasstList.each{ test ->
-        def sourceFilePath = "${test}.log"
-        echo "file --- ${sourceFilePath}"
-        //sh "cat ${sourceFilePath}"
-        // Read all lines from the source file containing "="
-        def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
-
-        // Read the target file into a list
-        def targetLines = readFile(file: targetFilePath).readLines()
-
-        // Iterate through the source lines
-        sourceLines.each { sourceLine ->
-            // Split the source line by "="
-            def sourceParts = sourceLine.split('=')
-            def sourceKey = sourceParts[0]
-            // Initialize a flag to determine if we have replaced a line
-            def lineReplaced = false
-            def insideBlock = false
-            def keywords = ["COMPILER", "VERIFIER", "RUNTIME"]
-            // Iterate through the target lines
-            def updatedTargetLines = targetLines.collect { line ->
-                def lineContainsKeywords =keywords.any { keyword -> line.contains(keyword) }
-                if (line.contains(blockCondition)) {
-                    insideBlock = true
-                    line
-                }else if (!(line.isEmpty() ||line.trim().isEmpty()) && !lineContainsKeywords) {
-                    insideBlock = false
-                    line
-                }else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
-                        //println "source key -- ${sourceKey}"
-                        lineReplaced = true
-                        //println sourceLine
-                        "   ${sourceLine}"
-                }else {
-                        line
+    if (ADOPTIUM_GIT_USER == ""){
+        echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
+        return false
+    } else {
+        sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
+            if (!SCRIPT_PR){  
+                SCRIPT_PR=true 
+                try {
+                    sh """
+                        git remote remove origin
+                        git remote remove upstream
+                    """
+                } catch (Exception e) {
+                    echo "Error removing remote: ${e.message}"
                 }
+                def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                def upstream ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                sh """
+                    git branch
+                    git remote add origin ${origin}
+                    git remote add upstream ${upstream}
+                    git checkout -b test
+                    git branch
+                    git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
+                    git config --global user.name "${ADOPTIUM_GIT_USER}"
+                """
             }
-            // Update the target lines for the next source line
-            targetLines = updatedTargetLines
-        }
-        // Write the updated target lines back to the target file
-        writeFile(file: targetFilePath, text: targetLines.join('\n'))
-    }
-    echo "jck.mk --- ${targetFilePath}"
-    def gitAddCommand = "git add ${targetFilePath}"
-    sh(script: gitAddCommand)
+            def targetFilePath = "${WORKSPACE}/aqa-tests/jck/jck.mk"
+            JDK_VERSION = params.JDK_VERSION
+            def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
 
-    sh """
-        git commit -m "update jck.mk"
-        git push origin1 test
-    """
-    }
+            sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
+                testClasstList.each{ test ->
+                    def sourceFilePath = "${test}.log"
+                    echo "file --- ${sourceFilePath}"
+                    //sh "cat ${sourceFilePath}"
+                    // Read all lines from the source file containing "="
+                    def sourceLines = readFile(file: sourceFilePath).readLines().findAll { it.contains('=') }
+
+                    // Read the target file into a list
+                    def targetLines = readFile(file: targetFilePath).readLines()
+
+                    // Iterate through the source lines
+                    sourceLines.each { sourceLine ->
+                        // Split the source line by "="
+                        def sourceParts = sourceLine.split('=')
+                        def sourceKey = sourceParts[0]
+                        // Initialize a flag to determine if we have replaced a line
+                        def lineReplaced = false
+                        def insideBlock = false
+                        def keywords = ["COMPILER", "VERIFIER", "RUNTIME"]
+                        // Iterate through the target lines
+                        def updatedTargetLines = targetLines.collect { line ->
+                            def lineContainsKeywords =keywords.any { keyword -> line.contains(keyword) }
+                            if (line.contains(blockCondition)) {
+                                insideBlock = true
+                                line
+                            }else if (!(line.isEmpty() ||line.trim().isEmpty()) && !lineContainsKeywords) {
+                                insideBlock = false
+                                line
+                            }else if (insideBlock && !lineReplaced && line.contains(sourceKey)) {
+                                    //println "source key -- ${sourceKey}"
+                                    lineReplaced = true
+                                    //println sourceLine
+                                    "   ${sourceLine}"
+                            }else {
+                                    line
+                            }
+                        }
+                        // Update the target lines for the next source line
+                        targetLines = updatedTargetLines
+                    }
+                    // Write the updated target lines back to the target file
+                    writeFile(file: targetFilePath, text: targetLines.join('\n'))
+                }
+                echo "jck.mk --- ${targetFilePath}"
+                def gitAddCommand = "git add ${targetFilePath}"
+                sh(script: gitAddCommand)
+
+                sh """
+                    git commit -m "update jck.mk"
+                    git push origin test
+                """
+            }
+        }
+    return true
     }
 }
 
 def createPRForScripts(number) {
-    withCredentials([
+
+    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
+    if (ADOPTIUM_GIT_USER == ""){
+        echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
+    } else {
+        withCredentials([
                 string(credentialsId: "${params.ADOPTIUM_GIT_CREDENTIALS}",variable: 'ADOPTIUM_GIT_TOKEN')
             ]){
             dir("${WORKSPACE}/aqa-tests") {
@@ -592,7 +613,7 @@ def createPRForScripts(number) {
                 title="Update jck.mk and playlist.xml file"
                 body="This is a new pull request"
                 echo " Creating PR for jck.mk and playlist.xml file"
-                url="https://api.github.com/repos/KapilPowar/aqa-tests/pulls"
+                url="https://api.github.com/repos/${ADOPTIUM_GIT_USER}/aqa-tests/pulls"
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                 def CURL_COMMAND = """
                                     curl -X POST "${url}" \\
@@ -601,7 +622,7 @@ def createPRForScripts(number) {
                                         -d '{
                                             "title": "${title}",
                                             "body": "${body}",
-                                            "head": "KapilPowar:test",
+                                            "head": "${ADOPTIUM_GIT_USER}:test",
                                             "base": "jcksync-copy"
                                         }'
                                 """
@@ -609,11 +630,11 @@ def createPRForScripts(number) {
                 def matcher = (response =~ /"number":\s*(\d+)/)
                 def PR = matcher ? matcher[0][1] : null
                 echo "PR_NUMBER = ${PR}"
-                PR_URL= "https://github.com/KapilPowar/aqa-tests/pull/"
+                PR_URL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
                 COMMENT=" PR #[${(PR)}](${PR_URL}${(PR)})  is created with changes in jck.mk and playlist.xml file .. "
                 createComment(COMMENT, number)
-
                 }
+            }
         }
     }
 }
