@@ -22,9 +22,9 @@ timestamps{
                     def gitConfig = scm.getUserRemoteConfigs().get(0)
                     // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
                     // ref_cache = "${env.HOME}/openjdk_cache"
-                    // timeout(time: 1, unit: 'HOURS') {
-                    //     forceCleanWS()
-                    // }
+                    timeout(time: 1, unit: 'HOURS') {
+                        forceCleanWS()
+                    }
                     checkout scm: [$class: 'GitSCM',
                     branches: [[name: "${scm.branches[0].name}"]],
                     extensions: [
@@ -56,9 +56,9 @@ timestamps{
                     }
                 } 
                 finally {
-                    // timeout(time: 1, unit: 'HOURS') {
-                    //     forceCleanWS()
-                    // }
+                    timeout(time: 1, unit: 'HOURS') {
+                        forceCleanWS()
+                    }
                         // timeout(time: 15, unit: 'MINUTES') {
                         //     if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
                         //         echo "Build was successful."
