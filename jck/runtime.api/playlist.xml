@@ -1310,4 +1310,21 @@
 			<version>9+</version>
 		</versions>
 	</test>
+	<test>
+		<testCaseName>jck-runtime-api-test</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>$(GEN_JTB_GENERIC) tests=api/test testsuite=RUNTIME; \
+		$(EXEC_RUNTIME_TEST); \
+		$(TEST_STATUS); \
+		$(GEN_SUMMARY_GENERIC) tests=api/test testsuite=RUNTIME
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+	</test>
 </playlist>
