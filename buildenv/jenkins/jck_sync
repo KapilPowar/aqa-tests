@@ -527,7 +527,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
     JDK_VERSION = params.JDK_VERSION
     def blockCondition = "ifeq (${JDK_VERSION}, \$(JDK_VERSION))"
 
-    sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+    sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
     testClasstList.each{ test ->
         def sourceFilePath = "${test}.log"
         echo "file --- ${sourceFilePath}"
@@ -585,7 +585,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
 
 def createPRForScripts(number) {
     withCredentials([
-                string(credentialsId: "${params.ADOPTIUM_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
+                string(credentialsId: "${params.ADOPTIUM_GIT_CREDENTIALS}",variable: 'ADOPTIUM_GIT_TOKEN')
             ]){
             dir("${WORKSPACE}/aqa-tests") {
                 sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
@@ -596,7 +596,7 @@ def createPRForScripts(number) {
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                 def CURL_COMMAND = """
                                     curl -X POST "${url}" \\
-                                        -H "Authorization: token \"\$PERSONAL_GIT_TOKEN\"" \\
+                                        -H "Authorization: token \"\$ADOPTIUM_GIT_TOKEN\"" \\
                                         -H "Content-Type: application/json" \\
                                         -d '{
                                             "title": "${title}",
