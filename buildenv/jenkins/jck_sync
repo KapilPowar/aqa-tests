@@ -354,7 +354,7 @@ def getSplitter(script_pr,number){
             script_pr=updateJCKmkFile(testClasstList,script_pr)
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList.join(", ")
             echo "${testClasstList}"
-            echo "${script_pr}"
+            echo "updateJCKmkFile ---- ${script_pr}"
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
         }
@@ -391,7 +391,7 @@ def getJavaSDK(){
 
 def udpateFolderCheck(){
 
-    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
+    def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == ""){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
@@ -508,7 +508,7 @@ def udpateFolderCheck(){
 }
 
 def updateJCKmkFile(testClasstList,SCRIPT_PR){
-    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
+    def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == ""){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
@@ -601,7 +601,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
 
 def createPRForScripts(number) {
 
-    def ADOPTIUM_GIT_USER = param.ADOPTIUM_USER ?: ""
+    def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
     if (ADOPTIUM_GIT_USER == ""){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
     } else {
