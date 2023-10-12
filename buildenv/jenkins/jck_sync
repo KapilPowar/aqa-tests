@@ -172,11 +172,11 @@ def syncJckMaterial(){
 
                     //def SCRIPT_PR= false
                     // echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
-                    // def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
-                    // echo "SCRIPT_PR -- ${SCRIPT_PR}"
-                    // SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
-                    // //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    // echo " Need to create PR ? -- $SCRIPT_PR"
+                    def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
+                    echo "SCRIPT_PR -- ${SCRIPT_PR}"
+                    SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
+                    //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
+                    echo " Need to create PR ? -- $SCRIPT_PR"
                     // if (SCRIPT_PR){                       
                     //     createPRForScripts(PR_NUMBER)
                     // }
@@ -357,7 +357,7 @@ def getSplitter(script_pr,number){
             echo "${testClasstList}"
             script_pr =true
         } else {
-            COMMENT =" No need to creat PR to update jck.mk file."
+            COMMENT =" No need to create PR to update jck.mk file."
         }
         createComment(COMMENT, number)
         return script_pr
@@ -393,7 +393,7 @@ def getJavaSDK(){
 def udpateFolderCheck(){
     dir("${WORKSPACE}/aqa-tests/jck") {
         // rename {params.EXTN_GIT_CREDS} to SSH creds
-        sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+        sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
             try {
                     sh """
                     git remote remove origin1
@@ -503,7 +503,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
 
     //def sourceFilePath = "test.log"
     //dir("${WORKSPACE}/aqa-tests/jck") {
-     sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+     sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
         echo "SCRIPT_PR in update_jckmk_file --- $SCRIPT_PR"
    if (!SCRIPT_PR){  
      SCRIPT_PR=true 
@@ -585,10 +585,10 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
 
 def createPRForScripts(number) {
     withCredentials([
-                string(credentialsId: "${params.PERSONAL_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
+                string(credentialsId: "${params.ADOPTIUM_GIT_CREDENTIALS}",variable: 'PERSONAL_GIT_TOKEN')
             ]){
             dir("${WORKSPACE}/aqa-tests") {
-                sshagent(credentials:["${params.EXTN_GIT_CREDS}"], ignoreMissing: true){
+                sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
                 title="Update jck.mk and playlist.xml file"
                 body="This is a new pull request"
                 echo " Creating PR for jck.mk and playlist.xml file"
