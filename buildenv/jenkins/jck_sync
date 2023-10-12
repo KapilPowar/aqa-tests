@@ -410,7 +410,8 @@ def udpateFolderCheck(){
                 sh """
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
-                    git checkout -b test
+                    git fetch upstream
+                    git checkout -b test upstream/master
                     git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
                 """
@@ -525,6 +526,8 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
                 sh """
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
+                    git fetch upstream
+                    git checkout -b test upstream/master
                     git checkout -b test
                     git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
