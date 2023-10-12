@@ -267,9 +267,9 @@ def targetFolderCheck(number){
             }
             //COMMENT="No new folders detected. No need to update playlist.xml "
             createComment(COMMENT, number)
-            //udpateFolderCheck() //remove after testing
+            udpateFolderCheck() //remove after testing
             //echo "SCRIPT_PR --  $SCRIPT_PR"
-            //SCRIPT_PR=true
+            SCRIPT_PR=true
             return SCRIPT_PR
 }
 
@@ -616,7 +616,7 @@ def createPRForScripts(number) {
                                             "title": "${title}",
                                             "body": "${body}",
                                             "head": "${ADOPTIUM_GIT_USER}:test",
-                                            "base": "master"
+                                            "base": "jcksync-copy"
                                         }'
                                 """
                 def response = sh(script: CURL_COMMAND, returnStdout: true)
