@@ -1,0 +1,175 @@
+#!groovy
+
+
+def targetFolderCheck(number){
+            env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
+            echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
+            def logFile = "test.log"
+            def COMMENT=""
+            def SCRIPT_PR = false
+            dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
+                sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+                    def GIT_BRANCH = params.JCK_GIT_BRANCH ?: "autoBranch" //default branch name in jckupdater.sh
+                    echo "${GIT_BRANCH}"
+                    def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
+                    def specificLine = "New test folder detected:"
+
+                    def STATUS = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+                    echo "EXITCODE for jck_target_folder_check = ${STATUS}"
+                    sh "cat ${logFile}"
+                        
+                    // Use 'grep' to check if any new folders are detected
+                    def grepCommand = "grep '${specificLine}' ${logFile} || true"
+                    def grepResult = sh(script: grepCommand, returnStatus: true)
+
+                    // grep last few lines after Done! to create comment
+                    def fileContents = readFile(file: logFile).trim()
+                    def delimiter = 'Done!'
+                    def parts = fileContents.split(delimiter)
+                    def linesAfterDone = parts[1].trim()
+                    def lines = linesAfterDone.split('\n')
+                    def commentBody = lines.collect { it.trim() }.join('\\r\\n')
+
+                    if (grepResult == 0)  {
+                        echo "No new folders detected. No need to update playlist.xml '"
+                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
+                    } else {
+                        echo "New folders detected. Need to update playlist.xml'"
+                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+                        SCRIPT_PR=udpateFolderCheck(logFile)
+                    }
+                }
+            }
+            //COMMENT="No new folders detected. No need to update playlist.xml "
+            //createComment(COMMENT, number)
+            udpateFolderCheck(logFile) //remove after testing
+            //echo "SCRIPT_PR --  $SCRIPT_PR"
+            SCRIPT_PR=true
+            return SCRIPT_PR
+}
+
+def udpateFolderCheck(file){
+
+    def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
+
+    if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
+        echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
+        return false
+    } else {
+        dir("${WORKSPACE}/aqa-tests/jck") {
+            sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
+                try {
+                        sh """
+                        git remote remove origin
+                        git remote remove upstream
+                        """
+                } catch (Exception e) {
+                        // Handle the error here, but do not throw it
+                        echo "Error removing remote: ${e.message}"
+                }
+                def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                def upstream ="git@github.com:adoptium/aqa-tests.git"
+                sh """
+                    git remote add origin ${origin}
+                    git remote add upstream ${upstream}
+                    git fetch upstream
+                    git checkout -b test
+                    git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
+                    git config --global user.name "${ADOPTIUM_GIT_USER}"
+                """
+                def sourceFilePath = createFile()
+                echo "LogFile -- $file"
+                //def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
+                def logfile="${WORKSPACE}/aqa-tests/jck/$sourceFilePath"
+                echo "sourceFilePath --- " $sourceFilePath
+                def SCRIPT = "./jck_target_folder_check/update_jck_target_folder.sh ${WORKSPACE}/aqa-tests/jck $sourceFilePath"
+                STATUS = sh(script: "${SCRIPT}",  returnStatus: true)    
+                // def filesToStage = modifiedFiles.join(' ')
+                //def gitAddCommand = "git add ${filesToStage}"
+
+                // sh(script: gitAddCommand)
+                if (STATUS==0){
+                sh """
+                    git add "**/playlist.xml"
+                    git commit -m "update folder check"
+                    git push origin test
+                """
+                }
+               
+            }
+        }
+    return true
+    }
+}
+
+def createFile(){
+    def logFile = "test1.log"
+    def fileContent = """
+    Cleaning up generated target list..
+Done!
+--------------------------------------------------------
+     Cross-checking test folders under: compiler       
+--------------------------------------------------------
+New test folder detected: ./lang/ANNOT1 | Please add target: jck-compiler-lang-ANNOT1
+New test folder detected: ./lang/TEST | Please add target: jck-compiler-lang-TEST
+<test>
+	<testCaseName>jck-compiler-lang-TEST</testCaseName>
+	<variations>
+		<variation>NoOptions</variation>
+	</variations>
+	<command>$(GEN_JTB_GENERIC) tests=lang/TEST testsuite=COMPILER; \
+		$(EXEC_COMPILER_TEST); \
+		$(TEST_STATUS); \
+		$(GEN_SUMMARY_GENERIC) tests=lang/TEST testsuite=COMPILER
+		</command>
+	<levels>
+		<level>extended</level>
+	</levels>
+	<groups>
+		<group>jck</group>
+	</groups>
+</test>
+New test folder detected: ./lang/STTTT | Please add target: jck-compiler-lang-STTTT
+<test>
+	<testCaseName>jck-compiler-lang-STTTT</testCaseName>
+	<variations>
+		<variation>NoOptions</variation>
+	</variations>
+	<command>$(GEN_JTB_GENERIC) tests=lang/STTTT testsuite=COMPILER; \
+		$(EXEC_COMPILER_TEST); \
+		$(TEST_STATUS); \
+		$(GEN_SUMMARY_GENERIC) tests=lang/STTTT testsuite=COMPILER
+		</command>
+	<levels>
+		<level>extended</level>
+	</levels>
+	<groups>
+		<group>jck</group>
+	</groups>
+</test>
+Total new folders detected : 2
+--------------------------------------------------------
+     Cross-checking test folders under: runtime       
+--------------------------------------------------------
+New test folder detected: ./xml_schema/TEST | Please add target: jck-runtime-xml_schema-TEST
+<test>
+	<testCaseName>jck-runtime-xml_schema-TEST</testCaseName>
+	<variations>
+		<variation>NoOptions</variation>
+	</variations>
+	<command>$(GEN_JTB_GENERIC) tests=xml_schema/TEST testsuite=RUNTIME; \
+		$(EXEC_RUNTIME_TEST); \
+		$(TEST_STATUS); \
+		$(GEN_SUMMARY_GENERIC) tests=xml_schema/TEST testsuite=RUNTIME
+		</command>
+	<levels>
+		<level>extended</level>
+	</levels>
+	<groups>
+		<group>jck</group>
+	</groups>
+</test>
+"""
+writeFile(file: logFile, text: fileContent)
+return logFile
+}

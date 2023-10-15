@@ -98,30 +98,24 @@ crossCheckTestFoldersIn() {
 		existingTargets=$( cat "${listOfExistingTargets}" )
 		if [[ ! " $existingTargets " =~ $tokenToSearch ]] ; then
 			echo "New test folder detected: $line | Please add target: jck-$tokenToSearch"
-			# command='<command>$(JCK_CMD_TEMPLATE) -test-args=$(Q)tests='${tokens[1]}/${tokens[2]}',jckRoot=$(JCK_ROOT),jckversion=$(JCK_VERSION),testsuite='$testTypeToUpper'$(Q); \'
-			# status='$(TEST_STATUS)</command>'
 			command='<command>$(GEN_JTB_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'; \
 		$(EXEC_'${testTypeToUpper}'_TEST); \
 		$(TEST_STATUS); \
 		$(GEN_SUMMARY_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'
 		</command>'
-			echo "	<test>"
-			echo "		<testCaseName>jck-$tokenToSearch</testCaseName>"
-			echo "		<variations>"
-			echo "			<variation>NoOptions</variation>"
-			echo "		</variations>"
-			echo "		$command"
-			#echo "	$status"
-			echo "		<levels>"
-			echo "			<level>extended</level>"
-			echo "		</levels>"
-			echo "		<groups>"
-			echo "			<group>jck</group>"
-			echo "		</groups>"
-			# echo "	<versions>"
-			# echo "		<version>$VERSION+</version>"
-			# echo "	</versions>"
-			echo "	</test>"
+			echo "<test>"
+			echo "	<testCaseName>jck-$tokenToSearch</testCaseName>"
+			echo "	<variations>"
+			echo "		<variation>NoOptions</variation>"
+			echo "	</variations>"
+			echo "	$command"
+			echo "	<levels>"
+			echo "		<level>extended</level>"
+			echo "	</levels>"
+			echo "	<groups>"
+			echo "		<group>jck</group>"
+			echo "	</groups>"
+			echo "</test>"
 			count=$((count +1))	
 		fi
 	done <"$dirList"

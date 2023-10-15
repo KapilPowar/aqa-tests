@@ -172,13 +172,14 @@ def syncJckMaterial(){
 
                     //def SCRIPT_PR= false
                     // echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
-                    def SCRIPT_PR=targetFolderCheck(PR_NUMBER)
+                    def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
                     echo "SCRIPT_PR -- ${SCRIPT_PR}"
-                    SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
+                    //SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
                     //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
                     echo " Need to create PR ? -- $SCRIPT_PR"
                     if (SCRIPT_PR){                       
-                        createPRForScripts(PR_NUMBER)
+                       // createPRForScripts(PR_NUMBER)
                     }
                 
            // }
@@ -523,6 +524,7 @@ def updateJCKmkFile(testClasstList,SCRIPT_PR){
                 }
                 def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
                 def upstream ="git@github.com:adoptium/aqa-tests.git"
+                //git checkout -b personal-branch upstream/main
                 sh """
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
