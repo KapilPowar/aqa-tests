@@ -34,7 +34,7 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
                     //def shouldExit = 
-                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JCKScripts"
+                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/test"
                     jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
                     echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
                     echo "jenkinsfile -- $jenkinsfile"
