@@ -30,12 +30,12 @@ def targetFolderCheck(number){
                     def commentBody = lines.collect { it.trim() }.join('\\r\\n')
 
                     if (grepResult == 0)  {
-                        echo "No new folders detected. No need to update playlist.xml '"
-                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
-                    } else {
                         echo "New folders detected. Need to update playlist.xml'"
                         COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
                         SCRIPT_PR=udpateFolderCheck(logFile)
+                    } else {
+                        echo "No new folders detected. No need to update playlist.xml '"
+                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
                     }
                 }
             }
