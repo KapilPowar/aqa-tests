@@ -104,12 +104,15 @@ def getSplitter(script_pr,number){
         } else if (JDK_VERSION == "11"){
              JDK_VERSION = "11a"
         }
+        def tempOutputFile = "SplitterOutput.txt"
         def SCRIPT = "./testUpdater.sh ${WORKSPACE} ${JDK_VERSION}"
-
-        def response = sh(script: SCRIPT, returnStdout: true)
-        def matcher = (response =~ /"PR_NEEDED="\s*(\b(?:true|false)\b)/)
+        def response = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
+        //def response = sh(script: SCRIPT, returnStdout: true)
+        def scriptOutput = readFile(tempOutputFile).trim()
+        echo scriptOutput
+        def matcher = (scriptOutput =~ /"PR_NEEDED="\s*(\b(?:true|false)\b)/)
         PR_NEEDED = matcher ? matcher[0][1] == "true" : null
-        def listMatcher = (response =~ /testClassList=\s*(\S+)/)
+        def listMatcher = (scriptOutput =~ /testClassList=\s*(\S+)/)
         testClassList = listMatcher ? listMatcher[0][1] : null
 
         if (PR_NEEDED){
