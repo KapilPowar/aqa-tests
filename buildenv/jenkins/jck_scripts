@@ -236,8 +236,9 @@ Total process took ~ 1 seconds.
 """
 writeFile(file: logFile, text: fileContent)
 //echo "$fileContent"
+echo "logFile +_+_ $logFile"
 sh "cat ${logFile}"
-//return logFile
+return logFile
 }
 
 return this
