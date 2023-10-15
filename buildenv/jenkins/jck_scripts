@@ -76,12 +76,13 @@ def udpateFolderCheck(file){
                     git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
                 """
-                def sourceFilePath = createFile()
+                //def sourceFilePath = createFile()
                 echo "LogFile -- $file"
-                def sourceFileContent = readFile(file: sourceFilePath)
-                echo "sourceFilePath --- " $sourceFileContent
+                //def sourceFileContent = readFile(file: sourceFilePath)
+                //echo "sourceFilePath --- " $sourceFileContent
                 //def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
                 def logfile="${WORKSPACE}/aqa-tests/jck/$sourceFilePath"
+                echo "logfile path -- $logfile"
                 
                 def SCRIPT = "./jck_target_folder_check/update_jck_target_folder.sh ${WORKSPACE}/aqa-tests/jck $sourceFilePath"
                 STATUS = sh(script: "${SCRIPT}",  returnStatus: true)    
