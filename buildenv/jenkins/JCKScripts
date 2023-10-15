@@ -1,6 +1,5 @@
 #!groovy
 
-
 def targetFolderCheck(number){
             env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"

@@ -34,7 +34,7 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
                     //def shouldExit = 
-                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JCKScripts"
                     jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
                     echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
                     echo "jenkinsfile -- $jenkinsfile"
@@ -178,14 +178,14 @@ def syncJckMaterial(JCK_SCRIPTS){
                     // echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
                     //def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     
-                    def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
-                    echo "SCRIPT_PR -- ${SCRIPT_PR}"
+                    //def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
+                    ///echo "SCRIPT_PR -- ${SCRIPT_PR}"
                     //SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
                     //echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    echo " Need to create PR ? -- $SCRIPT_PR"
-                    if (SCRIPT_PR){                       
+                    //echo " Need to create PR ? -- $SCRIPT_PR"
+                    //if (SCRIPT_PR){                       
                        // createPRForScripts(PR_NUMBER)
-                    }
+                    //}
                 
            // }
         }
