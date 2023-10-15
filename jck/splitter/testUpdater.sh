@@ -22,7 +22,7 @@ callSplitter(){
             fi
             logFileName="${key}.log"
             #echo "logFileName $logFileName" 
-            #$SCRIPT
+            ${SCRIPT} > ${logFileName}
             #return_status=$?
             lastLine=$(grep -E "COMPILER_LANG_${key}_TESTS_GROUP|VERIFIER_INSTRUCTIONS_TESTS_GROUP" "$logFileName" | tail -n 1)
             # Check if the last line is present in the target file
