@@ -3,49 +3,43 @@ import org.tap4j.consumer.TapConsumer;
 import org.tap4j.consumer.TapConsumerFactory;
 import org.tap4j.model.TestSet;
 
-def targetFolderCheck(number){
-            env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
-            echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-            def logFile = "test.log"
-            def COMMENT=""
-            def SCRIPT_PR = false
-            dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
-                sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                    def GIT_BRANCH = params.JCK_GIT_BRANCH ?: "autoBranch" //default branch name in jckupdater.sh
-                    echo "${GIT_BRANCH}"
-                    def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
-                    def specificLine = "New test folder detected:"
+def targetFolderCheck(){
+            // env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
+            // echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
+            // def logFile = "test.log"
+            // def COMMENT=""
+            // def SCRIPT_PR = false
+            // dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
+            //     sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
+            //         def GIT_BRANCH = params.JCK_GIT_BRANCH ?: "autoBranch" //default branch name in jckupdater.sh
+            //         echo "${GIT_BRANCH}"
+            //         def SCRIPT = "./jck_target_folder_check.sh ${params.JCK_GIT_REPO} ${WORKSPACE} ${GIT_BRANCH}"
+            //         def specificLine = "New test folder detected:"
 
-                    def STATUS = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
-                    echo "EXITCODE for jck_target_folder_check = ${STATUS}"
-                    sh "cat ${logFile}"
+            //         def STATUS = sh(script: "${SCRIPT} >${logFile}", returnStatus: true)
+            //         echo "EXITCODE for jck_target_folder_check = ${STATUS}"
+            //         sh "cat ${logFile}"
                         
-                    // Use 'grep' to check if any new folders are detected
-                    def grepCommand = "grep '${specificLine}' ${logFile} || true"
-                    def grepResult = sh(script: grepCommand, returnStatus: true)
+            //         // Use 'grep' to check if any new folders are detected
+            //         def grepCommand = "grep '${specificLine}' ${logFile} || true"
+            //         def grepResult = sh(script: grepCommand, returnStatus: true)
 
-                    // grep last few lines after Done! to create comment
-                    def fileContents = readFile(file: logFile).trim()
-                    def delimiter = 'Done!'
-                    def parts = fileContents.split(delimiter)
-                    def linesAfterDone = parts[1].trim()
-                    def lines = linesAfterDone.split('\n')
-                    def commentBody = lines.collect { it.trim() }.join('\\r\\n')
+            //         // grep last few lines after Done! to create comment
+            //         def fileContents = readFile(file: logFile).trim()
+            //         def delimiter = 'Done!'
+            //         def parts = fileContents.split(delimiter)
+            //         def linesAfterDone = parts[1].trim()
+            //         def lines = linesAfterDone.split('\n')
+            //         def commentBody = lines.collect { it.trim() }.join('\\r\\n')
 
-                    if (grepResult == 0)  {
-                        echo "No new folders detected. No need to update playlist.xml '"
-                        COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
-                    } else {
-                        echo "New folders detected. Need to update playlist.xml'"
-                        COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
-                        SCRIPT_PR=udpateFolderCheck(logFile)
-                    }
-                }
-            }
-            //COMMENT="No new folders detected. No need to update playlist.xml "
-            //createComment(COMMENT, number)
-            //udpateFolderCheck(logFile) //remove after testing
-            //echo "SCRIPT_PR --  $SCRIPT_PR"
-            //SCRIPT_PR=true
-            //return SCRIPT_PR
+            //         if (grepResult == 0)  {
+            //             echo "No new folders detected. No need to update playlist.xml '"
+            //             COMMENT="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
+            //         } else {
+            //             echo "New folders detected. Need to update playlist.xml'"
+            //             COMMENT="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+            //             //SCRIPT_PR=udpateFolderCheck(logFile)
+            //         }
+            //     }
+            // }
 }
