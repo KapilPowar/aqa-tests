@@ -34,8 +34,10 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
                     //def shouldExit = 
-                    def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
                     echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
+                    echo "jenkinsfile -- $jenkinsfile"
                     syncJckMaterial(JCK_SCRIPTS)
         //             if (shouldExit) {
         //     echo "Script returned exit code 2, No new update available. The job is completed without further action."
