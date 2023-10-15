@@ -37,7 +37,7 @@ timestamps{
                     JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     //jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
                     echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
-                    echo "jenkinsfile -- $jenkinsfile"
+                    //echo "jenkinsfile -- $jenkinsfile"
                     syncJckMaterial()
         //             if (shouldExit) {
         //     echo "Script returned exit code 2, No new update available. The job is completed without further action."
