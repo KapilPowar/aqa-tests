@@ -18,9 +18,9 @@ def targetFolderCheck(number){
                     sh "cat ${logFile}"
                         
                     // Use 'grep' to check if any new folders are detected
-                    def grepCommand = "grep '${specificLine}' ${logFile} || true"
-                    def grepResult = sh(script: grepCommand, returnStatus: true)
-
+                    def grepCommand = "grep '${specificLine}' ${logFile}"
+                    def grepResult = sh(script: grepCommand, returnStatus: true, returnStdout: true)
+                    echo "grepResult -- $grepResult"
                     // grep last few lines after Done! to create comment
                     def fileContents = readFile(file: logFile).trim()
                     def delimiter = 'Done!'
