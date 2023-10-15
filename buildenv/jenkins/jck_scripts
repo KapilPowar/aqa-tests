@@ -81,10 +81,10 @@ def udpateFolderCheck(file){
                 //def sourceFileContent = readFile(file: sourceFilePath)
                 //echo "sourceFilePath --- " $sourceFileContent
                 //def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
-                def logfile="${WORKSPACE}/aqa-tests/jck/$sourceFilePath"
+                def logfile="${WORKSPACE}/aqa-tests/jck/$file"
                 echo "logfile path -- $logfile"
                 
-                def SCRIPT = "./jck_target_folder_check/update_jck_target_folder.sh ${WORKSPACE}/aqa-tests/jck $sourceFilePath"
+                def SCRIPT = "./jck_target_folder_check/update_jck_target_folder.sh ${WORKSPACE}/aqa-tests/jck $file"
                 STATUS = sh(script: "${SCRIPT}",  returnStatus: true)    
                 // def filesToStage = modifiedFiles.join(' ')
                 //def gitAddCommand = "git add ${filesToStage}"
