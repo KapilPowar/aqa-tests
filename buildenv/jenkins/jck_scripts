@@ -78,7 +78,8 @@ def udpateFolderCheck(file){
                 """
                 def sourceFilePath = createFile()
                 echo "LogFile -- $file"
-                echo "sourceFilePath --- " $sourceFilePath
+                def sourceFileContent = readFile(file: sourceFilePath)
+                echo "sourceFilePath --- " $sourceFileContent
                 //def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
                 def logfile="${WORKSPACE}/aqa-tests/jck/$sourceFilePath"
                 
@@ -127,6 +128,119 @@ def createComment(Comment,Number) {
 }
 
 def createFile(){
+    def logFile = "test1.log"
+    def fileContent = """
+    Cleaning up generated target list..
+Done!
+--------------------------------------------------------
+     Cross-checking test folders under: compiler       
+--------------------------------------------------------
+New test folder detected: ./lang/ANNOT1 | Please add target: jck-compiler-lang-ANNOT1
+	<test>
+		<testCaseName>jck-compiler-lang-ANNOT1</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>\$(GEN_JTB_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER; \\
+		\$(EXEC_COMPILER_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/ANNOT1 testsuite=COMPILER
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+	</test>
+New test folder detected: ./lang/STMT1 | Please add target: jck-compiler-lang-STMT1
+	<test>
+		<testCaseName>jck-compiler-lang-STMT1</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>\$(GEN_JTB_GENERIC) tests=lang/STMT1 testsuite=COMPILER; \\
+		\$(EXEC_COMPILER_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/STMT1 testsuite=COMPILER
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+	</test>
+Total new folders detected : 2
+--------------------------------------------------------
+     Cross-checking test folders under: runtime       
+--------------------------------------------------------
+New test folder detected: ./lang/ARR1 | Please add target: jck-runtime-lang-ARR1
+	<test>
+		<testCaseName>jck-runtime-lang-ARR1</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>\$(GEN_JTB_GENERIC) tests=lang/ARR1 testsuite=RUNTIME; \\
+		\$(EXEC_RUNTIME_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=lang/ARR1 testsuite=RUNTIME
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+	</test>
+New test folder detected: ./api/test | Please add target: jck-runtime-api-test
+	<test>
+		<testCaseName>jck-runtime-api-test</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>\$(GEN_JTB_GENERIC) tests=api/test testsuite=RUNTIME; \\
+		\$(EXEC_RUNTIME_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=api/test testsuite=RUNTIME
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+	</test>
+New test folder detected: ./xml_schema/sunData1 | Please add target: jck-devtools-xml_schema-sunData1
+	<test>
+		<testCaseName>jck-devtools-xml_schema-sunData1</testCaseName>
+		<variations>
+			<variation>NoOptions</variation>
+		</variations>
+		<command>\$(GEN_JTB_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS; \\
+		\$(EXEC_DEVTOOLS_TEST); \\
+		\$(TEST_STATUS); \\
+		\$(GEN_SUMMARY_GENERIC) tests=xml_schema/sunData1 testsuite=DEVTOOLS
+		</command>
+		<levels>
+			<level>extended</level>
+		</levels>
+		<groups>
+			<group>jck</group>
+		</groups>
+		<versions>
+			<version>8</version>
+		</versions>
+	</test>
+Total new folders detected : 2
+Wed Sep 20 18:43:17 IST 2023
+Total process took ~ 1 seconds.
+"""
+writeFile(file: logFile, text: fileContent)
+return logFile
+}
+
+def createFile1(){
     def logFile = "test1.log"
     //echo "logFile $logFile"
     //def logFilePath = "${WORKSPACE}/aqa-tests/jck/${logFile}"
