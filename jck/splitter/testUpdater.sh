@@ -2,7 +2,7 @@
 
 callSplitter(){
     TARGET_TO_SPLIT="${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
-    mkFileName="${WORKSPACE}/jck.mk"
+    mkFileName="${WORKSPACE}/aqa-tests/jck/jck.mk"
 
     for ((i=0; i<${#keys[@]}; i++)); do
         key="${keys[i]}"
