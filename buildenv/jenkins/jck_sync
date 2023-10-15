@@ -34,7 +34,9 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
                     //def shouldExit = 
-                    syncJckMaterial()
+                    def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
+                    syncJckMaterial(JCK_SCRIPTS)
         //             if (shouldExit) {
         //     echo "Script returned exit code 2, No new update available. The job is completed without further action."
         //     return // Exit the pipeline
@@ -92,7 +94,7 @@ def forceCleanWS() {
     }
 }
 
-def syncJckMaterial(){
+def syncJckMaterial(JCK_SCRIPTS){
         echo "Starting script to sync JCK materials ....."
         echo "Check JDK VERSION"
         //def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
@@ -172,7 +174,8 @@ def syncJckMaterial(){
 
                     //def SCRIPT_PR= false
                     // echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
-                    def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    //def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    
                     def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
                     echo "SCRIPT_PR -- ${SCRIPT_PR}"
                     //SCRIPT_PR=getSplitter(SCRIPT_PR,PR_NUMBER)
