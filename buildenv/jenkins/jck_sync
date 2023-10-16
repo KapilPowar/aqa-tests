@@ -1,23 +1,11 @@
 #!groovy
 
-//def PR_NUMBER=0
-//def COMMENT = ""
-//def EXITCODE = 0
-//def SCRIPT_PR = false
 timestamps{
     stage('Setup') {
-            //SPEC = "linux_x86-64"
-            // if (params.LABEL) {
-            //     LABEL = params.LABEL
-            // } else {
-            //     LABEL = "ci.role.test&&hw.arch.x86&&sw.os.linux"
-            // }
-            def SYNC_LABEL = params.SYNC_LABEL ?: "ci.role.test&&hw.arch.x86&&sw.os.linux"
-            println "SYNC_LABEL: ${SYNC_LABEL}"
-            node(SYNC_LABEL) {
-                echo "clone the SCM GIT repo"
-               // println "SPEC: ${SPEC}"
-                //println "LABEL: ${LABEL}"
+        def SYNC_LABEL = params.SYNC_LABEL ?: "ci.role.test&&hw.arch.x86&&sw.os.linux"
+        println "SYNC_LABEL: ${SYNC_LABEL}"
+        node(SYNC_LABEL) {
+            echo "clone the SCM GIT repo"
                 try {
                     def gitConfig = scm.getUserRemoteConfigs().get(0)
                     // Adopt windows machines require env here https://github.com/adoptium/aqa-tests/issues/1803
@@ -33,16 +21,7 @@ timestamps{
                         [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
-                    //def shouldExit = 
-                    //JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
-                    //jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
-                    //echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
-                    //echo "jenkinsfile -- $jenkinsfile"
                     syncJckMaterial()
-        //             if (shouldExit) {
-        //     echo "Script returned exit code 2, No new update available. The job is completed without further action."
-        //     return // Exit the pipeline
-        // }
 
                 } catch (Exception e) {
                     //println("Exception: " + e.toString())
@@ -97,14 +76,14 @@ def forceCleanWS() {
 }
 
 def syncJckMaterial(){
-        echo "Starting script to sync JCK materials ....."
-        echo "Check JDK VERSION"
+    echo "Starting script to sync JCK materials ....."
+    echo "Check JDK VERSION"
         //def JCK_VERSION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
-        def JCK_GIT_BRANCH = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
+        def JCK_GIT_BRANCH_OPTION = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
        // def JAVA_HOME = params.JAVA_HOME ? "-java ${params.JAVA_HOME}": ""
-        def ARTIFACTORY_URL = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
-        def JCK_GIT_REPO = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
-        def match = JCK_GIT_REPO =~ /(\d+)/
+        def ARTIFACTORY_URL_OPTION = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+        def JCK_GIT_REPO_OPTION = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+        def match = JCK_GIT_REPO_OPTION =~ /(\d+)/
         env.JDK_VERSION = match[0][0]
         echo "Extracted number: $env.JDK_VERSION"
         def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
@@ -128,7 +107,7 @@ def syncJckMaterial(){
                             dir("${WORKSPACE}/aqa-tests/jck/jck-semiauto-updater"){
                             //dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL}  ${JCK_GIT_BRANCH} "
+                                    def SCRIPT = "./jckupdater.sh ${JCK_VERSION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO_OPTION}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL_OPTION}  ${JCK_GIT_BRANCH_OPTION} "
                                     //echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
@@ -172,40 +151,25 @@ def syncJckMaterial(){
         stage( 'Scripts'){
 
             def CHILD_JOB_NAME="JCK_Scripts"
-            def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
-            def CHILD_PARAMS = []
+            def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
+            def childParams = []
             params.each { param ->
                             def value = param.value.toString()
                                 if (value == "true" || value == "false") {
-                                    CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
+                                    childParams << booleanParam(name: param.key, value: value.toBoolean())
                                 } else {
-                                    CHILD_PARAMS << string(name: param.key, value: value)
+                                    childParams << string(name: param.key, value: value)
                                 }
                         }
-            CHILD_PARAMS << string(name: 'PR_NUMBER', value: PR_NUMBER)
-            echo "$CHILD_PARAMS"
-            def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-            def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
-            //createComment(COMMENT,PR_NUMBER)
-                    // def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
-                    
-                    // def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
-                    // echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
-                    // SCRIPT_PR=JCK_SCRIPTS.getSplitter(SCRIPT_PR,PR_NUMBER)
-                    // echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    // //echo " Need to create PR ? -- $SCRIPT_PR"
-                    // if (SCRIPT_PR){                       
-                    //    JCK_SCRIPTS.createPRForScripts(PR_NUMBER)
-                    // }
-                
-           // }
+            childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
+            //echo "$CHILD_PARAMS"
+            def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+            def COMMENT="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
         }
 
         stage('Test') {
-               //script{
-                   //if (EXITCODE ==0){ //change it to zero if want to run tests
                     def CHILD_JOB_NAME="Grinder_JCK"
-                    def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
+                    def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
                     def CHILD_PARAMS = []
                     // loop through all the params and change the parameters if needed
                     // if (params.JCK_GIT_BRANCH == null){
@@ -220,12 +184,6 @@ def syncJckMaterial(){
                                 }
                                 //echo "value -- $value"
                                 CHILD_PARAMS << string(name: param.key, value: value)
-                            // } else if (param.key == "SDK_RESOURCE") {
-                            //     CHILD_PARAMS << string(name: param.key, value: "releases")
-                            // } else if (param.key == "CUSTOMIZED_SDK_URL") {
-                            //     CHILD_PARAMS << string(name: param.key, value: "")
-                            // } else if (param.key == "LABEL") {
-                            //     CHILD_PARAMS << string(name: param.key, value: "")
                             } else {
                                 if (value == "true" || value == "false") {
                                     CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
@@ -236,8 +194,8 @@ def syncJckMaterial(){
                             
                         }
                     //echo "$CHILD_PARAMS"
-                    // def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    // def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+                    // def buildInfo = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+                    // def COMMENT="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
                     // createComment(COMMENT,PR_NUMBER)
         //}
     }
