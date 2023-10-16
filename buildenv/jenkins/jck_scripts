@@ -256,7 +256,6 @@ def createComment(comment) {
             def REPO = DOMAIN[2].split('\\.')
             def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${PR_NUMBER}/comments"
             def PR_URL="https://${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
-            echo ("${comment}")
             def CURL_COMMAND = """
                 curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
                 -d '{

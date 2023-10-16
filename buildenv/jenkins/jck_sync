@@ -132,7 +132,7 @@ def syncJckMaterial(){
                 }
             }
         }
-        def buildInfo = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+        def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
         def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}"
         createComment(comment,PR_NUMBER)
     }
