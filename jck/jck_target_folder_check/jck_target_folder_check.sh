@@ -99,10 +99,10 @@ crossCheckTestFoldersIn() {
 		if [[ ! " $existingTargets " =~ $tokenToSearch ]] ; then
 			echo "New test folder detected: $line | Please add target: jck-$tokenToSearch"
 			command='<command>$(GEN_JTB_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'; \
-		$(EXEC_'${testTypeToUpper}'_TEST); \
-		$(TEST_STATUS); \
-		$(GEN_SUMMARY_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'
-		</command>'
+	$(EXEC_'${testTypeToUpper}'_TEST); \
+	$(TEST_STATUS); \
+	$(GEN_SUMMARY_GENERIC) tests='${tokens[1]}/${tokens[2]}' testsuite='$testTypeToUpper'
+	</command>'
 			echo "<test>"
 			echo "	<testCaseName>jck-$tokenToSearch</testCaseName>"
 			echo "	<variations>"

@@ -167,6 +167,46 @@ def updateJCKFile(script_pr,jdk){
     return true
 }
 
+def createPRForScripts(number) {
+
+    def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
+    if (ADOPTIUM_GIT_USER == ""){
+        echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
+    } else {
+        withCredentials([
+                string(credentialsId: "${params.ADOPTIUM_GIT_CREDENTIALS}",variable: 'ADOPTIUM_GIT_TOKEN')
+            ]){
+            dir("${WORKSPACE}/aqa-tests") {
+                sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
+                title="Update jck.mk and playlist.xml file"
+                body="Creating PR to update jck.mk and playlist file"
+                echo " Creating PR for jck.mk and playlist.xml file"
+                url="https://api.github.com/repos/${ADOPTIUM_GIT_USER}/aqa-tests/pulls"
+                //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
+                def CURL_COMMAND = """
+                                    curl -X POST "${url}" \\
+                                        -H "Authorization: token \"\$ADOPTIUM_GIT_TOKEN\"" \\
+                                        -H "Content-Type: application/json" \\
+                                        -d '{
+                                            "title": "${title}",
+                                            "body": "${body}",
+                                            "head": "${ADOPTIUM_GIT_USER}:test",
+                                            "base": "jcksync-copy"
+                                        }'
+                                """
+                def response = sh(script: CURL_COMMAND, returnStdout: true)
+                def matcher = (response =~ /"number":\s*(\d+)/)
+                def PR = matcher ? matcher[0][1] : null
+                echo "PR_NUMBER = ${PR}"
+                PR_URL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
+                COMMENT=" PR #[${(PR)}](${PR_URL}${(PR)})  is created with changes in jck.mk and playlist.xml file .. "
+                createComment(COMMENT, number)
+                }
+            }
+        }
+    }
+}
+
 def createComment(Comment,Number) {
     withCredentials([
         string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')

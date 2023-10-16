@@ -183,9 +183,9 @@ def syncJckMaterial(){
                     SCRIPT_PR=JCK_SCRIPTS.getSplitter(SCRIPT_PR,PR_NUMBER)
                     echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
                     //echo " Need to create PR ? -- $SCRIPT_PR"
-                    //if (SCRIPT_PR){                       
-                       // createPRForScripts(PR_NUMBER)
-                    //}
+                    if (SCRIPT_PR){                       
+                       JCK_SCRIPTS.createPRForScripts(PR_NUMBER)
+                    }
                 
            // }
         }
