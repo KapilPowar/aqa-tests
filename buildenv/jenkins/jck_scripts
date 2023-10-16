@@ -134,7 +134,7 @@ def pushChangesToRepo(commit,target,script_pr){
                 //git checkout -b personal-branch upstream/main
             sh """
                 git add ${target}
-                git commit -m ${commit}
+                git commit -m \"${commit}\"
                 git push origin test
             """
             }
