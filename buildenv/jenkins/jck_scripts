@@ -61,7 +61,7 @@ def udpateFolderCheck(file){
                 if (STATUS == 0){
                     def commit="update folder check "
                     def filepath='**/playlist.xml' 
-                    pushChangesToRepo(commit, filePath,false)
+                    pushChangesToRepo(commit, filepath,false)
                 } else {
                     echo "Update_jck_target_folder script resulted non zero return status."
                     return false
@@ -90,9 +90,9 @@ def getSplitter(script_pr,number){
             echo "testClassList -- ${testClassList}"
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " 
             COMMENT+=testClassList.join(',')
-            def targetFilePath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
-            def commit= "update jck.mk"
-            pushChangesToRepo(commit,targetFilePath,script_pr)
+            filepath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
+            commit= "update jck.mk"
+            pushChangesToRepo(commit,filepath,script_pr)
             script_pr=true
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
