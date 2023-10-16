@@ -34,9 +34,9 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
                     //def shouldExit = 
-                    JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    //JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     //jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
-                    echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
+                    //echo "JCK_SCRIPTS -- $JCK_SCRIPTS"
                     //echo "jenkinsfile -- $jenkinsfile"
                     syncJckMaterial()
         //             if (shouldExit) {
@@ -170,16 +170,16 @@ def syncJckMaterial(){
                 }
 
         stage( 'Scripts'){
-                    def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
+                    // def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     
-                    def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
-                    echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
-                    SCRIPT_PR=JCK_SCRIPTS.getSplitter(SCRIPT_PR,PR_NUMBER)
-                    echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    //echo " Need to create PR ? -- $SCRIPT_PR"
-                    if (SCRIPT_PR){                       
-                       JCK_SCRIPTS.createPRForScripts(PR_NUMBER)
-                    }
+                    // def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
+                    // echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
+                    // SCRIPT_PR=JCK_SCRIPTS.getSplitter(SCRIPT_PR,PR_NUMBER)
+                    // echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
+                    // //echo " Need to create PR ? -- $SCRIPT_PR"
+                    // if (SCRIPT_PR){                       
+                    //    JCK_SCRIPTS.createPRForScripts(PR_NUMBER)
+                    // }
                 
            // }
         }
