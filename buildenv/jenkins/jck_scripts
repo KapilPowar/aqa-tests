@@ -22,14 +22,7 @@ timestamps{
                         [$class: 'RelativeTargetDirectory', relativeTargetDir: 'aqa-tests']],
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                     ]
-                    getJavaSDK()
-                    def SCRIPT_PR=targetFolderCheck()
-                    echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
-                    SCRIPT_PR=getSplitter(SCRIPT_PR)
-                    echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
-                    if (SCRIPT_PR){
-                       createPRForScripts()
-                    }
+                    callScripts()
                 } catch (Exception e) {
                     println("Exception: " + e.toString())
                     // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
@@ -76,13 +69,26 @@ def getJavaSDK(){
     }
 }
 
+def callScripts(){
+    stage('FolderCheck') {
+        getJavaSDK()
+        def SCRIPT_PR=targetFolderCheck()
+        echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
+        SCRIPT_PR=getSplitter(SCRIPT_PR)
+        echo "SCRIPT_PR after splitter-- ${SCRIPT_PR}"
+        if (SCRIPT_PR){
+            createPRForScripts()
+        }
+    }
+}
+
 def targetFolderCheck(){
-            env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
-            echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-            def logFile = "test.log"
-            def COMMENT=""
-            def SCRIPT_PR = false
-            dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
+    env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
+    echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
+    def logFile = "test.log"
+    def COMMENT=""
+    def SCRIPT_PR = false
+    dir("${WORKSPACE}/aqa-tests/jck/jck_target_folder_check") {
                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
                     def JCK_GIT_BRANCH = params.JCK_GIT_BRANCH ?: "autoBranch" //default branch name in jckupdater.sh
                     //echo "${GIT_BRANCH}"
