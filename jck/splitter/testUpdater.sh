@@ -40,7 +40,7 @@ callSplitter(){
     #     echo $value
     # done
     echo "PR_NEEDED=$PR_NEEDED"
-    echo "${testClassList[@]}"
+    echo "Class_List=${testClassList[@]}"
 }
 
 
