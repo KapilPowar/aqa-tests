@@ -112,13 +112,21 @@ def getSplitter(script_pr,number){
         echo scriptOutput
         // def matcher = (scriptOutput =~ /"PR_NEEDED="\s*(\b(?:true|false)\b)/)
         // PR_NEEDED = matcher ? matcher[0][1] == "true" : null
-        def listMatcher = (scriptOutput =~ /Class_List=\s*(\S+)/)
-        testClassList = listMatcher ? listMatcher[0][1] : null
-        echo "testClassList -- $testClassList"
+        // def listMatcher = (scriptOutput =~ /Class_List=\s*(\S+)/)
+        // testClassList = listMatcher ? listMatcher[0][1] : null
+        // echo "testClassList -- $testClassList"
+        
+        // if (match) {
+        //     def testClassList = match[0][1].split()
+        //     println testClassList
+        // }
         if (scriptOutput =~ /PR_NEEDED=true/){
+            def match = (scriptOutput =~ /Class_List=(.*)/)
+            def testClassList = match[0][1].split()
+            echo "testClassList -- ${testClassList}"
             //script_pr=updateJCKmkFile(testClasstList,script_pr)
             script_pr=true
-            COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClasstList
+            COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClassList.join(',')
             //echo "testClassList --- ${testClassList}"
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
