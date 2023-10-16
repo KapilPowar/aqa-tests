@@ -114,10 +114,10 @@ def getSplitter(script_pr,number){
             def match = (scriptOutput =~ /Class_List=(.*)/)
             def testClassList = match[0][1].split()
             echo "testClassList -- ${testClassList}"
-            script_pr=updateJCKFile(testClasstList,script_pr,JDK_VERSION)
+            script_pr=updateJCKFile(script_pr,JDK_VERSION)
             //script_pr=true
-            COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " + testClassList.join(',')
-            //echo "testClassList --- ${testClassList}"
+            COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " 
+            COMMENT+=testClassList.join(',')
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
         }
@@ -126,7 +126,7 @@ def getSplitter(script_pr,number){
     }
 }
 
-def updateJCKFile(testClasstList,script_pr,jdk){
+def updateJCKFile(script_pr,jdk){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
@@ -157,10 +157,8 @@ def updateJCKFile(testClasstList,script_pr,jdk){
                 """
             }
                 def targetFilePath= "${WORKSPACE}/aqa-tests/jck/jck${jdk}.mk"
-                def gitAddCommand = "git add ${targetFilePath}"
-                sh(script: gitAddCommand)
-
                 sh """
+                    git add ${targetFilePath}
                     git commit -m "update jck.mk"
                     git push origin test
                 """
