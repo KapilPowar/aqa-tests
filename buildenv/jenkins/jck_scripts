@@ -228,7 +228,7 @@ def createPRForScripts() {
                             "title": "${title}",
                             "body": "${body}",
                             "head": "${ADOPTIUM_GIT_USER}:autoTest",
-                            "base": "jcksync-copy"
+                            "base": "jcksync"
                         }'
                     """
                     def response = sh(script: CURL_COMMAND, returnStdout: true)
