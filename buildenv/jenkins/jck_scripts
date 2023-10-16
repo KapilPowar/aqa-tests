@@ -53,44 +53,19 @@ def udpateFolderCheck(file){
         return false
     } else {
         dir("${WORKSPACE}/aqa-tests/jck") {
-            sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-                try {
-                        sh """
-                        git remote remove origin
-                        git remote remove upstream
-                        """
-                } catch (Exception e) {
-                        // Handle the error here, but do not throw it
-                        echo "Error removing remote: ${e.message}"
-                }
-                def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
-                def upstream ="git@github.com:adoptium/aqa-tests.git"
-                sh """
-                    git remote add origin ${origin}
-                    git remote add upstream ${upstream}
-                    git fetch upstream
-                    git checkout -b test
-                    git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
-                    git config --global user.name "${ADOPTIUM_GIT_USER}"
-                """
                 def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
                 echo "logfile path -- $logfile"
                 
                 def SCRIPT = "./jck_target_folder_check/update_jck_target_folder.sh ${WORKSPACE}/aqa-tests/jck $logfile"
                 STATUS = sh(script: "${SCRIPT}",  returnStatus: true)    
                 if (STATUS == 0){
-                sh """
-                    git status
-                    git add "**/playlist.xml"
-                    git commit -m "update folder check"
-                    git push origin test
-                """
+                    def commit="update folder check "
+                    def filepath='**/playlist.xml' 
+                    pushChangesToRepo(commit, filePath,false)
                 } else {
                     echo "Update_jck_target_folder script resulted non zero return status."
                     return false
                 }
-               
-            }
         }
     return true
     }
@@ -107,17 +82,18 @@ def getSplitter(script_pr,number){
         def tempOutputFile = "SplitterOutput.txt"
         def SCRIPT = "./testUpdater.sh ${WORKSPACE} ${JDK_VERSION}"
         def response = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
-        //def response = sh(script: SCRIPT, returnStdout: true)
         def scriptOutput = readFile(tempOutputFile).trim()
         echo scriptOutput
         if (scriptOutput =~ /PR_NEEDED=true/){
             def match = (scriptOutput =~ /Class_List=(.*)/)
             def testClassList = match[0][1].split()
             echo "testClassList -- ${testClassList}"
-            script_pr=updateJCKFile(script_pr,JDK_VERSION)
-            //script_pr=true
             COMMENT=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " 
             COMMENT+=testClassList.join(',')
+            def targetFilePath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
+            def commit= "update jck.mk"
+            pushChangesToRepo(commit,targetFilePath,script_pr)
+            script_pr=true
         } else {
             COMMENT =" No need to create PR to update jck.mk file."
         }
@@ -126,7 +102,7 @@ def getSplitter(script_pr,number){
     }
 }
 
-def updateJCKFile(script_pr,jdk){
+def pushChangesToRepo(commit,target,script_pr){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
@@ -134,8 +110,7 @@ def updateJCKFile(script_pr,jdk){
         return false
     } else {
         sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-            if (!script_pr){  
-                script_pr=true 
+            if (!script_pr){ 
                 try {
                     sh """
                         git remote remove origin
@@ -146,7 +121,6 @@ def updateJCKFile(script_pr,jdk){
                 }
                 def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
                 def upstream ="git@github.com:adoptium/aqa-tests.git"
-                //git checkout -b personal-branch upstream/main
                 sh """
                     git remote add origin ${origin}
                     git remote add upstream ${upstream}
@@ -156,15 +130,14 @@ def updateJCKFile(script_pr,jdk){
                     git config --global user.name "${ADOPTIUM_GIT_USER}"
                 """
             }
-                def targetFilePath= "${WORKSPACE}/aqa-tests/jck/jck${jdk}.mk"
-                sh """
-                    git add ${targetFilePath}
-                    git commit -m "update jck.mk"
-                    git push origin test
-                """
-            }
+                //git checkout -b personal-branch upstream/main
+            sh """
+                git add ${target}
+                git commit -m ${commit}
+                git push origin test
+            """
         }
-    return true
+    }
 }
 
 def createPRForScripts(number) {

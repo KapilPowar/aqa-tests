@@ -170,12 +170,6 @@ def syncJckMaterial(){
                 }
 
         stage( 'Scripts'){
-            //script{
-                    //def comment ="TEST COMMENT"
-                    //createComment(comment, PR_NUMBER)
-
-                    //def SCRIPT_PR= false
-                    // echo "Splitter PR_NUMBER ---- ${PR_NUMBER} "
                     def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     
                     def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
