@@ -70,7 +70,6 @@ def getJavaSDK(){
 }
 
 def callScripts(){
-    stage('FolderCheck') {
         getJavaSDK()
         def SCRIPT_PR=targetFolderCheck()
         echo "SCRIPT_PR in jcysync-- ${SCRIPT_PR}"
@@ -79,10 +78,10 @@ def callScripts(){
         if (SCRIPT_PR){
             createPRForScripts()
         }
-    }
 }
 
 def targetFolderCheck(){
+    stage('FolderCheck') {
     env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
     echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
     def logFile = "test.log"
@@ -124,8 +123,8 @@ def targetFolderCheck(){
             createComment(COMMENT)
             echo "SCRIPT_PR --  $SCRIPT_PR"
             return SCRIPT_PR
+    }
 }
-
 def udpateFolderCheck(file){
 
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
@@ -154,6 +153,7 @@ def udpateFolderCheck(file){
 }
 
 def getSplitter(script_pr){
+    stage('Splitter') {
     dir("${WORKSPACE}/aqa-tests/jck/splitter") {
         def JDK_VERSION= params.JDK_VERSION
         if (JDK_VERSION == "8") {
@@ -184,6 +184,7 @@ def getSplitter(script_pr){
         return script_pr
     }
 }
+}
 
 def pushChangesToRepo(commit,target,script_pr){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
@@ -209,7 +210,7 @@ def pushChangesToRepo(commit,target,script_pr){
                         git remote add origin ${origin}
                         git remote add upstream ${upstream}
                         git fetch upstream
-                        git checkout -b test
+                        git checkout -b autoTest
                         git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
                         git config --global user.name "${ADOPTIUM_GIT_USER}"
                     """
@@ -218,7 +219,7 @@ def pushChangesToRepo(commit,target,script_pr){
             sh """
                 git add ${target}
                 git commit -m \"${commit}\"
-                git push origin test
+                git push origin autoTest
             """
             }
         }
@@ -226,7 +227,7 @@ def pushChangesToRepo(commit,target,script_pr){
 }
 
 def createPRForScripts() {
-
+    stage('CreatePR') {
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
     if (ADOPTIUM_GIT_USER == ""){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
@@ -241,6 +242,7 @@ def createPRForScripts() {
                 echo " Creating PR for jck.mk and playlist.xml file"
                 url="https://api.github.com/repos/${ADOPTIUM_GIT_USER}/aqa-tests/pulls"
                 //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
+                //change base branch to adoptium main branch
                 def CURL_COMMAND = """
                                     curl -X POST "${url}" \\
                                         -H "Authorization: token \"\$ADOPTIUM_GIT_TOKEN\"" \\
@@ -248,7 +250,7 @@ def createPRForScripts() {
                                         -d '{
                                             "title": "${title}",
                                             "body": "${body}",
-                                            "head": "${ADOPTIUM_GIT_USER}:test",
+                                            "head": "${ADOPTIUM_GIT_USER}:autoTest",
                                             "base": "jcksync-copy"
                                         }'
                                 """
@@ -264,6 +266,7 @@ def createPRForScripts() {
         }
     }
 }
+}
 
 def createComment(comment) {
     withCredentials([
@@ -275,8 +278,8 @@ def createComment(comment) {
         }else{
             def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)
             def REPO = DOMAIN[2].split('\\.')
-            def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${Number}/comments"
-            def PR_URL="https://${DOMAIN[1]}/${REPO[0]}/pull/${Number}"
+            def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${PR_NUMBER}/comments"
+            def PR_URL="https://${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
             echo ("${comment}")
             def CURL_COMMAND = """
                 curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
