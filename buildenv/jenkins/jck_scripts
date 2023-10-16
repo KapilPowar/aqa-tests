@@ -46,6 +46,19 @@ timestamps{
     }
 }
 
+def forceCleanWS() {
+    try {
+        cleanWs disableDeferredWipeout: true, deleteDirs: true
+    } catch (Exception e) {
+        echo 'Exception: ' + e.toString()
+        //cleanWs has issue to delete workspace that contains non-ASCII filename in TKG output https://issues.jenkins.io/browse/JENKINS-33478
+        //cannot delete workspace directly. Otherwise, Jenkins job will abort due to missing workspace
+        sh "rm -rf ${env.WORKSPACE}/aqa-tests/TKG"
+        // call cleanWs() again
+        cleanWs disableDeferredWipeout: true, deleteDirs: true
+    }
+}
+
 def getJavaSDK(){
     def JDK_VERSION_OPTION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}" : ""
     def CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
