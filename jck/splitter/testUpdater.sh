@@ -1,8 +1,35 @@
 #!/usr/bin/env bash
 
+updateJCKmkFile(){
+
+    sourceFilePath=$1
+    JDK_VERSION=$2
+    tempFile=$(mktemp)
+
+    while IFS= read -r targetLine; do
+        if [[  "$targetLine" == *'('* ]]; then
+            key=$(echo "$targetLine" | cut -d '(' -f 1 | awk '{$1=$1};1')
+            while IFS= read -r sourceLine; do
+                if [[ ! -z "$sourceLine" && "$sourceLine" == *'('* ]]; then
+                    sourceKey=$(echo "$sourceLine" | cut -d '(' -f 1 | awk '{$1=$1};1')
+                    if [[ "$sourceKey" == "$key"* ]]; then
+                    # Replace the target line with the source line
+                    targetLine="   $sourceLine"
+                    break  # No need to check the remaining lines in the source file
+                    fi
+                fi
+            done < $sourceFilePath
+        echo "$targetLine" >> "$tempFile"    
+        else 
+            echo "$targetLine" >> "$tempFile"  
+        fi
+    done < $mkFileName
+    mv "$tempFile" "$mkFileName"
+}
+
 callSplitter(){
     TARGET_TO_SPLIT="${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
-    mkFileName="${WORKSPACE}/aqa-tests/jck/jck.mk"
+    mkFileName="${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
 
     for ((i=0; i<${#keys[@]}; i++)); do
         key="${keys[i]}"
@@ -21,17 +48,16 @@ callSplitter(){
                 key="CLASS"
             fi
             logFileName="${key}.log"
-            #echo "logFileName $logFileName" 
             ${SCRIPT} > ${logFileName}
             #return_status=$?
             lastLine=$(grep -E "COMPILER_LANG_${key}_TESTS_GROUP|VERIFIER_INSTRUCTIONS_TESTS_GROUP" "$logFileName" | tail -n 1)
             # Check if the last line is present in the target file
-            #echo $lastLine
             if grep -qF "$lastLine" "$mkFileName"; then
             echo "No need to create PR for --- $key"
             else
             #echo "We need to create PR for --- $key"
             testClassList+=("$key")
+            updateJCKmkFile $logFileName $JDK_VERSION
             PR_NEEDED=true
             fi
         fi
