@@ -270,7 +270,7 @@ def createComment(comment) {
         string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
     ]) {
         def PR_NUMBER = params.PR_NUMBER ?:0
-        if (PR_NUMBER <= 0){
+        if (PR_NUMBER == 0){
             echo "No PR created to comment"
         }else{
             def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)

@@ -170,6 +170,23 @@ def syncJckMaterial(){
                 }
 
         stage( 'Scripts'){
+
+            def CHILD_JOB_NAME="JCK_Scripts"
+            def BUILD_URL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
+            def CHILD_PARAMS = []
+            params.each { param ->
+                            def value = param.value.toString()
+                                if (value == "true" || value == "false") {
+                                    CHILD_PARAMS << booleanParam(name: param.key, value: value.toBoolean())
+                                } else {
+                                    CHILD_PARAMS << string(name: param.key, value: value)
+                                }
+                        }
+            CHILD_PARAMS << string(name: 'PR_NUMBER', value: PR_NUMBER)
+            echo "$CHILD_PARAMS"
+            def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+            def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
+            //createComment(COMMENT,PR_NUMBER)
                     // def JCK_SCRIPTS = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/jck_scripts"
                     
                     // def SCRIPT_PR=JCK_SCRIPTS.targetFolderCheck(PR_NUMBER)
@@ -218,7 +235,7 @@ def syncJckMaterial(){
                             }
                             
                         }
-                    echo "$CHILD_PARAMS"
+                    //echo "$CHILD_PARAMS"
                     // def BUILD_INFO = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
                     // def COMMENT="Job [#${BUILD_INFO.number}](${BUILD_URL}${BUILD_INFO.number}) completed with status: ${BUILD_INFO.result}\\r\\n"
                     // createComment(COMMENT,PR_NUMBER)
