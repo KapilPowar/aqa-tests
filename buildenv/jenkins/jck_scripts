@@ -110,32 +110,34 @@ def pushChangesToRepo(commit,target,script_pr){
         return false
     } else {
         sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
-            if (!script_pr){ 
-                try {
+            dir("${WORKSPACE}/aqa-tests/jck") {
+                if (!script_pr){
+                    try {
+                        sh """
+                            git remote remove origin
+                            git remote remove upstream
+                        """
+                    } catch (Exception e) {
+                        echo "Error removing remote: ${e.message}"
+                    }
+                    def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
+                    def upstream ="git@github.com:adoptium/aqa-tests.git"
                     sh """
-                        git remote remove origin
-                        git remote remove upstream
+                        git remote add origin ${origin}
+                        git remote add upstream ${upstream}
+                        git fetch upstream
+                        git checkout -b test
+                        git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
+                        git config --global user.name "${ADOPTIUM_GIT_USER}"
                     """
-                } catch (Exception e) {
-                    echo "Error removing remote: ${e.message}"
                 }
-                def origin ="git@github.com:${ADOPTIUM_GIT_USER}/aqa-tests.git"
-                def upstream ="git@github.com:adoptium/aqa-tests.git"
-                sh """
-                    git remote add origin ${origin}
-                    git remote add upstream ${upstream}
-                    git fetch upstream
-                    git checkout -b test
-                    git config --global user.email "${ADOPTIUM_GIT_USER}@in.ibm.com"
-                    git config --global user.name "${ADOPTIUM_GIT_USER}"
-                """
-            }
                 //git checkout -b personal-branch upstream/main
             sh """
                 git add ${target}
                 git commit -m ${commit}
                 git push origin test
             """
+            }
         }
     }
 }
