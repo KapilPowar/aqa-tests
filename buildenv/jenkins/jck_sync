@@ -94,7 +94,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 //script {
                 
-                //getJavaSDK()
+                getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
@@ -163,9 +163,9 @@ def syncJckMaterial(){
                         }
             childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
             echo "$childParams"
-            //def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
-            //def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
-            //createComment(comment,PR_NUMBER)
+            def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+            def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+            createComment(comment,PR_NUMBER)
         }
 
         stage('Test') {
@@ -339,13 +339,12 @@ def getSplitter(script_pr,number){
 def getJavaSDK(){
         def JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
        // def JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
-        def CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
-
+        def CUSTOMIZED_SDK_OPTION = "-c ${params.CUSTOMIZED_SDK}"
         def CLONE_OPENJ9_OPTION = "--clone_openj9 false"
         //echo "getJavaSDK"
         //-r $SDK_RESOURCE , JDK_IMPL_OPTION not passing as default is nightly
         def PLATFORM_OPTION = "-p x86-64_linux"
-        def GET_SH_CMD = "./get.sh -s `pwd`/.. $PLATFORM_OPTION  $JDK_VERSION_OPTION $CUSTOMIZED_SDK_URL_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION}
+        def GET_SH_CMD = "./get.sh -s `pwd`/.. $PLATFORM_OPTION  $JDK_VERSION_OPTION $CUSTOMIZED_SDK_OPTION $CLONE_OPENJ9_OPTION "// ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION}
         dir("${WORKSPACE}/aqa-tests") {
             if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
 			// USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
