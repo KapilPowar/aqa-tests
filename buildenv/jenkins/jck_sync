@@ -150,7 +150,7 @@ def syncJckMaterial(){
 
         stage( 'Scripts'){
 
-            def CHILD_JOB_NAME="JCK_Scripts"
+            def CHILD_JOB_NAME="Folder_Check"
             def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
             def childParams = []
             params.each { param ->
