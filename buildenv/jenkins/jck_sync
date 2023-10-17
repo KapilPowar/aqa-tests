@@ -94,7 +94,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 //script {
                 
-                //getJavaSDK()
+                getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
@@ -162,9 +162,9 @@ def syncJckMaterial(){
                                 }
                         }
             childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
-            //echo "$CHILD_PARAMS"
             def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
-            def COMMENT="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+            def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+            createComment(comment,PR_NUMBER)
         }
 
         stage('Test') {
