@@ -94,7 +94,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 //script {
                 
-                getJavaSDK()
+                //getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
@@ -162,9 +162,10 @@ def syncJckMaterial(){
                                 }
                         }
             childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
-            def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
-            def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
-            createComment(comment,PR_NUMBER)
+            echo "$childParams"
+            //def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+            //def comment="Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+            //createComment(comment,PR_NUMBER)
         }
 
         stage('Test') {
@@ -339,6 +340,7 @@ def getJavaSDK(){
         def JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
        // def JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
         def CUSTOMIZED_SDK_URL_OPTION = "-c ${params.CUSTOMIZED_SDK_URL}"
+
         def CLONE_OPENJ9_OPTION = "--clone_openj9 false"
         //echo "getJavaSDK"
         //-r $SDK_RESOURCE , JDK_IMPL_OPTION not passing as default is nightly
