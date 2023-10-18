@@ -152,7 +152,7 @@ def getSplitter(scriptPR){
                 def match = (scriptOutput =~ /Class_List=(.*)/)
                 def testClassList = match[0][1].split()
                 echo "Splitter.sh resulted in new test groups. We need to create PR to update jck.mk file for below test group\n "+ testClassList.join(',')
-                filePath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
+                filePath= "${WORKSPACE}/aqa-tests/jck/subdirs/jck${JDK_VERSION}.mk"
                 commit= "update jck.mk"
                 scriptPR = pushChangesToRepo(commit,filePath,scriptPR)
             } else {
