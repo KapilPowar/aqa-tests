@@ -22,7 +22,7 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                 ]
                 getJavaSDK()
-                targetFolderCheck()
+                def scriptPR = targetFolderCheck()
                 // scriptPR=getSplitter(scriptPR)
                 // if (scriptPR){
                 //     createPRForScripts()
@@ -104,7 +104,7 @@ def targetFolderCheck(){
             if (grepResult == 0)  {
                 echo "New folders detected. Need to update playlist.xml'"
                 //comment="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
-                udpateFolderCheck(logFile)
+                scriptPR = udpateFolderCheck(logFile)
             } else {
                 echo "No new folders detected. No need to update playlist.xml '"
                 //comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
@@ -112,14 +112,14 @@ def targetFolderCheck(){
             }
         }
         //createComment(comment)
-        //return scriptPR
+        return scriptPR
     }
 }
 def udpateFolderCheck(file){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
-        //return false
+        return false
     } else {
         dir("${WORKSPACE}/aqa-tests/jck") {
             def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
@@ -128,14 +128,14 @@ def udpateFolderCheck(file){
             if (STATUS == 0){
                 def commit="update folder check "
                 def filePath='**/playlist.xml' 
-                pushChangesToRepo(commit, filePath)
+                pushChangesToRepo(commit, filePath,false)
 
             } else {
                 echo "Update_jck_target_folder script resulted non zero return status."
-                //return false
+                return false
             }
         }
-    //return true
+    return true
     }
 }
 
@@ -167,7 +167,7 @@ def getSplitter(scriptPR){
     }
 }
 
-def pushChangesToRepo(commit,target){
+def pushChangesToRepo(commit,target,scriptPR){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
