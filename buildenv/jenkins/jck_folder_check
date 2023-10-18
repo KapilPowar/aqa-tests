@@ -23,7 +23,7 @@ timestamps{
                 ]
                 getJavaSDK()
                 def scriptPR = targetFolderCheck()
-                // scriptPR=getSplitter(scriptPR)
+                scriptPR = getSplitter(scriptPR)
                 if (scriptPR){
                     createPRForScripts()
                 }
@@ -128,8 +128,7 @@ def udpateFolderCheck(file){
             if (STATUS == 0){
                 def commit="update folder check "
                 def filePath='**/playlist.xml' 
-                pushChangesToRepo(commit, filePath,false)
-
+                scriptPR = pushChangesToRepo(commit, filePath,false)
             } else {
                 echo "Update_jck_target_folder script resulted non zero return status."
                 return false
@@ -152,16 +151,14 @@ def getSplitter(scriptPR){
             if (scriptOutput =~ /PR_NEEDED=true/){
                 def match = (scriptOutput =~ /Class_List=(.*)/)
                 def testClassList = match[0][1].split()
-                comment=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " 
-                comment+=testClassList.join(',')
+                echo "Splitter.sh resulted in new test groups. We need to create PR to update jck.mk file for below test group\n "+ testClassList.join(',')
                 filePath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
                 commit= "update jck.mk"
-                pushChangesToRepo(commit,filePath,scriptPR)
-                scriptPR=true
+                scriptPR = pushChangesToRepo(commit,filePath,scriptPR)
             } else {
-                comment =" No need to create PR to update jck.mk file."
+                echo " No need to create PR to update jck.mk file."
             }
-            createComment(comment)
+            //createComment(comment)
             return scriptPR
         }
     }
@@ -172,7 +169,7 @@ def pushChangesToRepo(commit,target,scriptPR){
 
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
-        //return false
+        return false
     } else {
         sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
             dir("${WORKSPACE}/aqa-tests/jck") {
@@ -204,6 +201,7 @@ def pushChangesToRepo(commit,target,scriptPR){
             """
             }
         }
+    return true
     }
 }
 
@@ -235,12 +233,12 @@ def createPRForScripts() {
                             "base": "jcksync-copy"
                         }'
                     """
-                    def response = sh(script: CURL_COMMAND, returnStdout: true)
-                    def matcher = (response =~ /"number":\s*(\d+)/)
-                    def prNumber = matcher ? matcher[0][1] : null
-                    prURL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
-                    comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
-                    createComment(comment)
+                    // def response = sh(script: CURL_COMMAND, returnStdout: true)
+                    // def matcher = (response =~ /"number":\s*(\d+)/)
+                    // def prNumber = matcher ? matcher[0][1] : null
+                    // prURL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
+                    //comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
+                    //createComment(comment)
                     }
                 }
             }

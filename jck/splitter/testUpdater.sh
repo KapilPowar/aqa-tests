@@ -3,7 +3,6 @@
 updateJCKmkFile(){
 
     sourceFilePath=$1
-    JDK_VERSION=$2
     tempFile=$(mktemp)
 
     while IFS= read -r targetLine; do
@@ -28,9 +27,16 @@ updateJCKmkFile(){
 }
 
 callSplitter(){
-    TARGET_TO_SPLIT="${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
-    mkFileName="${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
+    mkFileName="${WORKSPACE}/aqa-tests/jck/subdirs/jck${JDK_VERSION}.mk"
 
+    if [[ "$JDK_VERSION" == "8" ]]; then
+        JDK_VERSION="8d"
+    elif [[ "$JDK_VERSION" == "11" ]]; then
+        JDK_VERSION="11a"
+    fi
+
+    TARGET_TO_SPLIT="${WORKSPACE}/test/JCK-compiler-${JDK_VERSION}/tests/lang"
+    
     for ((i=0; i<${#keys[@]}; i++)); do
         key="${keys[i]}"
         value="${values[i]}"
@@ -57,7 +63,7 @@ callSplitter(){
             else
             #echo "We need to create PR for --- $key"
             testClassList+=("$key")
-            updateJCKmkFile $logFileName $JDK_VERSION
+            updateJCKmkFile $logFileName
             PR_NEEDED=true
             fi
         fi
@@ -78,10 +84,3 @@ values=("5" "10" "5" "5" "11" "5" "5" "5" "5" "5" "4")
 PR_NEEDED=false
 testClassList=()
 callSplitter
-# if [ -n "$testClassList" ]; then
-#   echo "testClassList is not empty: $testClassList"
-# else
-#   echo "testClassList is empty"
-# fi
-
-
