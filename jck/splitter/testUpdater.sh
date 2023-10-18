@@ -72,7 +72,7 @@ callSplitter(){
     #     echo $value
     # done
     echo "PR_NEEDED=$PR_NEEDED"
-    echo "Class_List=${testClassList[@]}"
+    echo -e "Splitter.sh resulted in new test groups. We need to create PR to update jck.mk file for below test group \n ${testClassList[@]}"
 }
 
 
