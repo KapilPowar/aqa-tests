@@ -24,9 +24,9 @@ timestamps{
                 getJavaSDK()
                 def scriptPR = targetFolderCheck()
                 // scriptPR=getSplitter(scriptPR)
-                // if (scriptPR){
-                //     createPRForScripts()
-                // }
+                if (scriptPR){
+                    createPRForScripts()
+                }
             } catch (Exception e) {
                 println("Exception: " + e.toString())
                 // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
