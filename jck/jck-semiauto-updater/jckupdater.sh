@@ -362,20 +362,7 @@ test() {
 	echo "Response -- $response"
 	pr_number=$(echo "$response" | grep -o '"number": *[0-9]*' | awk -F':' '{print $2}' | tr -d ' ,"')
 
-	#env.TEST_ENV =${pr_number}
-	#echo "TEST_ENV== ${env.TEST_ENV}"
 	echo "PR_NUMBER=$pr_number"
-	# export TEST_ENV="$pr_number"
-	# echo "TEST_ENV== $TEST_ENV"
-	#echo "PR -- $pr_number"
-	# file_path="$WORKSPACE/../../test/file.txt"
-	# mkdir -p "$(dirname "$file_path")"
-	# touch "$file_path"
-	# echo "file path -- $file_path"
-	# echo "$pr_number" > "$file_path"
-	# echo "file contents--"
-	# cat "$file_path"
-	# chmod 0777 $file_path
 }
 
 cleanup() {

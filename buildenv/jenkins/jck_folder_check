@@ -22,11 +22,11 @@ timestamps{
                     userRemoteConfigs: [[url: "${gitConfig.getUrl()}"]]
                 ]
                 getJavaSDK()
-                def scriptPR=targetFolderCheck()
-                scriptPR=getSplitter(scriptPR)
-                if (scriptPR){
-                    createPRForScripts()
-                }
+                targetFolderCheck()
+                // scriptPR=getSplitter(scriptPR)
+                // if (scriptPR){
+                //     createPRForScripts()
+                // }
             } catch (Exception e) {
                 println("Exception: " + e.toString())
                 // build result may not be updated correctly at the moment (see https://issues.jenkins.io/browse/JENKINS-56402)
@@ -103,23 +103,23 @@ def targetFolderCheck(){
 
             if (grepResult == 0)  {
                 echo "New folders detected. Need to update playlist.xml'"
-                comment="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
-                scriptPR=udpateFolderCheck(logFile)
+                //comment="New folders detected. Need to update playlist.xml \\r\\n ``` ${commentBody} "
+                udpateFolderCheck(logFile)
             } else {
                 echo "No new folders detected. No need to update playlist.xml '"
-                comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
+                //comment="No new folders detected. No need to update playlist.xml \\r\\n ``` ${commentBody} "
                 }
             }
         }
-        createComment(comment)
-        return scriptPR
+        //createComment(comment)
+        //return scriptPR
     }
 }
 def udpateFolderCheck(file){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
-        return false
+        //return false
     } else {
         dir("${WORKSPACE}/aqa-tests/jck") {
             def logfile="${WORKSPACE}/aqa-tests/jck/jck_target_folder_check/$file"
@@ -128,13 +128,14 @@ def udpateFolderCheck(file){
             if (STATUS == 0){
                 def commit="update folder check "
                 def filePath='**/playlist.xml' 
-                pushChangesToRepo(commit, filePath,false)
+                pushChangesToRepo(commit, filePath)
+
             } else {
                 echo "Update_jck_target_folder script resulted non zero return status."
-                return false
+                //return false
             }
         }
-    return true
+    //return true
     }
 }
 
@@ -142,11 +143,6 @@ def getSplitter(scriptPR){
     stage('Splitter') {
         dir("${WORKSPACE}/aqa-tests/jck/splitter") {
             def JDK_VERSION= params.JDK_VERSION
-            if (JDK_VERSION == "8") {
-                JDK_VERSION = "8d"
-            } else if (JDK_VERSION == "11"){
-                JDK_VERSION = "11a"
-            }
             def tempOutputFile = "SplitterOutput.txt"
             def SCRIPT = "./testUpdater.sh ${WORKSPACE} ${JDK_VERSION}"
             def response = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
@@ -158,9 +154,9 @@ def getSplitter(scriptPR){
                 def testClassList = match[0][1].split()
                 comment=" Splitter.sh resulted in new test groups.\\r\\n We need to create PR to update jck.mk file for below test group\\r\\n " 
                 comment+=testClassList.join(',')
-                filepath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
+                filePath= "${WORKSPACE}/aqa-tests/jck/jck${JDK_VERSION}.mk"
                 commit= "update jck.mk"
-                pushChangesToRepo(commit,filepath,scriptPR)
+                pushChangesToRepo(commit,filePath,scriptPR)
                 scriptPR=true
             } else {
                 comment =" No need to create PR to update jck.mk file."
@@ -171,12 +167,12 @@ def getSplitter(scriptPR){
     }
 }
 
-def pushChangesToRepo(commit,target,scriptPR){
+def pushChangesToRepo(commit,target){
     def ADOPTIUM_GIT_USER = params.ADOPTIUM_GIT_USER ?: ""
 
     if (ADOPTIUM_GIT_USER == "" || ADOPTIUM_GIT_USER == null){
         echo "No PR will be created as ADOPTIUM_GIT_USER value is null. "
-        return false
+        //return false
     } else {
         sshagent(credentials:["${params.ADOPTIUM_SSH_CREDS}"], ignoreMissing: true){
             dir("${WORKSPACE}/aqa-tests/jck") {
