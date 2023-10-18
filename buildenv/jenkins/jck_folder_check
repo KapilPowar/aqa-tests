@@ -233,43 +233,14 @@ def createPRForScripts() {
                             "base": "jcksync-copy"
                         }'
                     """
-                    // def response = sh(script: CURL_COMMAND, returnStdout: true)
-                    // def matcher = (response =~ /"number":\s*(\d+)/)
-                    // def prNumber = matcher ? matcher[0][1] : null
-                    // prURL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
-                    //comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
-                    //createComment(comment)
+                    def response = sh(script: CURL_COMMAND, returnStdout: true)
+                    def matcher = (response =~ /"number":\s*(\d+)/)
+                    def prNumber = matcher ? matcher[0][1] : null
+                    prURL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
+                    comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
+                    echo "${comment}"
                     }
                 }
-            }
-        }
-    }
-}
-
-def createComment(comment) {
-    withCredentials([
-        string(credentialsId: "${params.GIT_CREDENTIALS}",variable: 'GIT_CREDENTIALS')
-    ]) {
-        def PR_NUMBER = params.PR_NUMBER ?:0
-        if (PR_NUMBER == 0){
-            echo "No PR created to comment"
-        }else{
-            def DOMAIN = params.JCK_GIT_REPO.split(/[@:]/)
-            def REPO = DOMAIN[2].split('\\.')
-            def COMMENT_URL="https://${DOMAIN[1]}/api/v3/repos/${REPO[0]}/issues/${PR_NUMBER}/comments"
-            def PR_URL="https://${DOMAIN[1]}/${REPO[0]}/pull/${PR_NUMBER}"
-            echo ("${comment}")
-            def CURL_COMMAND = """
-                curl -X POST -H "Authorization: token \"\$GIT_CREDENTIALS\"" \\
-                -d '{
-                "body":"${comment}"
-                }' "$COMMENT_URL"
-            """
-            def STATUS = sh(script: CURL_COMMAND, returnStatus: true, returnStdout: true)
-            if (STATUS == 0) {
-                echo ("Comment added successfully to PR ${PR_URL} ")
-            } else {
-                error ("Failed to add a comment to PR ${PR_URL} ")
             }
         }
     }

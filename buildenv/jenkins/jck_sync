@@ -161,7 +161,6 @@ def syncJckMaterial(){
                                     childParams << string(name: param.key, value: value)
                                 }
                         }
-            childParams << string(name: 'PR_NUMBER', value: PR_NUMBER)
             echo "$childParams"
             def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
             def comment="${CHILD_JOB_NAME} Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
