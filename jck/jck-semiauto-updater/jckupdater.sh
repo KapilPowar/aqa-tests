@@ -356,7 +356,7 @@ test() {
 	echo "Inside jckupdater script"
 	response='{
 	"url": "https://github.ibm.com/api/v3/repos/kapil-powar/JCK8-unzipped/pulls/4",
-	"number": 4,
+	"number": 8,
 	"id": 12262634
 	}'
 	echo "Response -- $response"
