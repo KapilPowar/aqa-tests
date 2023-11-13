@@ -4,6 +4,7 @@ timestamps{
     stage('Setup') {
         def SYNC_LABEL = params.SYNC_LABEL ?: "ci.role.test&&hw.arch.x86&&sw.os.linux"
         println "SYNC_LABEL: ${SYNC_LABEL}"
+        def SPEC = 'linux_x86'
         node(SYNC_LABEL) {
             echo "clone the SCM GIT repo"
                 try {
