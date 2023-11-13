@@ -150,29 +150,29 @@ def syncJckMaterial(){
 
         stage( 'Scripts'){
             //RESOLVED_MAKE = "if [ `uname` = AIX ] || [ `uname` = SunOS ] || [ `uname` = *BSD ]; then MAKE=gmake; else MAKE=make; fi"
-            env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
-            echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
-            String tearDownCmd = "make -f ./aqa-tests/TKG/testEnv.mk testEnvTeardown"
-            //String makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $env.target"
-            //unset LD_LIBRARY_PATH workaround for issue https://github.com/adoptium/infrastructure/issues/2934
-            TARGET = "${params.TARGET}";
-            wrap([$class: 'Xvfb', autoDisplayName: true, timeout:10]) {
-					def DISPLAY = sh (
-							script: 'ps -f  | grep \'[X]vfb\' | awk \'{print \$9}\'',
-							returnStdout: true
-					).trim()
-					env.DISPLAY = "${DISPLAY}"
-					echo "env.DISPLAY is ${env.DISPLAY}"
-                    makeTestCmd = "cd ./aqa-tests/TKG; make $TARGET"
-					//makeTest("${RUNTEST_CMD}")
-				}
+            // env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
+            // echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
+            // String tearDownCmd = "make -f ./aqa-tests/TKG/testEnv.mk testEnvTeardown"
+            // //String makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $env.target"
+            // //unset LD_LIBRARY_PATH workaround for issue https://github.com/adoptium/infrastructure/issues/2934
+            // TARGET = "${params.TARGET}";
+            // wrap([$class: 'Xvfb', autoDisplayName: true, timeout:10]) {
+			// 		def DISPLAY = sh (
+			// 				script: 'ps -f  | grep \'[X]vfb\' | awk \'{print \$9}\'',
+			// 				returnStdout: true
+			// 		).trim()
+			// 		env.DISPLAY = "${DISPLAY}"
+			// 		echo "env.DISPLAY is ${env.DISPLAY}"
+            //         makeTestCmd = "cd ./aqa-tests/TKG; make $TARGET"
+			// 		//makeTest("${RUNTEST_CMD}")
+			// 	}
 
-            try {
-                sh "$tearDownCmd"
-                sh "$makeTestCmd"
-            } catch (err) {
-                currentBuild.result = 'UNSTABLE'
-            }
+            // try {
+            //     sh "$tearDownCmd"
+            //     sh "$makeTestCmd"
+            // } catch (err) {
+            //     currentBuild.result = 'UNSTABLE'
+            // }
 
             def CHILD_JOB_NAME="Folder_Check"
             def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
@@ -186,9 +186,9 @@ def syncJckMaterial(){
                                 }
                         }
             //echo "$childParams"
-            // def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
-            // def comment="${CHILD_JOB_NAME} Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
-            // createComment(comment,PR_NUMBER)
+            def buildInfo = build job: CHILD_JOB_NAME, parameters: childParams
+            def comment="${CHILD_JOB_NAME} Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+            createComment(comment,PR_NUMBER)
         }
 
         stage('Test') {
