@@ -45,6 +45,7 @@ ifeq ($(CYGWIN),1)
 endif
 
 JCK_VERSION_NUMBER = $(JDK_VERSION)
+JCK_GIT_BRANCH = kapil
 ifeq (8, $(JDK_VERSION))
    JCK_VERSION_NUMBER = 8d
 endif
