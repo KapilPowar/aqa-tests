@@ -94,7 +94,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 //script {
                 
-                //getJavaSDK()
+                getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
@@ -149,8 +149,9 @@ def syncJckMaterial(){
                 }
 
         stage( 'Scripts'){
-
-            String tearDownCmd = "make; \$MAKE -f ./aqa-tests/TKG/testEnv.mk testEnvTeardown"
+            //RESOLVED_MAKE = "if [ `uname` = AIX ] || [ `uname` = SunOS ] || [ `uname` = *BSD ]; then MAKE=gmake; else MAKE=make; fi"
+		
+            String tearDownCmd = "make -f ./aqa-tests/TKG/testEnv.mk testEnvTeardown"
             //String makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $env.target"
             //unset LD_LIBRARY_PATH workaround for issue https://github.com/adoptium/infrastructure/issues/2934
             TARGET = "${params.TARGET}";
@@ -161,7 +162,7 @@ def syncJckMaterial(){
 					).trim()
 					env.DISPLAY = "${DISPLAY}"
 					echo "env.DISPLAY is ${env.DISPLAY}"
-                    makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $TARGET"
+                    makeTestCmd = "cd ./aqa-tests/TKG; make $TARGET"
 					//makeTest("${RUNTEST_CMD}")
 				}
 
