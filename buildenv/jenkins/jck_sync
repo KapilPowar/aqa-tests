@@ -150,6 +150,28 @@ def syncJckMaterial(){
 
         stage( 'Scripts'){
 
+            String tearDownCmd = "make; \$MAKE -f ./aqa-tests/TKG/testEnv.mk testEnvTeardown"
+            //String makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $env.target"
+            //unset LD_LIBRARY_PATH workaround for issue https://github.com/adoptium/infrastructure/issues/2934
+            TARGET = "${params.TARGET}";
+            wrap([$class: 'Xvfb', autoDisplayName: true, timeout:10]) {
+					def DISPLAY = sh (
+							script: 'ps -f  | grep \'[X]vfb\' | awk \'{print \$9}\'',
+							returnStdout: true
+					).trim()
+					env.DISPLAY = "${DISPLAY}"
+					echo "env.DISPLAY is ${env.DISPLAY}"
+                    makeTestCmd = "make; cd ./aqa-tests/TKG; \$MAKE $TARGET"
+					//makeTest("${RUNTEST_CMD}")
+				}
+
+            try {
+                sh "$tearDownCmd"
+                sh "$makeTestCmd"
+            } catch (err) {
+                currentBuild.result = 'UNSTABLE'
+            }
+
             def CHILD_JOB_NAME="Folder_Check"
             def buildURL="${JENKINS_URL}job/${CHILD_JOB_NAME}/"
             def childParams = []
@@ -194,9 +216,9 @@ def syncJckMaterial(){
                             
                         }
                     //echo "$CHILD_PARAMS"
-                    def buildInfo = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
-                    def COMMENT="${CHILD_JOB_NAME} Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
-                    createComment(COMMENT,PR_NUMBER)
+                    // def buildInfo = build job: CHILD_JOB_NAME, parameters: CHILD_PARAMS
+                    // def COMMENT="${CHILD_JOB_NAME} Job [#${buildInfo.number}](${buildURL}${buildInfo.number}) completed with status: ${buildInfo.result}\\r\\n"
+                    //createComment(COMMENT,PR_NUMBER)
         //}
     }
 }
