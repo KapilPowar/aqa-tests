@@ -118,6 +118,9 @@ def syncJckMaterial(){
                                     EXITCODE = sh(script: "${SCRIPT} > ${tempOutputFile}",  returnStatus: true)
                                     //echo "EXITCODE= ${EXITCODE}"
                                     //def scriptOutput = readFile(tempOutputFile).trim()
+                                    def scriptOutput = readFile(tempOutputFile).trim()
+                                    echo "jckupdater script output:"
+                                    echo scriptOutput
                                     if (EXITCODE == 2) {
                                         //echo "script returned exit code 2, No new update available. The job is completed without further action. "
                                         // error "script returned exit code 2, No new update available. The job is completed without further action. "
@@ -127,9 +130,7 @@ def syncJckMaterial(){
                                         //exit
                                     } else if (EXITCODE == 0) {
                                         echo "script returned exit code 0, new update is available and PR is created, proceeding to Stage 2."
-                                        def scriptOutput = readFile(tempOutputFile).trim()
-                                        echo "jckupdater script output:"
-                                        echo scriptOutput
+                                        
                                         def matcher = (scriptOutput =~ /PR_NUMBER=\s*(\d+)/)
                                         PR_NUMBER = matcher ? matcher[0][1] : null
                                         if (PR_NUMBER == null || PR_NUMBER == 0) {
