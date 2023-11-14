@@ -96,7 +96,7 @@ def syncJckMaterial(){
         stage('JCKUpdater') {
                 //script {
                 
-                //getJavaSDK()
+                getJavaSDK()
 
                     //udpateFolderCheck()
                     //create_PR_for_scripts()
