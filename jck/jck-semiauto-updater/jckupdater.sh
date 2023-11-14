@@ -165,19 +165,20 @@ isLatestUpdate() {
 	echo "JCK_BUILD_ID - $JCK_WITHOUT_BACKSLASH"
 	GIT_URL="https://raw.github.ibm.com/runtimes/JCK$JCK_VERSION-unzipped/main/JCK-compiler-$JCK_FOLDER_SUFFIX/build.txt"
 
-	# curl -o "build.txt" $GIT_URL -H "Authorization: token $GIT_TOKEN"
-	# echo -e "JCK version in build.txt:\n$(cat build.txt)\n\n"
-	
-	# if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
-	# 	echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
-	# 	#clean up after testing
-	# 	cleanup
-	# 	exit 2
-	# else
+	echo "GIT_URL -- $GIT_URL"
+	curl -o "build.txt" $GIT_URL -H "Authorization: token $GIT_TOKEN"
+	echo -e "JCK version in build.txt:\n$(cat build.txt)\n\n"
+
+	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
+		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
+		#clean up after testing
+		cleanup
+		exit 2
+	else
 		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
 		get_JAVA_SDK
 		getJCKSources
-	#fi
+	fi
 }
 
 ## Download directly from given URL under current folder
