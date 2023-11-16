@@ -153,8 +153,8 @@ def syncJckMaterial(){
 
         stage( 'Scripts'){
 
-            // jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
-            // jenkinsfile.testBuild()
+            jenkinsfile = load "${WORKSPACE}/aqa-tests/buildenv/jenkins/JenkinsfileBase"
+            jenkinsfile.testBuild()
             //RESOLVED_MAKE = "if [ `uname` = AIX ] || [ `uname` = SunOS ] || [ `uname` = *BSD ]; then MAKE=gmake; else MAKE=make; fi"
             // env.TEST_JDK_HOME = "$WORKSPACE/openjdkbinary/j2sdk-image"
             // echo "TEST_JDK_HOME == ${env.TEST_JDK_HOME}"
