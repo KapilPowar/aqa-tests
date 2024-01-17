@@ -18,7 +18,9 @@ JCK_GIT_BRANCH="autoBranch"
 GIT_TOKEN=""
 JCK_FOLDER_SUFFIX=""
 GIT_EXCLUDE_API_URL="https://api.github.ibm.com/repos/runtimes"
-JAVA_SDK_PATH="$WORKSPACE/../../../../jdkbinary/j2sdk-image"
+#JAVA_SDK_PATH="$WORKSPACE/../../../../jdkbinary/j2sdk-image" -- changed only for jdk22
+JAVA_SDK_PATH="$WORKSPACE/../../../../openjdkbinary/j2sdk-image"
+#/home/jenkins/workspace/JCK_Sync/aqa-tests/../openjdkbinary/j2sdk-image/bin/java
 
 usage ()
 {
