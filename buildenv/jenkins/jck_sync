@@ -90,10 +90,16 @@ def syncJckMaterial(){
     //     //echo "Extracted number: $env.JDK_VERSION"
     //     def JCK_VERSION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}": ""
     //     echo "${JCK_VERSION}"
+    // def JCK_VERSION_OPTION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
+    // def JCK_GIT_BRANCH_OPTION = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
+    // def ARTIFACTORY_URL_OPTION = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+    // def JCK_GIT_REPO_OPTION = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
     def JCK_VERSION_OPTION = params.JDK_VERSION ? "-j ${params.JDK_VERSION}": ""
     def JCK_GIT_BRANCH_OPTION = params.JCK_GIT_BRANCH ? "-gb ${params.JCK_GIT_BRANCH}": ""
     def ARTIFACTORY_URL_OPTION = params.ARTIFACTORY_URL ? "-au ${params.ARTIFACTORY_URL}": ""
+    def ARTIFACTORY_API_URL_OPTION = params.ARTIFACTORY_API_URL ? "-ap ${params.ARTIFACTORY_API_URL}": ""
     def JCK_GIT_REPO_OPTION = params.JCK_GIT_REPO ? "-repo ${params.JCK_GIT_REPO}": ""
+    def GIT_EXCLUDE_API_URL_OPTION = params.GIT_EXCLUDE_API_URL ? "-eu ${params.GIT_EXCLUDE_API_URL}": ""
     //def PR_NUMBER = 0
         def EXITCODE = 1
         def PR_NUMBER=0
@@ -114,7 +120,7 @@ def syncJckMaterial(){
                             dir("${WORKSPACE}/aqa-tests/jck/jck-semiauto-updater"){
                             //dir("${currentDirectory}/aqa-tests/jck/jck-semiauto-updater") {
                                 sshagent(credentials:["${params.USER_CREDENTIALS_ID}"], ignoreMissing: true){
-                                    def SCRIPT = "./jckupdater.sh ${JCK_VERSION_OPTION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO_OPTION}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL_OPTION}  ${JCK_GIT_BRANCH_OPTION} "
+                                    def SCRIPT = "./jckupdater.sh ${JCK_VERSION_OPTION} -at  \"\$ARTIFACTORY_CREDENTIALS\" ${JCK_GIT_REPO_OPTION}  -gt \"\$GIT_CREDENTIALS\"  ${ARTIFACTORY_URL_OPTION} ${ARTIFACTORY_API_URL_OPTION} ${JCK_GIT_BRANCH_OPTION} ${GIT_EXCLUDE_API_URL_OPTION} "
                                     //echo "${SCRIPT}"
                                     def tempOutputFile = "temp_output.txt"
                                     //create a temp output file 
