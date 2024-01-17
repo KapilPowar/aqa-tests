@@ -24,7 +24,7 @@ split()
 	
 	testPathPrefix=$3
     numOfIndices=numOfGrps+1; 
-    lastPrefix=$(echo "$testPathPrefix" | awk -F'/' '{print $NF}')
+    lastPrefix=$(echo "$testPathPrefix" | awk -F'/' '{print $NF}' | tr '[:lower:]' '[:upper:]')
 	firstPrefix=$(echo "$pathPrefix" | awk -F'/' '{print $1}' | tr '[:lower:]' '[:upper:]')
 	# if [[ "$path" =~ JCK-compiler ]]; then
 	# 	folderName="COMPILER"

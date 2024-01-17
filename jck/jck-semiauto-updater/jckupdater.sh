@@ -97,9 +97,10 @@ setup(){
 	fi
 	echo "JCK_FOLDER_SUFFIX=" $JCK_FOLDER_SUFFIX
 	#check if given ARTIFACTORY_DOWNLOAD_URL is complete till JCK/tck to download material
-	if ! echo "$ARTIFACTORY_DOWNLOAD_URL" | grep -q "${JCK}/tck/"; then
-		ARTIFACTORY_DOWNLOAD_URL="${ARTIFACTORY_DOWNLOAD_URL}/${JCK}/tck/"
-	fi
+	# if ! echo "$ARTIFACTORY_DOWNLOAD_URL" | grep -q "${JCK}/tck/"; then
+	ARTIFACTORY_DOWNLOAD_URL="${ARTIFACTORY_DOWNLOAD_URL}/${JCK}/"
+	ARTIFACTORY_API_URL="https://eu.artifactory.swg-devops.com/artifactory/api/storage/jim-jck-generic-local/${JCK}/exc/"
+	# fi
 
 	echo "ARTIFACTORY_DOWNLOAD_URL=$ARTIFACTORY_DOWNLOAD_URL"
 
@@ -141,7 +142,8 @@ executeCmdWithRetry()
 
 
 list() {
-	file_list=$(curl -ks -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} "${ARTIFACTORY_DOWNLOAD_URL}")
+	url="$1"
+	file_list=$(curl -ks -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} "${url}")
 
 	# Use grep to filter out the content within <a href=""> tags
 	file_names=$(echo "$file_list" | grep -o '<a href="[^"]*">' | sed 's/<a href="//;s/">//')	
@@ -149,8 +151,8 @@ list() {
 
 isLatestUpdate() {
 	cd $WORKSPACE/jckmaterial
-	
-	list # get the JCK update number from artifactory
+	url=${ARTIFACTORY_DOWNLOAD_URL}tck/
+	list "$url" # get the JCK update number from artifactory
 	last_file=""
 		for file in $file_names; do
     		last_file="$file"
@@ -168,47 +170,119 @@ isLatestUpdate() {
 	echo "GIT_URL -- $GIT_URL"
 	curl -o "build.txt" $GIT_URL -H "Authorization: token $GIT_TOKEN"
 	echo -e "JCK version in build.txt:\n$(cat build.txt)\n\n"
+	
+	#check if latest exclude file is available 
+	getExcludeFiles
+	exclude_files=$?
+	echo "exclude_files available== $exclude_files"
 
-	if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
+	result=$(grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; echo $?)
+	echo "result == $result"
+
+	if [ $result -eq 0 ] && [ $exclude_files -eq 0 ]; then
+	#if grep -q "$JCK_WITHOUT_BACKSLASH" build.txt; then
 		echo " JCK$JCK_VERSION material is $JCK_WITHOUT_BACKSLASH in the repo $GIT_URL. It is up to date. No need to pull changes"
 		#clean up after testing
 		cleanup
 		exit 2
 	else
-		echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
-		get_JAVA_SDK
-		getJCKSources
+		if [ $result -ne 0 ]; then
+			echo " JCK$JCK_VERSION $JCK_WITHOUT_BACKSLASH is latest and not in the repo $GIT_URL... Please proceed with download"
+			get_JAVA_SDK
+		else 
+			echo " Latest exclude files are available for JCK$JCK_VERSION"
+		fi
+		getJCKSources 
 	fi
 }
 
+getLastModifiedForFile() {
+    file="$1"
+    curl -s -H "X-JFrog-Art-Api:$ARTIFACTORY_TOKEN" "$ARTIFACTORY_API_URL$file" | awk -F'"' '/lastModified/ {print $4}'
+}
+
+getExcludeFiles(){
+	github_last_modified=$(curl -s -H "Authorization: token $GIT_TOKEN" "https://api.github.ibm.com/repos/runtimes/JCK$JCK_VERSION-unzipped/commits?path=excludes/jck$JCK_FOLDER_SUFFIX.jtx" | awk -F'"date":' '{if(NF>1){gsub(/[",]/,"",$2); print $2; exit}}') 
+	github_date_only=$(date -u -d "${github_last_modified}" "+%Y-%m-%d")
+	echo "Last Modified Time in GitHub: $github_last_modified"
+	
+	echo "ARTIFACTORY_API_URL "$ARTIFACTORY_API_URL
+	artifactory_file_list=$(curl -s -H "X-JFrog-Art-Api:$ARTIFACTORY_TOKEN" "$ARTIFACTORY_API_URL" -s | \
+    awk -F'"uri" : "' '/"uri" : "\// { gsub(/".*$/, "", $2); print $2 }' | \
+    awk '{gsub(/^\//, ""); print}' | \
+    grep -v '/$' )
+
+	declare -a last_modified_dates
+	declare -a file_last_modified
+
+	echo "List of Files in Artifactory:"
+	echo "$artifactory_file_list"
+
+	IFS=' ' read -ra files <<< "$artifactory_file_list"
+
+	for file in "${files[@]}"; do
+		last_modified_date=$(getLastModifiedForFile "$file")
+        artifactory_date_only=$(date -d "${last_modified_date%%T*}" "+%Y-%m-%d")
+        month=$((10#${artifactory_date_only:5:2}))
+        artifactory_date="${artifactory_date_only:0:5}${month}${artifactory_date_only:7}"
+        last_modified_dates+=("$artifactory_date")
+        file_last_modified["$artifactory_date"]=$file
+	done
+
+	latest_artifactory_last_modified=$(printf "%s\n" "${last_modified_dates[@]}" | sort -r | head -n 1)
+	latest_file_name="${file_last_modified[$latest_artifactory_last_modified]}"
+	echo "Last Modified Time in artifactory: $latest_artifactory_last_modified"
+	echo "File Name: $latest_file_name"
+	
+	echo "Last Modified Date in GitHub: ${github_date_only}"
+	echo "Last Modified Date in Artifactory: ${latest_artifactory_last_modified}"
+
+	# Compare and find the latest last modified date
+	if [[ "${github_date_only}" > "${latest_artifactory_last_modified}" ]]; then
+		echo "No need to update exclude files : ${github_date_only} (GitHub)"
+		return 0
+	else
+		echo "Update exclude file with $latest_file_name: ${latest_artifactory_last_modified} (Artifactory)"
+		return 1
+	fi
+
+}
 ## Download directly from given URL under current folder
 getJCKSources() {
 	cd $WORKSPACE/jckmaterial
 	echo "remove build.txt file after comparison"
 	rm -rf build.txt
 	echo "download jck materials..."
-	
-	ARTIFACTORY_DOWNLOAD_URL=$ARTIFACTORY_DOWNLOAD_URL$JCK_UPDATE_NUMBER
-	echo $ARTIFACTORY_DOWNLOAD_URL
+	#download latest exclude file
+	if [ $exclude_files -eq 1 ]; then
+		executeCmdWithRetry "${latest_file_name##*/}" "_ENCODE_FILE_NEW=UNTAGGED curl -OLJSk -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} ${ARTIFACTORY_DOWNLOAD_URL}exc/$latest_file_name"
+		unzip -o $latest_file_name
+		#ls -la
+	fi
 
-	list #get list of files to download
-	
-	IFS=$'\n' read -r -d '' -a file_names_array <<< "$file_names"
+	if [ $result -ne 0 ]; then
+		ARTIFACTORY_DOWNLOAD_URL=${ARTIFACTORY_DOWNLOAD_URL}tck/$JCK_UPDATE_NUMBER
+		echo $ARTIFACTORY_DOWNLOAD_URL
 
-	if [ "${ARTIFACTORY_DOWNLOAD_URL}" != "" ]; then
-		for file in "${file_names_array[@]:1}"; do
-			url="$ARTIFACTORY_DOWNLOAD_URL$file"
-			executeCmdWithRetry "${file##*/}" "_ENCODE_FILE_NEW=UNTAGGED curl -OLJSk -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} $url"
+		list "$ARTIFACTORY_DOWNLOAD_URL" #get list of files to download
+		
+		IFS=$'\n' read -r -d '' -a file_names_array <<< "$file_names"
 
-			rt_code=$?
-			if [ $rt_code != 0 ]; then
-				echo "curl error code: $rt_code"
-				echo "Failed to retrieve $file. This is what we received of the file and MD5 sum:"
-				ls -ld $file
+		if [ "${ARTIFACTORY_DOWNLOAD_URL}" != "" ]; then
+			for file in "${file_names_array[@]:1}"; do
+				url="$ARTIFACTORY_DOWNLOAD_URL$file"
+				executeCmdWithRetry "${file##*/}" "_ENCODE_FILE_NEW=UNTAGGED curl -OLJSk -H X-JFrog-Art-Api:${ARTIFACTORY_TOKEN} $url"
 
-				exit 1
-			fi
-		done	
+				rt_code=$?
+				if [ $rt_code != 0 ]; then
+					echo "curl error code: $rt_code"
+					echo "Failed to retrieve $file. This is what we received of the file and MD5 sum:"
+					ls -ld $file
+
+					exit 1
+				fi
+			done	
+		fi
 	fi
 }
 
@@ -225,23 +299,24 @@ get_JAVA_SDK(){
 #Unpack downloaded jar files 
 extract() {
 	cd $WORKSPACE/jckmaterial
-	
-  	echo "install downloaded resources"
+	if [ $result -ne 0 ]; then
+		echo "install downloaded resources"
 
-	for f in $WORKSPACE/jckmaterial/*.jar; do
-		echo "Unpacking $f:"
-		
-		#using default java on machine for local
-		if [[ $JAVA_HOME != "" ]] ; then
-			$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
-		else
-			$JAVA_SDK_PATH/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
-		fi
+		for f in $WORKSPACE/jckmaterial/*.jar; do
+			echo "Unpacking $f:"
+			
+			#using default java on machine for local
+			if [[ $JAVA_HOME != "" ]] ; then
+				$JAVA_HOME/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
+			else
+				$JAVA_SDK_PATH/bin/java -jar $f -install shell_scripts -o $WORKSPACE/unpackjck
+			fi
 
-	done
-	cd $WORKSPACE/unpackjck
-	ls -la
-	echo "completed unpack of jck resources"
+		done
+		cd $WORKSPACE/unpackjck
+		ls -la
+		echo "completed unpack of jck resources"
+	fi
 }
 
 #Clone GIT branch.
@@ -270,18 +345,20 @@ copyFilestoGITRepo() {
 	rm -rf natives
 	echo "copy unpacked JCK files from $WORKSPACE/unpackjck to local GIT dir $GIT_REPO"
 
-	cd $WORKSPACE/unpackjck
-	for file in $WORKSPACE/unpackjck/*; do
-		echo $file
-		cp -rf $file $GIT_REPO
-	done
+	if [ $result -ne 0 ]; then
+		cd $WORKSPACE/unpackjck
+		for file in $WORKSPACE/unpackjck/*; do
+			echo $file
+			cp -rf $file $GIT_REPO
+		done
+	fi
 
 	#copy remaining file like .jtx, .kfl .html to GIT Repo
 	for file in $WORKSPACE/jckmaterial/*; do
 		if [[ "$file" != *.zip ]] && [[ "$file" != *.gz* ]] && [[ "$file" != *.jar ]];then
 			if [[ "$file" == *.kfl* ]]  || [[ "$file" == *.jtx* ]]; then
 				echo "Copy $file to $GIT_REPO"
-				cp -rf $file $GIT_REPO/excludes
+				mkdir -p $GIT_REPO/excludes && cp -rf $file $GIT_REPO/excludes
 			else
 	 			cp -rf $file $GIT_REPO
 			fi
@@ -385,9 +462,9 @@ if [ "$JCK_VERSION" != "" ] && [ "$JCK_GIT_REPO" != "" ] && [ "$GIT_TOKEN" != ""
 	setup
 	isLatestUpdate
 	extract
-	gitClone
-	copyFilestoGITRepo
-	checkChangesAndCommit
+	#gitClone
+	#copyFilestoGITRepo
+	#checkChangesAndCommit
 	cleanup
 	#test
 else 
