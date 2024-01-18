@@ -38,7 +38,10 @@ timestamps{
                     println("Exception: " + e.toString())
                     currentBuild.result = 'FAILURE'
                 }
-            }
+            } finally {
+                    timeout(time: 1, unit: 'HOURS') {
+                        forceCleanWS()
+                    }
         }
     }
 }
@@ -223,7 +226,7 @@ def createPRForScripts() {
                     //-d "{"title":"$title","body":"$body","head":\"KapilPowar:test\",\"base\":\"jcksync-copy"}" \
                     //change base branch to adoptium main branch
                     def CURL_COMMAND = """
-                        curl -X POST -H "Authorization: token \"\$ADOPTIUM_GIT_TOKEN\"" \\
+                        curl -X POST -H 'Authorization: token \"\$ADOPTIUM_GIT_TOKEN\"' \\
                         -H "Content-Type: application/json" \\
                         -d '{
                             "title": "${title}",
@@ -236,8 +239,8 @@ def createPRForScripts() {
                     def matcher = (response =~ /"number":\s*(\d+)/)
                     def prNumber = matcher ? matcher[0][1] : null
                     prURL= "https://github.com/${ADOPTIUM_GIT_USER}/aqa-tests/pull/"
-                    //comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
-                    //echo "${comment}"
+                    comment=" PR #[${(prNumber)}](${prURL}${(prNumber)}) is created with changes in jck.mk and playlist.xml file .. "
+                    echo "${comment}"
                     }
                 }
             }
