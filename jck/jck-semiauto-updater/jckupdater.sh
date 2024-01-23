@@ -18,8 +18,8 @@ JCK_GIT_BRANCH="autoBranch"
 GIT_TOKEN=""
 JCK_FOLDER_SUFFIX=""
 GIT_EXCLUDE_API_URL="https://api.github.ibm.com/repos/runtimes"
-#JAVA_SDK_PATH="$WORKSPACE/../../../../jdkbinary/j2sdk-image" -- changed only for jdk22
-JAVA_SDK_PATH="$WORKSPACE/../../../../openjdkbinary/j2sdk-image"
+JAVA_SDK_PATH="$WORKSPACE/../../../../jdkbinary/j2sdk-image" # -- changed only for jdk22
+#JAVA_SDK_PATH="$WORKSPACE/../../../../openjdkbinary/j2sdk-image"
 #/home/jenkins/workspace/JCK_Sync/aqa-tests/../openjdkbinary/j2sdk-image/bin/java
 
 usage ()
@@ -221,7 +221,7 @@ getExcludeFiles() {
 		echo "Last Modified Date in Artifactory: ${formatted_date}"
 
 		# Compare and find the latest last modified date only if file is present in github. Else update exclude file
-		if [[ -n "${github_last_modified}" && "${github_date_only}" > "${formatted_date}" ]]; then
+		if [[ -n "${github_last_modified}" && "${github_date_only}" >= "${formatted_date}" ]]; then
 			echo "No need to update exclude file in GitHub"
 			return 1
 		else
