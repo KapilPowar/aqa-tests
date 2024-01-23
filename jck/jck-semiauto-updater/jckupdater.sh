@@ -219,6 +219,7 @@ getExcludeFiles() {
 		echo "Latest exclude file: $latest_file_name"
 		echo "Last Modified Date in GitHub: ${github_date_only}"
 		echo "Last Modified Date in Artifactory: ${formatted_date}"
+		echo "github_last_modified: ${github_last_modified}"
 
 		# Compare and find the latest last modified date only if file is present in github. Else update exclude file
 		if [[ -n "${github_last_modified}" && "${github_date_only}" -ge "${formatted_date}" ]]; then
