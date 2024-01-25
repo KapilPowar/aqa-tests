@@ -339,8 +339,8 @@
 		<testCaseName>jck-runtime-api-signaturetest</testCaseName>
 		<disables>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
@@ -453,8 +453,8 @@
 				<impl>openj9</impl>
 			</disable>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
@@ -510,8 +510,8 @@
 				<impl>openj9</impl>
 			</disable>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
@@ -768,8 +768,8 @@
 				<impl>openj9</impl>
 			</disable>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
@@ -874,8 +874,8 @@
 		<testCaseName>jck-runtime-api-javax_imageio</testCaseName>
 		<disables>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
@@ -1329,8 +1329,8 @@
 		<testCaseName>jck-runtime-api-serializabletypes</testCaseName>
 		<disables>
 			<disable>
-				<comment>Disabled on aarch64_mac due to backlog/issues/1300.</comment>
-				<platform>aarch64_mac.*</platform>
+				<comment>Disabled on aarch64_mac and x86-64_mac due to backlog/issues/1300.</comment>
+				<platform>aarch64_mac.*|x86-64_mac.*</platform>
 				<impl>openj9</impl>
 			</disable>
 		</disables>
