@@ -38,10 +38,10 @@ timestamps{
                     println("Exception: " + e.toString())
                     currentBuild.result = 'FAILURE'
                 }
-            } finally {
-                    timeout(time: 1, unit: 'HOURS') {
-                        forceCleanWS()
-                    }
+            // } finally {
+            //         timeout(time: 1, unit: 'HOURS') {
+            //             forceCleanWS()
+            //         }
             }
         }
     }
