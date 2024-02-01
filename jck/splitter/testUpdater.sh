@@ -13,7 +13,7 @@ updateJCKmkFile(){
                     sourceKey=$(echo "$sourceLine" | cut -d '(' -f 1 | awk '{$1=$1};1')
                     if [[ "$sourceKey" == "$key"* ]]; then
                     # Replace the target line with the source line
-                    targetLine="   $sourceLine"
+                    targetLine="$sourceLine"
                     break  # No need to check the remaining lines in the source file
                     fi
                 fi
